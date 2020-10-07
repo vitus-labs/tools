@@ -1,7 +1,11 @@
 {
   "name": "@vitus-labs/tools-typescript",
   "version": "0.1.0",
-  "private": true,
+  "license": "MIT",
+  "author": "Vit Bokisch <vit@bokisch.com>",
+  "maintainers": [
+    "Vit Bokisch <vit@bokisch.com>"
+  ],
   "main": "./index.json",
   "module": "./index.json",
   "files": [
