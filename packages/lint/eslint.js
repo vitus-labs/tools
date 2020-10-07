@@ -74,16 +74,4 @@ module.exports = {
       { extensions: ['.js', '.jsx', '.ts', '.tsx'] },
     ],
   },
-  overrides: [
-    {
-      files: ['*.md'],
-      processor: 'markdown/markdown',
-    },
-    {
-      files: ['**/*.md/*.js'],
-      rules: {
-        strict: 'off',
-      },
-    },
-  ],
 }
