@@ -11,6 +11,9 @@
   "files": [
     "./index.js"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@babel/core": "^7.10.4",
     "@babel/plugin-proposal-class-properties": "^7.10.4",

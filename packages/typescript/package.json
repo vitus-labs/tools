@@ -12,6 +12,9 @@
     "index.json",
     "nextjs.json"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "peerDependencies": {
     "typescript": "*"
   },

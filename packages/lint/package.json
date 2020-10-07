@@ -12,6 +12,9 @@
     "style.js",
     "eslint.js"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "peerDependencies": {
     "prettier": "*"
   },
