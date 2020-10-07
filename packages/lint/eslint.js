@@ -6,7 +6,7 @@ module.exports = {
     es6: true,
   },
   parser: '@typescript-eslint/parser',
-  plugins: ['react', '@typescript-eslint', 'prettier', 'markdown'],
+  plugins: ['react', '@typescript-eslint', 'prettier'],
   parserOptions: {
     ecmaFeatures: {
       jsx: true,
@@ -15,6 +15,9 @@ module.exports = {
     sourceType: 'module',
   },
   extends: [
+    'plugin:import/errors',
+    'plugin:import/warnings',
+    'plugin:import/typescript',
     'plugin:react/recommended',
     'plugin:prettier/recommended',
     'plugin:@typescript-eslint/eslint-recommended',
@@ -32,6 +35,9 @@ module.exports = {
       node: {
         extensions: ['.js', '.jsx', '.ts', '.tsx'],
       },
+      typescript: {
+        directory: ['./tsconfig.json'],
+      },
     },
   },
   rules: {
@@ -46,10 +52,14 @@ module.exports = {
       },
     ],
     'prettier/prettier': 'error',
-    'no-use-before-define': 'off',
     'no-unused-vars': 'off',
     'no-useless-constructor': 'off',
     'no-shadow': 'off',
+    'no-use-before-define': 'off', // is being used @typescript-eslint/no-use-before-define
+    'no-param-reassign': [
+      'error',
+      { props: true, ignorePropertyModificationsFor: ['self'] },
+    ],
     '@typescript-eslint/no-useless-constructor': 'error',
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/no-unused-vars': 'error',
@@ -62,13 +72,13 @@ module.exports = {
         },
         singleline: {
           delimiter: 'semi',
-          requireLast: false,
+          requireLast: true,
         },
       },
     ],
     'react/require-default-props': 'off',
-    'react/jsx-props-no-spreading': 'off',
     'react/prop-types': 'off',
+    'react/jsx-props-no-spreading': 'off',
     'react/jsx-filename-extension': [
       1,
       { extensions: ['.js', '.jsx', '.ts', '.tsx'] },
