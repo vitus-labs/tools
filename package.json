@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "description": "Pre-configured tooling for development",
-  "author": "Vit Bokisch <vit@bokisch.cz>",
+  "author": "Vit Bokisch <vit@bokisch.com>",
   "license": "MIT",
   "homepage": "https://github.com/vitus-labs/tools#readme",
   "repository": "git@github.com:vitus-labs/tools.git",
@@ -14,6 +14,9 @@
     "packages": [
       "packages/*"
     ]
+  },
+  "scripts": {
+    "release": "lerna publish"
   },
   "devDependencies": {
     "lerna": "^3.22.1",
