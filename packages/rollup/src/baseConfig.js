@@ -1,6 +1,11 @@
 module.exports = {
   sourceDir: 'src',
   typescript: true,
+  visualise: {
+    template: 'network',
+    gzipSize: true,
+  },
+  filesize: true,
   extensions: ['.js', '.jsx', '.ts', '.tsx', '.es6', '.es', '.mjs'],
   exclude: [
     '*.d.ts',

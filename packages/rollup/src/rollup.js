@@ -1,6 +1,7 @@
 const typescript = require('rollup-plugin-typescript2')
 const resolve = require('@rollup/plugin-node-resolve').default
 const filesize = require('rollup-plugin-filesize')
+const visualizer = require('rollup-plugin-visualizer')
 const replace = require('@rollup/plugin-replace')
 const { terser } = require('rollup-plugin-terser')
 const babel = require('rollup-plugin-babel')
@@ -9,7 +10,7 @@ const baseConfig = require('./baseConfig')
 
 const CONFIG = loadConfig(baseConfig)
 
-const loadPlugins = ({ env, platform, typings }) => {
+const loadPlugins = ({ env, platform, typings, file }) => {
   const babelConfig = {
     extensions: CONFIG.extensions,
     include: [CONFIG.sourceDir],
@@ -27,7 +28,7 @@ const loadPlugins = ({ env, platform, typings }) => {
     },
   }
 
-  const config = {
+  const replaceOptions = {
     'process.env.NODE_ENV': JSON.stringify(env),
     __VERSION__: JSON.stringify(PKG.version),
     __SERVER__: JSON.stringify(
@@ -52,20 +53,37 @@ const loadPlugins = ({ env, platform, typings }) => {
     plugins.push(typescript(tsConfig))
   }
 
-  plugins.push(replace(config))
+  plugins.push(replace(replaceOptions))
   plugins.push(babel(babelConfig))
+
+  // generate visualised graphs in dist folder
+  if (CONFIG.visualise) {
+    const filePath = file.split('/')
+    const fileName = filePath.pop()
+
+    const visualiserOptions = {
+      title: `${PKG.name} - ${fileName}`,
+      filename: `${filePath.join('/')}/analysis/${fileName}.html`,
+      template: CONFIG.visualise.template,
+      gzipSize: CONFIG.visualise.gzipSize,
+    }
+
+    plugins.push(visualizer(visualiserOptions))
+  }
 
   if (env === 'production') {
     plugins.push(terser())
   }
 
-  plugins.push(filesize())
+  if (CONFIG.filesize) {
+    plugins.push(filesize())
+  }
 
   return plugins
 }
 
 const rollupConfig = ({ file, format, env, typings, platform }) => {
-  const plugins = loadPlugins({ env, typings, platform })
+  const plugins = loadPlugins({ file, env, typings, platform })
 
   return {
     input: CONFIG.sourceDir,
