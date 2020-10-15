@@ -7,7 +7,6 @@
     "Vit Bokisch <vit@bokisch.com>"
   ],
   "main": "./index.js",
-  "module": "./index.js",
   "files": [
     "./index.js",
     "./lib.js"
@@ -22,7 +21,6 @@
     "@babel/plugin-transform-react-jsx": "^7.10.4",
     "@babel/preset-env": "^7.10.4",
     "@babel/preset-react": "^7.10.4",
-    "@babel/preset-typescript": "^7.10.4",
-    "babel-loader": "^8.1.0"
+    "@babel/preset-typescript": "^7.10.4"
   }
 }

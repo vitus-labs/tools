@@ -9,7 +9,7 @@
   "main": "./index.js",
   "files": [
     "index.js",
-    "style.js",
+    "styles.js",
     "eslint.js"
   ],
   "publishConfig": {
