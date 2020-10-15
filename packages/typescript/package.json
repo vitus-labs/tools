@@ -10,6 +10,7 @@
   "module": "./index.json",
   "files": [
     "index.json",
+    "lib.json",
     "nextjs.json"
   ],
   "publishConfig": {
