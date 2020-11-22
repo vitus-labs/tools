@@ -5,6 +5,13 @@ module.exports = {
     node: true,
     es6: true,
   },
+  globals: {
+    __SERVER__: true,
+    __WEB__: true,
+    __BROWSER__: true,
+    __NATIVE__: true,
+    __CLIENT__: true,
+  },
   parser: '@typescript-eslint/parser',
   plugins: ['react', '@typescript-eslint', 'prettier'],
   parserOptions: {
