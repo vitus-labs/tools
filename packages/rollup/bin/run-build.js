@@ -27,12 +27,12 @@ const getBuildTypes = () => {
     main: {
       format: 'cjs',
       env: 'development',
-      platform: browserBuilds ? 'web' : undefined,
+      platform: browserBuilds ? 'browser' : undefined,
     },
     module: {
       format: 'es',
       env: 'development',
-      platform: browserBuilds ? 'web' : undefined,
+      platform: browserBuilds ? 'browser' : undefined,
     },
   }
 

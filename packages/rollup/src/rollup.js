@@ -31,20 +31,11 @@ const loadPlugins = ({ env, platform, typings, file }) => {
   const replaceOptions = {
     'process.env.NODE_ENV': JSON.stringify(env),
     __VERSION__: JSON.stringify(PKG.version),
-    __SERVER__: JSON.stringify(
-      platform ? platform === 'server' : 'typeof window === undefined'
-    ),
-    __BROWSER__: JSON.stringify(
-      platform ? platform === 'web' : 'typeof window !== undefined'
-    ),
-    __NATIVE__: JSON.stringify(
-      platform ? platform === 'native' : 'typeof window !== undefined'
-    ),
-    __CLIENT__: JSON.stringify(
-      platform
-        ? ['native', 'web'].includes(platform)
-        : 'typeof window !== undefined'
-    ),
+    __SERVER__: JSON.stringify(platform === 'server'),
+    __WEB__: JSON.stringify(['server', 'browser'].includes(platform)),
+    __BROWSER__: JSON.stringify(platform === 'browser'),
+    __NATIVE__: JSON.stringify(platform === 'native'),
+    __CLIENT__: JSON.stringify(['native', 'browser'].includes(platform)),
   }
 
   const plugins = [resolve({ extensions: CONFIG.extensions })]
