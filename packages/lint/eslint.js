@@ -79,7 +79,7 @@ module.exports = {
         },
         singleline: {
           delimiter: 'semi',
-          requireLast: true,
+          requireLast: false,
         },
       },
     ],
