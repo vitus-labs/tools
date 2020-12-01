@@ -1,7 +1,11 @@
 #!/usr/bin/env node
+const rimraf = require('rimraf')
 const rollup = require('rollup')
 const rollupConfig = require('../src/rollup')
-const { PKG } = require('../src/utils')
+const { PKG, loadConfig } = require('../src/utils')
+const baseConfig = require('../src/baseConfig')
+
+const CONFIG = loadConfig(baseConfig)
 
 // --------------------------------------------------------
 // GET BUILD TYPES from package.json
@@ -40,7 +44,7 @@ const getBuildTypes = () => {
     main: {
       format: 'cjs',
       env: 'development',
-      platform: shouldBuildBrowser ? undefined : 'server',
+      platform: shouldBuildBrowser ? undefined : 'web',
     },
     module: {
       format: 'es',
@@ -105,7 +109,7 @@ async function build({ inputOptions, outputOptions }) {
 // --------------------------------------------------------
 // SERIALIZE ALL BUILDS
 // --------------------------------------------------------
-const createBuilds = () => {
+const createBuilds = async () => {
   let p = Promise.resolve() // Q() in q
 
   // serialize builds
@@ -118,4 +122,17 @@ const createBuilds = () => {
   return p
 }
 
+// --------------------------------------------------------
+// (1) delete build folder first
+// --------------------------------------------------------
+console.log('[1/3] Cleaning up old build folder...')
+
+rimraf.sync(`${process.cwd()}/${CONFIG.outputDir}`)
+
+console.log('[2/3] Old build removed...')
+
+// --------------------------------------------------------
+// (2) build
+// --------------------------------------------------------
+console.log('[3/3] Generating builds...')
 createBuilds()

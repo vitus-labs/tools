@@ -1,4 +1,5 @@
 const typescript = require('rollup-plugin-typescript2')
+const ttypescript = require('ttypescript')
 const resolve = require('@rollup/plugin-node-resolve').default
 const filesize = require('rollup-plugin-filesize')
 const visualizer = require('rollup-plugin-visualizer')
@@ -10,26 +11,49 @@ const baseConfig = require('./baseConfig')
 
 const CONFIG = loadConfig(baseConfig)
 
+const defineExtensions = (platform) => {
+  const platformExtensions = []
+
+  if (['browser', 'server', 'web', 'native'].includes(platform)) {
+    CONFIG.extensions.forEach((item) => {
+      platformExtensions.push(`.${platform}${item}`)
+    })
+  }
+
+  return platformExtensions.concat(CONFIG.extensions)
+}
+
 const loadPlugins = ({ env, platform, typings, file }) => {
+  const extensions = defineExtensions(platform)
+
   const babelConfig = {
-    extensions: CONFIG.extensions,
+    extensions,
     include: [CONFIG.sourceDir],
     exclude: CONFIG.exclude,
   }
 
   const tsConfig = {
+    typescript: ttypescript,
     exclude: CONFIG.exclude,
     useTsconfigDeclarationDir: true,
     tsconfigDefaults: {
+      exclude: CONFIG.exclude,
+      include: CONFIG.include,
       compilerOptions: {
+        types: ['@vitus-labs/tools-rollup'],
         declaration: typings,
-        declarationDir: 'lib/types',
+        declarationDir: CONFIG.typesDir,
+        plugins: [
+          {
+            transform: '@zerollup/ts-transform-paths',
+            exclude: ['*'],
+          },
+        ],
       },
     },
   }
 
   const replaceOptions = {
-    'process.env.NODE_ENV': JSON.stringify(env),
     __VERSION__: JSON.stringify(PKG.version),
     __SERVER__: JSON.stringify(platform === 'server'),
     __WEB__: JSON.stringify(['server', 'browser'].includes(platform)),
@@ -38,7 +62,11 @@ const loadPlugins = ({ env, platform, typings, file }) => {
     __CLIENT__: JSON.stringify(['native', 'browser'].includes(platform)),
   }
 
-  const plugins = [resolve({ extensions: CONFIG.extensions })]
+  if (env === 'production') {
+    replaceOptions['process.env.NODE_ENV'] = JSON.stringify(env)
+  }
+
+  const plugins = [resolve({ extensions })]
 
   if (CONFIG.typescript) {
     plugins.push(typescript(tsConfig))
@@ -54,7 +82,9 @@ const loadPlugins = ({ env, platform, typings, file }) => {
 
     const visualiserOptions = {
       title: `${PKG.name} - ${fileName}`,
-      filename: `${filePath.join('/')}/analysis/${fileName}.html`,
+      filename: `${filePath.join('/')}/${
+        CONFIG.visualise.outputDir
+      }/${fileName}.html`,
       template: CONFIG.visualise.template,
       gzipSize: CONFIG.visualise.gzipSize,
     }
