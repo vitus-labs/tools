@@ -75,7 +75,7 @@ const createBrowserBuildVariants = () => {
     const output = value.substring(2) // strip './' from the beginning of path
 
     Object.keys(BASE_VARIANTS).forEach((item) => {
-      if (PKG[item] === source) {
+      if (PKG[item] === source && soure !== output) {
         result.push({
           ...BASE_VARIANTS[item],
           file: output,

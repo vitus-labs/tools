@@ -41,7 +41,7 @@ const createBuilds = async () => {
   return p
 }
 
-const runBuild = () => {
+const runBuild = async () => {
   // --------------------------------------------------------
   // (1) delete build folder first
   // --------------------------------------------------------
@@ -61,7 +61,12 @@ const runBuild = () => {
   log(
     `${chalk.bold.bgBlue.black('[3/4]')} ${chalk.blue('Generating builds...')}`
   )
-  createBuilds()
+
+  new Promise()
+    .then(() => createBuilds())
+    .then(() => {
+      log(`${chalk.bold.bgBlue.black('[4/4]')} ${chalk.blue('Done!')}`)
+    })
 }
 
 module.exports = runBuild

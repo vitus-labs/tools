@@ -41,8 +41,7 @@ const loadPlugins = ({ env, platform, typings, file }) => {
       include: CONFIG.include,
       compilerOptions: {
         types: ['@vitus-labs/tools-rollup'],
-        declaration: typings,
-        declarationDir: CONFIG.typesDir,
+        declaration: false,
         plugins: [
           {
             transform: '@zerollup/ts-transform-paths',
@@ -51,6 +50,11 @@ const loadPlugins = ({ env, platform, typings, file }) => {
         ],
       },
     },
+  }
+
+  if (typings) {
+    tsConfig.tsconfigDefaults.compilerOptions.declaration = typings
+    tsConfig.tsconfigDefaults.compilerOptions.declarationDir = CONFIG.typesDir
   }
 
   const replaceOptions = {
