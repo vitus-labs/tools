@@ -46,7 +46,9 @@ function createEslint({ projects = ['packages'], env = {}, globals = {} }) {
           extensions: ['.js', '.jsx', '.ts', '.tsx'],
         },
         typescript: {
-          project: projects.map((item) => `${item}/*/tsconfig.json'`),
+          project: (projects || ['packages']).map(
+            (item) => `${item}/*/tsconfig.json'`
+          ),
         },
       },
     },
