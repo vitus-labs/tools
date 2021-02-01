@@ -62,7 +62,7 @@ const runBuild = async () => {
     `${chalk.bold.bgBlue.black('[3/4]')} ${chalk.blue('Generating builds...')}`
   )
 
-  new Promise()
+  Promise.resolve()
     .then(() => createBuilds())
     .then(() => {
       log(`${chalk.bold.bgBlue.black('[4/4]')} ${chalk.blue('Done!')}`)
