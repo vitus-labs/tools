@@ -8,6 +8,8 @@ const createBuildPipeline = require('./utils')
 
 const { log } = console
 const CONFIG = loadConfig(baseConfig)
+const allBuilds = createBuildPipeline()
+const allBuildsCount = allBuilds.length
 
 // --------------------------------------------------------
 // BUILD rollup
@@ -25,15 +27,20 @@ const createBuilds = async () => {
   let p = Promise.resolve() // Q() in q
 
   // serialize builds
-  createBuildPipeline().forEach((item) => {
+  allBuilds.forEach((item, i) => {
     const { output, ...input } = rollupConfig(item)
 
-    p = p.then(() => build({ inputOptions: input, outputOptions: output }))
+    p = p.then(() => {
+      log(chalk.green(`🚧 Creating a build ${i}/${allBuildsCount}`))
+      return build({ inputOptions: input, outputOptions: output })
+    })
   })
 
   p.catch((e) => {
     log(
-      `${chalk.bold.bgRed.white('ERROR')} ${chalk.red('Something went wrong')}`
+      `${chalk.bold.bgRed.white('⚠️ ERROR')} ${chalk.red(
+        'Something went wrong'
+      )}`
     )
     log(e)
   })
@@ -47,25 +54,31 @@ const runBuild = async () => {
   // --------------------------------------------------------
   log(
     `${chalk.bold.bgBlue.black('[1/4]')} ${chalk.blue(
-      'Cleaning up old build folder...'
+      '🧹 Cleaning up old build folder...'
     )}`
   )
 
   rimraf.sync(`${process.cwd()}/${CONFIG.outputDir}`)
 
-  log(`${chalk.bold.bgBlue.black('[2/4]')} ${chalk.blue('Old build removed')}`)
+  log(
+    `${chalk.bold.bgBlue.black('[2/4]')} ${chalk.blue('🧻 Old build removed')}`
+  )
 
   // --------------------------------------------------------
   // (2) build
   // --------------------------------------------------------
   log(
-    `${chalk.bold.bgBlue.black('[3/4]')} ${chalk.blue('Generating builds...')}`
+    `${chalk.bold.bgBlue.black('[3/4]')} ${chalk.blue(
+      `💪 Generating ${allBuildsCount} builds in total...`
+    )}`
   )
+
+  log('\n')
 
   Promise.resolve()
     .then(() => createBuilds())
     .then(() => {
-      log(`${chalk.bold.bgBlue.black('[4/4]')} ${chalk.blue('Done!')}`)
+      log(`${chalk.bold.bgBlue.black('[4/4]')} ${chalk.blue('🎉 Done!')}`)
     })
 }
 
