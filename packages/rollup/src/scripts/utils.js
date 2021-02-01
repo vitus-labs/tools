@@ -100,4 +100,4 @@ const createBuildPipeline = () => {
   return result
 }
 
-module.exports = createBuildPipeline()
+module.exports = createBuildPipeline
