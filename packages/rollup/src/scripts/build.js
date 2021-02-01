@@ -31,7 +31,7 @@ const createBuilds = async () => {
     const { output, ...input } = rollupConfig(item)
 
     p = p.then(() => {
-      log(chalk.green(`🚧 Creating a build ${i}/${allBuildsCount}`))
+      log(chalk.green(`🚧  Creating a build ${i + 1}/${allBuildsCount}`))
       return build({ inputOptions: input, outputOptions: output })
     })
   })
@@ -54,14 +54,14 @@ const runBuild = async () => {
   // --------------------------------------------------------
   log(
     `${chalk.bold.bgBlue.black('[1/4]')} ${chalk.blue(
-      '🧹 Cleaning up old build folder...'
+      '✂️  Cleaning up old build folder...'
     )}`
   )
 
   rimraf.sync(`${process.cwd()}/${CONFIG.outputDir}`)
 
   log(
-    `${chalk.bold.bgBlue.black('[2/4]')} ${chalk.blue('🧻 Old build removed')}`
+    `${chalk.bold.bgBlue.black('[2/4]')} ${chalk.blue('☑️  Old build removed')}`
   )
 
   // --------------------------------------------------------
@@ -69,7 +69,7 @@ const runBuild = async () => {
   // --------------------------------------------------------
   log(
     `${chalk.bold.bgBlue.black('[3/4]')} ${chalk.blue(
-      `💪 Generating ${allBuildsCount} builds in total...`
+      `💪  Generating ${allBuildsCount} builds in total...`
     )}`
   )
 
@@ -78,7 +78,7 @@ const runBuild = async () => {
   Promise.resolve()
     .then(() => createBuilds())
     .then(() => {
-      log(`${chalk.bold.bgBlue.black('[4/4]')} ${chalk.blue('🎉 Done!')}`)
+      log(`${chalk.bold.bgBlue.black('[4/4]')} ${chalk.blue('🎉  Done!')}`)
     })
 }
 
