@@ -1,4 +1,10 @@
-function createEslint({ projects = ['packages'], env = {}, globals = {} }) {
+function createEslint({
+  projects = ['packages'],
+  env = {},
+  globals = {},
+} = {}) {
+  const tsProjects = projects.map((item) => `${item}/*/tsconfig.json`)
+
   return {
     root: true,
     env: {
@@ -46,9 +52,7 @@ function createEslint({ projects = ['packages'], env = {}, globals = {} }) {
           extensions: ['.js', '.jsx', '.ts', '.tsx'],
         },
         typescript: {
-          project: (projects || ['packages']).map(
-            (item) => `${item}/*/tsconfig.json'`
-          ),
+          project: [...tsProjects, 'tsconfig.json'],
         },
       },
     },
