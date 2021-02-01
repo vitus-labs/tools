@@ -32,7 +32,9 @@ const createBuilds = async () => {
   })
 
   p.catch((e) => {
-    log(`${chalk.bold.bgRed('ERROR')} Something went wrong`)
+    log(
+      `${chalk.bold.bgRed.white('ERROR')} ${chalk.red('Something went wrong')}`
+    )
     log(e)
   })
 
@@ -43,16 +45,22 @@ const runBuild = () => {
   // --------------------------------------------------------
   // (1) delete build folder first
   // --------------------------------------------------------
-  log(`${chalk.bold.bgGreen('[1/4]')} Cleaning up old build folder...`)
+  log(
+    `${chalk.bold.bgBlue.black('[1/4]')} ${chalk.blue(
+      'Cleaning up old build folder...'
+    )}`
+  )
 
   rimraf.sync(`${process.cwd()}/${CONFIG.outputDir}`)
 
-  log(`${chalk.bold.bgGreen('[2/4]')} Old build removed`)
+  log(`${chalk.bold.bgBlue.black('[2/4]')} ${chalk.blue('Old build removed')}`)
 
   // --------------------------------------------------------
   // (2) build
   // --------------------------------------------------------
-  log(`${chalk.bold.bgGreen('[3/4]')} Generating builds...`)
+  log(
+    `${chalk.bold.bgBlue.black('[3/4]')} ${chalk.blue('Generating builds...')}`
+  )
   createBuilds()
 }
 
