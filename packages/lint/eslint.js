@@ -46,7 +46,6 @@ function createEslint({ projects = ['packages'], env = {}, globals = {} }) {
           extensions: ['.js', '.jsx', '.ts', '.tsx'],
         },
         typescript: {
-          directory: ['./tsconfig.json'],
           project: projects.map((item) => `${item}/*/tsconfig.json'`),
         },
       },
@@ -98,5 +97,5 @@ function createEslint({ projects = ['packages'], env = {}, globals = {} }) {
   }
 }
 
-module.exports = createEslint
-module.exports.default = createEslint()
+module.exports.createEslint = createEslint
+module.exports = createEslint()
