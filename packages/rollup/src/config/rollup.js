@@ -6,8 +6,8 @@ const visualizer = require('rollup-plugin-visualizer')
 const replace = require('@rollup/plugin-replace')
 const { terser } = require('rollup-plugin-terser')
 const babel = require('rollup-plugin-babel')
-const { PKG, loadConfig, swapGlobals } = require('./utils')
 const baseConfig = require('./baseConfig')
+const { PKG, loadConfig, swapGlobals } = require('../utils')
 
 const CONFIG = loadConfig(baseConfig)
 
