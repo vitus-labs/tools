@@ -124,6 +124,7 @@ function createEslint({
         ],
         rules: {
           '@typescript-eslint/explicit-module-boundary-types': 'off',
+          'no-console': 'off',
           'import/no-extraneous-dependencies': [
             'error',
             {
