@@ -100,6 +100,28 @@ function createEslint({
         { extensions: ['.js', '.jsx', '.ts', '.tsx'] },
       ],
     },
+    overrides: [
+      {
+        files: [
+          '__stories__/*',
+          '*.stories.',
+          '__tests__',
+          '*.spec.*',
+          '*.test.*',
+        ],
+        rules: {
+          '@typescript-eslint/explicit-module-boundary-types': 'off',
+          'import/no-extraneous-dependencies': [
+            'error',
+            {
+              devDependencies: true,
+              optionalDependencies: true,
+              peerDependencies: true,
+            },
+          ],
+        },
+      },
+    ],
   }
 }
 
