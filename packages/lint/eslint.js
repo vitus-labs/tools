@@ -135,6 +135,19 @@ function createEslint({
           ],
         },
       },
+      {
+        files: ['**/bin/*.js'],
+        rules: {
+          '@typescript-eslint/no-var-requires': 'off',
+          'no-console': 'off',
+          'import/no-extraneous-dependencies': [
+            'error',
+            {
+              peerDependencies: true,
+            },
+          ],
+        },
+      },
     ],
   }
 }
