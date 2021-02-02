@@ -102,10 +102,24 @@ function createEslint({
     },
     overrides: [
       {
+        files: ['*.eslint*.js'],
+        rules: {
+          'import/no-extraneous-dependencies': [
+            'error',
+            {
+              depencencies: false,
+              devDependencies: true,
+              optionalDependencies: false,
+              peerDependencies: false,
+            },
+          ],
+        },
+      },
+      {
         files: [
-          '__stories__/*',
-          '*.stories.',
-          '__tests__',
+          '**/__stories__/**',
+          '*.stories.*',
+          '**/__tests__/**',
           '*.spec.*',
           '*.test.*',
         ],
