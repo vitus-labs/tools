@@ -1,6 +1,6 @@
 {
   "name": "@vitus-labs/tools-storybook",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "private": true,
   "main": "./index.js",
   "module": "./index.js",
