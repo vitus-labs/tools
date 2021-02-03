@@ -10,8 +10,6 @@ const tsConfig = loadFile('tsconfig.json')
 const aliases = get(tsConfig, 'compilerOptions.paths', {})
 const baseUrl = get(tsConfig, 'compilerOptions.baseUrl', '')
 
-console.log(tsConfig)
-
 // --------------------------------------------------------
 // TS CONFIG parsing
 // --------------------------------------------------------
@@ -46,8 +44,6 @@ module.exports = {
 
   webpackFinal: async (config) => {
     const aliases = { ...config.resolve.alias, ...getTSConfigAliases() }
-
-    console.log(aliases)
 
     // add aliases from tsConfig file
     config.resolve.alias = aliases
