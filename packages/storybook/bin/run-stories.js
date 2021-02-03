@@ -1,9 +1,6 @@
 #!/usr/bin/env node
+/* eslint-disable @typescript-eslint/no-var-requires */
 const storybook = require('@storybook/react/standalone')
-const CONFIG = require('../src/config')
+const { storybookStandalone } = require('../src/storybook')
 
-storybook({
-  mode: 'dev',
-  port: CONFIG.port,
-  configDir: `${__dirname}/../config`,
-})
+storybook(storybookStandalone)

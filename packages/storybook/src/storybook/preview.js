@@ -1,8 +1,13 @@
+/* eslint-disable no-undef */
 import { MINIMAL_VIEWPORTS, INITIAL_VIEWPORTS } from '@storybook/addon-viewport'
 import { withKnobs, text, boolean, number } from '@storybook/addon-knobs'
 import themeDecorator from '../decorators/themeDecorator'
 
-export const decorators = [themeDecorator({})]
+// define configuration globally in window so it can be accessible from anywhere in the browser
+// eslint-disable-next-line no-underscore-dangle
+window.__VITUS_LABS_STORIES__ = __VITUS_LABS_STORIES__
+
+export const decorators = [themeDecorator(__VITUS_LABS_STORIES__.theme)]
 
 export const parameters = {
   viewport: {
