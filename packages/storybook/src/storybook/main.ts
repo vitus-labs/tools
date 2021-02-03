@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable no-param-reassign */
-const path = require('path')
-const get = require('lodash.get')
-const { DefinePlugin } = require('webpack')
-const CONFIG = require('../config')
-const { loadFile } = require('../utils')
+import path from 'path'
+import get from 'lodash.get'
+import { DefinePlugin } from 'webpack'
+import CONFIG from '../config'
+import { loadFile } from '../utils'
 
 const tsConfig = loadFile('tsconfig.json')
 const aliases = get(tsConfig, 'compilerOptions.paths', {})
@@ -38,7 +38,7 @@ const getTSConfigAliases = () => {
 // --------------------------------------------------------
 // STORYBOOK configuration
 // --------------------------------------------------------
-module.exports = {
+export default {
   stories: CONFIG.stories,
   addons: Object.keys(CONFIG.addons).map((item) => `@storybook/addon-${item}`),
 

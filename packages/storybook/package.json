@@ -1,8 +1,8 @@
 {
   "name": "@vitus-labs/tools-storybook",
   "version": "0.5.0",
-  "main": "./index.js",
-  "module": "./index.js",
+  "license": "MIT",
+  "main": "./lib/vitus-labs-tools-storybook.js",
   "bin": {
     "vl_stories": "bin/run-stories.js",
     "vl_stories-build": "bin/run-stories-build.js"
@@ -10,7 +10,13 @@
   "publishConfig": {
     "access": "public"
   },
+  "files": ["bin/", "lib/", "storybook/"],
+  "scripts": {
+    "prepublish": "yarn build",
+    "build": "yarn vl_build"
+  },
   "peerDependencies": {
+    "@vitus-labs/unistyle": "*",
     "react": "*",
     "react-dom": "*",
     "webpack": "*"
@@ -25,11 +31,16 @@
     "@storybook/addons": "^6.1.16",
     "@storybook/react": "^6.1.16",
     "@storybook/theming": "^6.1.16",
-    "@vitus-labs/unistyle": "^0.8.0-alpha.16",
     "babel-loader": "8.2.2",
     "find-up": "^5.0.0",
     "lodash.get": "^4.4.2",
     "lodash.merge": "^4.6.2",
     "svg-inline-loader": "^0.8.2"
+  },
+  "devDependencies": {
+    "@vitus-labs/tools-babel": "^0.5.0",
+    "@vitus-labs/tools-rollup": "^0.5.0",
+    "@vitus-labs/tools-typescript": "^0.5.0",
+    "@vitus-labs/unistyle": "*"
   }
 }

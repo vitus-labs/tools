@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-const path = require('path')
-const CONFIG = require('../config')
+import path from 'path'
+import CONFIG from '~/config'
 
 const storybookConfigDir = path.resolve(`${__dirname}/../storybook`)
 
@@ -16,5 +16,4 @@ const storybookBuild = {
   configDir: storybookConfigDir,
 }
 
-module.exports.storybookStandalone = storybookStandalone
-module.exports.storybookBuild = storybookBuild
+export { storybookStandalone, storybookBuild }

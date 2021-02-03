@@ -5,8 +5,18 @@ import themeDecorator from '../decorators/themeDecorator'
 
 // define configuration globally in window so it can be accessible from anywhere in the browser
 // eslint-disable-next-line no-underscore-dangle
-window.__VITUS_LABS_STORIES__ = __VITUS_LABS_STORIES__
+// @ts-ignore
+export const extendWindow = __VITUS_LABS_STORIES__
 
+// @ts-ignore
+export const globals = {
+  text,
+  boolean,
+  number,
+  withKnobs,
+}
+
+// @ts-ignore
 export const decorators = [themeDecorator(__VITUS_LABS_STORIES__.theme)]
 
 export const parameters = {
@@ -30,9 +40,4 @@ export const parameters = {
   },
 }
 
-global.STORY = {
-  text,
-  boolean,
-  number,
-  withKnobs,
-}
+

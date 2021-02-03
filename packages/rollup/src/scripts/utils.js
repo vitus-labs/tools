@@ -66,9 +66,8 @@ const createBasicBuildVariants = () => {
 }
 
 const createBrowserBuildVariants = () => {
-  if (!PKG.browser) return false
-
   const result = []
+  if (!PKG.browser) return result
 
   Object.entries(PKG.browser).forEach(([key, value]) => {
     const source = key.substring(2) // strip './' from the beginning of path

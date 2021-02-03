@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-const fs = require('fs')
-const findUp = require('find-up')
-const merge = require('lodash.merge')
-const get = require('lodash.get')
+import fs from 'fs'
+import findUp from 'find-up'
+import merge from 'lodash.merge'
+import get from 'lodash.get'
 
 // --------------------------------------------------------
 // FIND & READ file helpers
@@ -47,9 +47,12 @@ const loadConfig = (config) => {
   return merge(config, get(externalConfig, 'stories'))
 }
 
-module.exports = {
+const CONFIG = getExternalConfig()
+
+
+export {
   loadConfig,
-  CONFIG: getExternalConfig(),
+  CONFIG,
   findFile,
   loadFile,
 }

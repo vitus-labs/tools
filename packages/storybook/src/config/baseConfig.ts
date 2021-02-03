@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   outDir: `${process.cwd()}/docs`,
   port: 6006,
   ui: {

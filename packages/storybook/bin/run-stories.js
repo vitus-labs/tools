@@ -1,6 +1,5 @@
 #!/usr/bin/env node
-/* eslint-disable @typescript-eslint/no-var-requires */
 const storybook = require('@storybook/react/standalone')
-const { storybookStandalone } = require('../src/storybook')
+const { storybookStandalone } = require('../lib/vitus-labs-tools-storybook')
 
 storybook(storybookStandalone)
