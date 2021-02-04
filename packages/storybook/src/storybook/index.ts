@@ -2,7 +2,7 @@
 import path from 'path'
 import CONFIG from '../config'
 
-const storybookConfigDir = path.resolve(`${__dirname}/storybook`)
+const storybookConfigDir = path.resolve(__dirname)
 
 const storybookStandalone = {
   mode: 'dev',
