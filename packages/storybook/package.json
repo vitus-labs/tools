@@ -2,7 +2,7 @@
   "name": "@vitus-labs/tools-storybook",
   "version": "0.5.1-alpha.3",
   "license": "MIT",
-  "main": "./lib/vitus-labs-tools-storybook.js",
+  "main": "./index.js",
   "bin": {
     "vl_stories": "bin/run-stories.js",
     "vl_stories-build": "bin/run-stories-build.js"
@@ -12,8 +12,7 @@
   },
   "files": [
     "bin/",
-    "lib/",
-    "storybook/"
+    "lib/"
   ],
   "scripts": {
     "prepublish": "yarn build",
