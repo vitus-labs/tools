@@ -16,7 +16,7 @@
     ]
   },
   "scripts": {
-    "release": "lerna publish --force-publish"
+    "release": "lerna publish"
   },
   "devDependencies": {
     "lerna": "^3.22.1",
