@@ -10,6 +10,7 @@
   "compilerOptions": {
     "target": "ES5",
     "module": "commonjs",
+    "incremental": false,
     "rootDir": "src",
     "outDir": "lib",
     "baseUrl": ".",
