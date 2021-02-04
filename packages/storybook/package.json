@@ -2,7 +2,6 @@
   "name": "@vitus-labs/tools-storybook",
   "version": "0.5.1-alpha.9",
   "license": "MIT",
-  "main": "./index.js",
   "types": "./lib/types",
   "bin": {
     "vl_stories": "bin/run-stories.js",
@@ -43,7 +42,6 @@
   },
   "devDependencies": {
     "@vitus-labs/tools-babel": "^0.5.0",
-    "@vitus-labs/tools-rollup": "0.5.1-alpha.0",
     "@vitus-labs/tools-typescript": "^0.5.0",
     "@vitus-labs/unistyle": "*"
   }
