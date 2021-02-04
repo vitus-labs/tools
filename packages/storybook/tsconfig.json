@@ -11,6 +11,7 @@
     "target": "ES5",
     "module": "commonjs",
     "incremental": false,
+    "declarationDir": "./lib/types",
     "rootDir": "src",
     "outDir": "lib",
     "baseUrl": ".",

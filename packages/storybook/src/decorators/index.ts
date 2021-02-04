@@ -1,3 +1,3 @@
-import themeDecorator from './themeDecorator'
+import theme from './theme'
 
-export { themeDecorator }
+export { theme }

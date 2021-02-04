@@ -39,8 +39,13 @@ const getTSConfigAliases = () => {
 // STORYBOOK configuration
 // --------------------------------------------------------
 export default {
-  stories: CONFIG.stories,
-  addons: Object.keys(CONFIG.addons).map((item) => `@storybook/addon-${item}`),
+  stories: CONFIG.storiesDir,
+  addons: Object.entries(CONFIG.addons).reduce((acc, [key, value]) => {
+    if (value) {
+      return acc.push(`@storybook/addon-${key}`)
+    }
+    return acc
+  }, []),
 
   webpackFinal: async (config) => {
     const aliases = { ...config.resolve.alias, ...getTSConfigAliases() }

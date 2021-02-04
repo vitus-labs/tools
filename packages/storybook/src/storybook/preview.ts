@@ -2,7 +2,7 @@
 /* eslint-disable no-undef */
 import { MINIMAL_VIEWPORTS, INITIAL_VIEWPORTS } from '@storybook/addon-viewport'
 import { withKnobs, text, boolean, number } from '@storybook/addon-knobs'
-import { themeDecorator } from '../decorators'
+import * as d from '../decorators'
 
 declare global {
   const __VITUS_LABS_STORIES__: Record<string, unknown>
@@ -29,7 +29,12 @@ window.__STORY__ = {
   withKnobs,
 }
 
-export const decorators = [themeDecorator(__VITUS_LABS_STORIES__.theme)]
+export const decorators = Object.entries(
+  __VITUS_LABS_STORIES__.decorators
+).reduce((acc, [key, value]) => {
+  if (value) return acc.push(d[key](value))
+  return acc
+}, [])
 
 export const parameters = {
   viewport: {

@@ -3,6 +3,7 @@
   "version": "0.5.1-alpha.7",
   "license": "MIT",
   "main": "./index.js",
+  "types": "./lib/types",
   "bin": {
     "vl_stories": "bin/run-stories.js",
     "vl_stories-build": "bin/run-stories-build.js"
