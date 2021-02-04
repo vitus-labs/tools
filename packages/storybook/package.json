@@ -17,7 +17,7 @@
   ],
   "scripts": {
     "prepublish": "yarn build",
-    "build": "yarn vl_build"
+    "build": "rm -rf lib && tsc"
   },
   "peerDependencies": {
     "@vitus-labs/unistyle": "*",

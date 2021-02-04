@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import path from 'path'
-import CONFIG from '~/config'
+import CONFIG from '../config'
 
-const storybookConfigDir = path.resolve(`${__dirname}/../storybook`)
+const storybookConfigDir = path.resolve(`${__dirname}/storybook`)
 
 const storybookStandalone = {
   mode: 'dev',
