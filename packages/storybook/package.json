@@ -1,6 +1,6 @@
 {
   "name": "@vitus-labs/tools-storybook",
-  "version": "0.5.1-alpha.7",
+  "version": "0.5.1-alpha.8",
   "license": "MIT",
   "main": "./index.js",
   "types": "./lib/types",
