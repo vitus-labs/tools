@@ -32,7 +32,7 @@ window.__STORY__ = {
 export const decorators = Object.entries(
   __VITUS_LABS_STORIES__.decorators
 ).reduce((acc, [key, value]) => {
-  if (value) return acc.push(d[key](value))
+  if (value) acc.push(d[key](value))
   return acc
 }, [])
 

@@ -42,8 +42,9 @@ export default {
   stories: CONFIG.storiesDir,
   addons: Object.entries(CONFIG.addons).reduce((acc, [key, value]) => {
     if (value) {
-      return acc.push(`@storybook/addon-${key}`)
+      acc.push(`@storybook/addon-${key}`)
     }
+
     return acc
   }, []),
 
