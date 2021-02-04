@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 import { MINIMAL_VIEWPORTS, INITIAL_VIEWPORTS } from '@storybook/addon-viewport'
 import { withKnobs, text, boolean, number } from '@storybook/addon-knobs'
-import themeDecorator from '../decorators/themeDecorator'
+import { themeDecorator } from '~/decorators'
 
 // define configuration globally in window so it can be accessible from anywhere in the browser
 // eslint-disable-next-line no-underscore-dangle
@@ -39,5 +39,3 @@ export const parameters = {
     },
   },
 }
-
-
