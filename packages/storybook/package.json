@@ -1,6 +1,6 @@
 {
   "name": "@vitus-labs/tools-storybook",
-  "version": "0.5.0",
+  "version": "0.5.1-alpha.0",
   "license": "MIT",
   "main": "./lib/vitus-labs-tools-storybook.js",
   "bin": {
@@ -10,7 +10,11 @@
   "publishConfig": {
     "access": "public"
   },
-  "files": ["bin/", "lib/", "storybook/"],
+  "files": [
+    "bin/",
+    "lib/",
+    "storybook/"
+  ],
   "scripts": {
     "prepublish": "yarn build",
     "build": "yarn vl_build"
@@ -39,7 +43,7 @@
   },
   "devDependencies": {
     "@vitus-labs/tools-babel": "^0.5.0",
-    "@vitus-labs/tools-rollup": "^0.5.0",
+    "@vitus-labs/tools-rollup": "0.5.1-alpha.0",
     "@vitus-labs/tools-typescript": "^0.5.0",
     "@vitus-labs/unistyle": "*"
   }
