@@ -60,7 +60,9 @@ const loadPlugins = ({ env, platform, typings, file }) => {
   const replaceOptions = {
     __VERSION__: JSON.stringify(PKG.version),
     __SERVER__: JSON.stringify(platform === 'server'),
-    __WEB__: JSON.stringify(['server', 'browser'].includes(platform)),
+    __WEB__: JSON.stringify(
+      ['server', 'browser', 'universal'].includes(platform)
+    ),
     __BROWSER__: JSON.stringify(platform === 'browser'),
     __NATIVE__: JSON.stringify(platform === 'native'),
     __CLIENT__: JSON.stringify(['native', 'browser'].includes(platform)),

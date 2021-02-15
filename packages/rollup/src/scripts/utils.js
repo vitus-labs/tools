@@ -17,12 +17,12 @@ const BASE_VARIANTS = {
   main: {
     format: 'cjs',
     env: 'development',
-    platform: undefined,
+    platform: 'universal',
   },
   module: {
     format: 'es',
     env: 'development',
-    platform: undefined,
+    platform: 'universal',
   },
   'react-native': {
     format: 'es',
