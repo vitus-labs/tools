@@ -1,6 +1,6 @@
 {
   "name": "@vitus-labs/tools-storybook",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "license": "MIT",
   "types": "./lib/types",
   "bin": {
@@ -41,8 +41,8 @@
     "svg-inline-loader": "^0.8.2"
   },
   "devDependencies": {
-    "@vitus-labs/tools-babel": "0.6.1",
-    "@vitus-labs/tools-typescript": "0.6.1",
+    "@vitus-labs/tools-babel": "0.6.2",
+    "@vitus-labs/tools-typescript": "0.6.2",
     "@vitus-labs/unistyle": "*"
   }
 }
