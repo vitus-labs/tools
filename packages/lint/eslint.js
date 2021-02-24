@@ -40,7 +40,6 @@ function createEslint({
       'plugin:@typescript-eslint/recommended',
       'airbnb',
       'prettier',
-      'prettier/react',
     ],
     settings: {
       'import/extensions': ['.js', '.jsx', '.ts', '.tsx'],
