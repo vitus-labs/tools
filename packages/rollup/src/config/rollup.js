@@ -119,7 +119,7 @@ const rollupConfig = ({ file, format, env, typings, platform }) => {
       format,
       globals: swapGlobals(CONFIG.globals),
       sourcemap: true,
-      exports: format === 'cjs' ? 'named' : undefined,
+      exports: ['cjs', 'umd'].includes(format) ? 'named' : undefined,
       name: ['umd', 'iife'].includes(format) ? PKG.bundleName : undefined,
     },
     external: PKG.externalDependencies,
