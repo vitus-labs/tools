@@ -9,6 +9,7 @@ const createBuildPipeline = require('./utils')
 const { log } = console
 const CONFIG = loadConfig(baseConfig)
 const allBuilds = createBuildPipeline()
+// const allBuilds = allBuildOptions.map((item) => rollupConfig(item)).flat()
 const allBuildsCount = allBuilds.length
 
 // --------------------------------------------------------
@@ -28,12 +29,32 @@ const createBuilds = async () => {
 
   // serialize builds
   allBuilds.forEach((item, i) => {
-    const { output, ...input } = rollupConfig(item)
+    const buildOptions = rollupConfig(item)
 
-    p = p.then(() => {
-      log(chalk.green(`🚧  Creating a build ${i + 1}/${allBuildsCount}`))
-      return build({ inputOptions: input, outputOptions: output })
-    })
+    // it might be an array for such a cases like typescript optimization file
+    // which we want to do in one iteration only
+    if (Array.isArray(buildOptions)) {
+      const [buildConfig, typescriptConfig] = buildOptions
+
+      const { output, ...input } = buildConfig
+      const { output: tsOutput, ...tsInput } = typescriptConfig
+
+      p = p.then(() => {
+        log(chalk.green(`🚧  Creating a build ${i + 1}/${allBuildsCount}`))
+        return build({ inputOptions: input, outputOptions: output })
+      })
+
+      p = p.then(() =>
+        build({ inputOptions: tsInput, outputOptions: tsOutput })
+      )
+    } else {
+      const { output, ...input } = buildOptions
+
+      p = p.then(() => {
+        log(chalk.green(`🚧  Creating a build ${i + 1}/${allBuildsCount}`))
+        return build({ inputOptions: input, outputOptions: output })
+      })
+    }
   })
 
   p.catch((e) => {

@@ -1,6 +1,6 @@
 {
   "name": "@vitus-labs/tools-rollup",
-  "version": "0.6.4",
+  "version": "0.6.5-alpha.3",
   "license": "MIT",
   "author": "Vit Bokisch <vit@bokisch.com>",
   "maintainers": [
@@ -26,6 +26,7 @@
     "rimraf": "^3.0.2",
     "rollup": "^2.38.3",
     "rollup-plugin-babel": "^4.4.0",
+    "rollup-plugin-dts": "^3.0.1",
     "rollup-plugin-filesize": "^9.1.0",
     "rollup-plugin-terser": "^7.0.2",
     "rollup-plugin-typescript2": "^0.30.0",

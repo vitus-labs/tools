@@ -1,6 +1,7 @@
 const { PKG } = require('../utils')
 
 const shouldBuildNative = PKG['react-native'] !== PKG.module
+const shouldGenerateTypes = !!(PKG.types || PKG.typings)
 
 const hasDifferentBrowserBuild = (type) => {
   if (!PKG.browser) return false
@@ -94,7 +95,7 @@ const createBuildPipeline = () => {
   ]
 
   // add generate typings for the first bundle only
-  result[0] = { ...result[0], typings: true }
+  result[0] = { ...result[0], typings: shouldGenerateTypes }
 
   return result
 }
