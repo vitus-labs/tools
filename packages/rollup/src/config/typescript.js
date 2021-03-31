@@ -1,4 +1,4 @@
-const dts = require('rollup-plugin-dts')
+const dts = require('rollup-plugin-dts').default
 const baseConfig = require('./baseConfig')
 const { PKG, loadConfig } = require('../utils')
 
