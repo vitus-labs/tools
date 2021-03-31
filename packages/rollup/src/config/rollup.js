@@ -79,7 +79,7 @@ const loadPlugins = ({ env, platform, typings, file }) => {
     plugins.push(typescript(tsConfig))
   }
 
-  plugins.push(replace(replaceOptions))
+  plugins.push(replace({ preventAssignment: true, values: replaceOptions }))
   plugins.push(babel(babelConfig))
 
   // generate visualised graphs in dist folder
@@ -111,8 +111,8 @@ const loadPlugins = ({ env, platform, typings, file }) => {
 }
 
 const typescriptConfig = () => ({
-  input: CONFIG.typesDir,
-  output: [{ file: PKG.typings || PKG.types, format: 'es' }],
+  input: `${CONFIG.typesDir}/index.d.ts`,
+  output: { file: PKG.typings || PKG.types, format: 'es' },
   plugins: [dts()],
 })
 
@@ -133,7 +133,9 @@ const rollupConfig = ({ file, format, env, typings, platform }) => {
     plugins,
   }
 
-  if (typings) return [buildOutput, typescriptConfig()]
+  if (typings) {
+    return [buildOutput, typescriptConfig()]
+  }
 
   return buildOutput
 }
