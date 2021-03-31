@@ -43,6 +43,6 @@
   "devDependencies": {
     "@vitus-labs/tools-babel": "^0.7.0",
     "@vitus-labs/tools-typescript": "^0.7.0",
-    "@vitus-labs/unistyle": "0.10.9-alpha.50"
+    "@vitus-labs/unistyle": "0.11.0"
   }
 }
