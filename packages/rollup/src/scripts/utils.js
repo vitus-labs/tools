@@ -1,7 +1,4 @@
-const { PKG, loadConfig } = require('../utils')
-const { baseConfig, typescriptConfig } = require('../config')
-
-const CONFIG = loadConfig(baseConfig)
+const { PKG } = require('../utils')
 
 const shouldBuildNative = PKG['react-native'] !== PKG.module
 const shouldGenerateTypes = !!(PKG.types || PKG.typings)
@@ -99,10 +96,6 @@ const createBuildPipeline = () => {
 
   // add generate typings for the first bundle only
   result[0] = { ...result[0], typings: shouldGenerateTypes }
-
-  if (shouldGenerateTypes) {
-    result.push(typescriptConfig())
-  }
 
   return result
 }

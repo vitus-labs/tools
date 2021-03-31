@@ -6,6 +6,7 @@ const visualizer = require('rollup-plugin-visualizer')
 const replace = require('@rollup/plugin-replace')
 const { terser } = require('rollup-plugin-terser')
 const babel = require('rollup-plugin-babel')
+const dts = require('rollup-plugin-dts').default
 const baseConfig = require('./baseConfig')
 const { PKG, loadConfig, swapGlobals } = require('../utils')
 
@@ -109,10 +110,16 @@ const loadPlugins = ({ env, platform, typings, file }) => {
   return plugins
 }
 
+const typescriptConfig = () => ({
+  input: CONFIG.typesDir,
+  output: [{ file: PKG.typings || PKG.types, format: 'es' }],
+  plugins: [dts()],
+})
+
 const rollupConfig = ({ file, format, env, typings, platform }) => {
   const plugins = loadPlugins({ file, env, typings, platform })
 
-  return {
+  const buildOutput = {
     input: CONFIG.sourceDir,
     output: {
       file,
@@ -125,6 +132,10 @@ const rollupConfig = ({ file, format, env, typings, platform }) => {
     external: PKG.externalDependencies,
     plugins,
   }
+
+  if (typings) return [buildOutput, typescriptConfig()]
+
+  return buildOutput
 }
 
 module.exports = rollupConfig
