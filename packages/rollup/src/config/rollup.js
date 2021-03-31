@@ -72,7 +72,7 @@ const loadPlugins = ({ env, platform, typings, file }) => {
     replaceOptions['process.env.NODE_ENV'] = JSON.stringify(env)
   }
 
-  const plugins = [resolve({ extensions })]
+  const plugins = [resolve({ extensions, browser: platform === 'browser' })]
 
   if (CONFIG.typescript) {
     plugins.push(typescript(tsConfig))
