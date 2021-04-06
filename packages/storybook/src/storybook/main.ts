@@ -10,6 +10,17 @@ const tsConfig = loadFile('tsconfig.json')
 const aliases = get(tsConfig, 'compilerOptions.paths', {})
 const baseUrl = get(tsConfig, 'compilerOptions.baseUrl', '')
 
+const ADDONS_MAP = {
+  a11y: '@storybook/addon-a11y',
+  actions: '@storybook/addon-actions',
+  backgrounds: '@storybook/addon-backgrounds',
+  controls: '@storybook/addon-controls',
+  docs: '@storybook/addon-docs',
+  mode: 'storybook-dark-mode',
+  toolbars: '@storybook/addon-toolbars',
+  viewport: '@storybook/addon-viewport',
+}
+
 // --------------------------------------------------------
 // TS CONFIG parsing
 // --------------------------------------------------------
@@ -41,8 +52,9 @@ const getTSConfigAliases = () => {
 export default {
   stories: CONFIG.storiesDir,
   addons: Object.entries(CONFIG.addons).reduce((acc, [key, value]) => {
-    if (value) {
-      acc.push(`@storybook/addon-${key}`)
+    const addon = ADDONS_MAP[key]
+    if (addon && value && value !== null) {
+      acc.push(addon)
     }
 
     return acc
