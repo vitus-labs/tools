@@ -1,6 +1,18 @@
 import React from 'react'
 import { Provider } from '@vitus-labs/unistyle'
 
+import { init } from '@vitus-labs/core'
+
+if (__VITUS_LABS_STORIES__.styles === 'styled-components') {
+  const styled = require('styled-components')
+
+  init({
+    styled: styled.default,
+    css: styled.css,
+    context: styled.ThemeContext,
+  })
+}
+
 export default (theme) => (Story) => (
   <Provider theme={theme}>
     <style

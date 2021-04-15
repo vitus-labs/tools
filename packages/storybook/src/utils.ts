@@ -49,10 +49,4 @@ const loadConfig = (config) => {
 
 const CONFIG = getExternalConfig()
 
-
-export {
-  loadConfig,
-  CONFIG,
-  findFile,
-  loadFile,
-}
+export { loadConfig, CONFIG, findFile, loadFile }

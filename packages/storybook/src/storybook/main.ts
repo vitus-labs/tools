@@ -49,6 +49,7 @@ const getTSConfigAliases = () => {
 // --------------------------------------------------------
 // STORYBOOK configuration
 // --------------------------------------------------------
+
 export default {
   stories: CONFIG.storiesDir,
   addons: Object.entries(CONFIG.addons).reduce((acc, [key, value]) => {
