@@ -3271,10 +3271,18 @@
     "@typescript-eslint/types" "4.21.0"
     eslint-visitor-keys "^2.0.0"
 
-"@vitus-labs/unistyle@0.11.0":
-  version "0.11.0"
-  resolved "https://registry.yarnpkg.com/@vitus-labs/unistyle/-/unistyle-0.11.0.tgz#929c8cca57a6a6cfb21d0f80fec5b7d83855c0dc"
-  integrity sha512-NPOYGwQQcGISaD3Q0bWonxjFv4Rovlg4yREETbKgXHQJB6NGUO/yyKliftZUAvREtusbHiWqLqxg6Me2yOXI0A==
+"@vitus-labs/core@^0.14.0":
+  version "0.14.0"
+  resolved "https://registry.yarnpkg.com/@vitus-labs/core/-/core-0.14.0.tgz#2edd50eac842436dbe1c86b28c0eddd35c971dba"
+  integrity sha512-J4O8IDdBgr5kk8CtRgohESluUFbmoY89OhYZdp698XdcJ6HbheTDOFA9m5XqN0xAEH9N5RbJlF9//xWGAPFu7w==
+  dependencies:
+    lodash "^4.17.15"
+    moize "^6.0.0"
+
+"@vitus-labs/unistyle@^0.14.0":
+  version "0.14.0"
+  resolved "https://registry.yarnpkg.com/@vitus-labs/unistyle/-/unistyle-0.14.0.tgz#d8feadf18a9fcb5fc2fc1a98944c826434f5f9ff"
+  integrity sha512-erUHaGfYu5Yx034+1/RSveckiYv0xram232lY6oR6Tp9lxu8JbC2oS9G1GsOGzJJNi1P0v4yAEnCbjpYEEX7jA==
 
 "@webassemblyjs/ast@1.9.0":
   version "1.9.0"
@@ -6316,6 +6324,11 @@ fast-diff@^1.1.2:
   resolved "https://registry.yarnpkg.com/fast-diff/-/fast-diff-1.2.0.tgz#73ee11982d86caaf7959828d519cfe927fac5f03"
   integrity sha512-xJuoT5+L99XlZ8twedaRf6Ax2TgQVxvgZOYoPKqZufmJib0tL2tegPBOZb1pVNgIhlqDlA0eO0c3wBvQcmzx4w==
 
+fast-equals@2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/fast-equals/-/fast-equals-2.0.0.tgz#bef2c423af3939f2c54310df54c57e64cd2adefc"
+  integrity sha512-u6RBd8cSiLLxAiC04wVsLV6GBFDOXcTCgWkd3wEoFXgidPSoAJENqC9m7Jb2vewSvjBIfXV6icKeh3GTKfIaXA==
+
 fast-glob@^2.2.6:
   version "2.2.7"
   resolved "https://registry.yarnpkg.com/fast-glob/-/fast-glob-2.2.7.tgz#6953857c3afa475fff92ee6015d52da70a4cd39d"
@@ -9008,6 +9021,11 @@ methods@~1.1.2:
   resolved "https://registry.yarnpkg.com/methods/-/methods-1.1.2.tgz#5529a4d67654134edcc5266656835b0f851afcee"
   integrity sha1-VSmk1nZUE07cxSZmVoNbD4Ua/O4=
 
+micro-memoize@4.0.9:
+  version "4.0.9"
+  resolved "https://registry.yarnpkg.com/micro-memoize/-/micro-memoize-4.0.9.tgz#b44a38c9dffbee1cefc2fd139bc8947952268b62"
+  integrity sha512-Z2uZi/IUMGQDCXASdujXRqrXXEwSY0XffUrAOllhqzQI3wpUyZbiZTiE2JuYC0HSG2G7DbCS5jZmsEKEGZuemg==
+
 microevent.ts@~0.1.1:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/microevent.ts/-/microevent.ts-0.1.1.tgz#70b09b83f43df5172d0205a63025bce0f7357fa0"
@@ -9252,6 +9270,14 @@ modify-values@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/modify-values/-/modify-values-1.0.1.tgz#b3939fa605546474e3e3e3c63d64bd43b4ee6022"
   integrity sha512-xV2bxeN6F7oYjZWTe/YPAy6MN2M+sL4u/Rlm2AHCIVGfo2p1yGmBHQ6vHehl4bRTZBdHu3TSkWdYgkwpYzAGSw==
+
+moize@^6.0.0:
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/moize/-/moize-6.0.1.tgz#5e1cd820fb156e90b83e411e0e22b3bbbccea474"
+  integrity sha512-Bl91P98A6Xba35mn9XoAW9DuGoQb3HyoY888TxrvQbMr9+1v3dzBzi9n4Guh5Lne8ENdqbXjQ0a8mf7UUvZ9wg==
+  dependencies:
+    fast-equals "2.0.0"
+    micro-memoize "4.0.9"
 
 move-concurrently@^1.0.1:
   version "1.0.1"
