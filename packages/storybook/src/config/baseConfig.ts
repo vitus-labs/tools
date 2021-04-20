@@ -7,7 +7,11 @@ export default {
   ui: {
     theme: 'dark',
   },
-  storiesDir: [`/src/**/__stories__/**/*.stories.@(js|jsx|ts|tsx|mdx)`],
+  storiesDir: [
+    `/src/**/__stories__/**/*.stories.@(js|jsx|ts|tsx|mdx)`,
+    `/src/**/*.stories.@(js|jsx|ts|tsx|mdx)`,
+    `/src/**/stories.@(js|jsx|ts|tsx|mdx)`,
+  ],
   globals: {
     // theme: {
     //   name: 'Theme',
