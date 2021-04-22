@@ -117,6 +117,7 @@ function createEslint({
         files: [
           '**/__stories__/**',
           '*.stories.*',
+          '*stories.*',
           '**/__tests__/**',
           '*.spec.*',
           '*.test.*',
