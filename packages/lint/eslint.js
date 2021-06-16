@@ -1,5 +1,5 @@
 function createEslint({
-  projects = ['packages'],
+  projects = ['packages', 'apps', 'tools', 'features'],
   env = {},
   globals = {},
 } = {}) {
