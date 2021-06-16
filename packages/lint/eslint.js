@@ -3,7 +3,7 @@ function createEslint({
   env = {},
   globals = {},
 } = {}) {
-  const tsProjects = projects.map((item) => `${item}/*/tsconfig.json`)
+  const tsProjects = projects.map((item) => `${item}/**/*/tsconfig.json`)
 
   return {
     root: true,
