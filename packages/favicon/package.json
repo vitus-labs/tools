@@ -1,0 +1,20 @@
+{
+  "name": "@vitus-labs/tools-favicon",
+  "version": "0.9.8",
+  "license": "MIT",
+  "author": "Vit Bokisch <vit@bokisch.com>",
+  "maintainers": [
+    "Vit Bokisch <vit@bokisch.com>"
+  ],
+  "main": "./index.js",
+  "bin": {
+    "vl_favicon": "bin/run-favicon.js"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@vitus-labs/tools-core": "0.9.8",
+    "favicons": "^6.2.2"
+  }
+}

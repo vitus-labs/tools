@@ -41,7 +41,7 @@ const loadFile = (filename) => {
 // --------------------------------------------------------
 const getExternalConfig = () => loadFile('vl-tools.config.js')
 
-const loadConfig = (config) => {
+const loadConfig = (config = {}) => {
   const externalConfig = getExternalConfig()
 
   return merge(config, get(externalConfig, 'stories'))
