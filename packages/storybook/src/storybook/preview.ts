@@ -18,21 +18,21 @@ if (__VITUS_LABS_STORIES__.styles === 'styled-components') {
   }
 }
 
-if (__VITUS_LABS_STORIES__.styles === 'emotion') {
-  try {
-    const styled = require('@emotion/styled')
-    const helper = require('@emotion/react')
-    const { ThemeProvider } = require('emotion-theming')
+// if (__VITUS_LABS_STORIES__.styles === 'emotion') {
+//   try {
+//     const styled = require('@emotion/styled')
+//     const helper = require('@emotion/react')
+//     const { ThemeProvider } = require('emotion-theming')
 
-    init({
-      styled: styled.default,
-      css: helper.css,
-      context: ThemeProvider,
-    })
-  } catch (e) {
-    // ignore
-  }
-}
+//     init({
+//       styled: styled.default,
+//       css: helper.css,
+//       context: ThemeProvider,
+//     })
+//   } catch (e) {
+//     // ignore
+//   }
+// }
 
 declare global {
   const __VITUS_LABS_STORIES__: Record<string, unknown>
