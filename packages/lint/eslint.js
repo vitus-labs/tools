@@ -43,6 +43,9 @@ function createEslint({
       'prettier',
     ],
     settings: {
+      jest: {
+        version: 27,
+      },
       'import/extensions': ['.js', '.jsx', '.ts', '.tsx'],
       'import/parsers': {
         '@typescript-eslint/parser': ['.ts', '.tsx'],
@@ -154,11 +157,6 @@ function createEslint({
         files: ['**/__tests__/**', '**/__specs__/**', '*.spec.*', '*.test.*'],
         env: {
           'jest/globals': true,
-        },
-        settings: {
-          jest: {
-            version: 27,
-          },
         },
       },
     ],
