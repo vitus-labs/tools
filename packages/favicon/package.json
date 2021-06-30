@@ -1,6 +1,6 @@
 {
   "name": "@vitus-labs/tools-favicon",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "license": "MIT",
   "author": "Vit Bokisch <vit@bokisch.com>",
   "maintainers": [
@@ -14,7 +14,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@vitus-labs/tools-core": "0.10.0",
+    "@vitus-labs/tools-core": "0.10.1",
     "favicons": "^6.2.2"
   }
 }
