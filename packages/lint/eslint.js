@@ -155,6 +155,11 @@ function createEslint({
         env: {
           'jest/globals': true,
         },
+        settings: {
+          jest: {
+            version: 27,
+          },
+        },
       },
     ],
   }
