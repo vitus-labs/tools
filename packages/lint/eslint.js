@@ -22,7 +22,7 @@ function createEslint({
       ...globals,
     },
     parser: '@typescript-eslint/parser',
-    plugins: ['react', '@typescript-eslint', 'prettier'],
+    plugins: ['react', '@typescript-eslint', 'jest', 'prettier'],
     parserOptions: {
       ecmaFeatures: {
         jsx: true,
@@ -39,6 +39,7 @@ function createEslint({
       'plugin:@typescript-eslint/eslint-recommended',
       'plugin:@typescript-eslint/recommended',
       'airbnb',
+      'plugin:jest/all',
       'prettier',
     ],
     settings: {
@@ -119,6 +120,7 @@ function createEslint({
           '*.stories.*',
           '*stories.*',
           '**/__tests__/**',
+          '**/__specs__/**',
           '*.spec.*',
           '*.test.*',
         ],
@@ -146,6 +148,12 @@ function createEslint({
               peerDependencies: true,
             },
           ],
+        },
+      },
+      {
+        files: ['**/__tests__/**', '**/__specs__/**', '*.spec.*', '*.test.*'],
+        env: {
+          'jest/globals': true,
         },
       },
     ],
