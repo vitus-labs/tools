@@ -105,7 +105,14 @@ function createEslint({
     },
     overrides: [
       {
-        files: ['.eslintrc.js', '*.eslintrc.js', '*.eslintrc.*.js'],
+        files: [
+          '.eslintrc.js',
+          '*.eslintrc.js',
+          '*.eslintrc.*.js',
+          'stylelint.config.js',
+          'vl-tools.config.js',
+          '.babelrc.js',
+        ],
         rules: {
           'import/no-extraneous-dependencies': [
             'error',
