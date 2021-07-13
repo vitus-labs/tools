@@ -1,6 +1,6 @@
 {
   "name": "@vitus-labs/tools-rollup",
-  "version": "0.10.3-alpha.0",
+  "version": "0.10.3",
   "license": "MIT",
   "author": "Vit Bokisch <vit@bokisch.com>",
   "maintainers": [
