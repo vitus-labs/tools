@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 const typescript = require('rollup-plugin-typescript2')
 const ttypescript = require('ttypescript')
-const resolve = require('@rollup/plugin-node-resolve').default
+const { nodeResolve } = require('@rollup/plugin-node-resolve')
 const filesize = require('rollup-plugin-filesize')
 const { visualizer } = require('rollup-plugin-visualizer')
 const replace = require('@rollup/plugin-replace')
@@ -73,7 +74,7 @@ const loadPlugins = ({ env, platform, typings, file }) => {
     replaceOptions['process.env.NODE_ENV'] = JSON.stringify(env)
   }
 
-  const plugins = [resolve({ extensions, browser: platform === 'browser' })]
+  const plugins = [nodeResolve({ extensions, browser: platform === 'browser' })]
 
   if (CONFIG.typescript) {
     plugins.push(typescript(tsConfig))
