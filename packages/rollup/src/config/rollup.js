@@ -38,6 +38,7 @@ const loadPlugins = ({ env, platform, typings, file }) => {
     typescript: ttypescript,
     exclude: CONFIG.exclude,
     useTsconfigDeclarationDir: true,
+    clean: true,
     tsconfigDefaults: {
       exclude: CONFIG.exclude,
       include: CONFIG.include,
