@@ -79,6 +79,7 @@ function createEslint({
         'error',
         { props: true, ignorePropertyModificationsFor: ['self'] },
       ],
+      '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-useless-constructor': 'error',
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/no-unused-vars': 'error',
