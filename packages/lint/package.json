@@ -6,18 +6,32 @@
   "maintainers": [
     "Vit Bokisch <vit@bokisch.com>"
   ],
-  "main": "./index.js",
+  "main": "lib/vitus-tools-lint.js",
+  "module": "lib/vitus-tools-lint.module.js",
+  "typings": "lib/index.d.ts",
   "files": [
-    "index.js",
-    "styles.js",
-    "eslint.js"
+    "lib/"
   ],
   "publishConfig": {
     "access": "public"
   },
+  "scripts": {
+    "dev": "yarn vl_stories",
+    "prepublish": "yarn build",
+    "build": "yarn vl_build",
+    "build:watch": "yarn vl_build-watch",
+    "lint:css": "stylelint src/*.ts src/*.tsx",
+    "lint:ts": "eslint src/*",
+    "lint": "yarn lint:css && yarn lint:ts"
+  },
   "peerDependencies": {
     "prettier": "*",
     "typescript": "*"
+  },
+  "devDependencies": {
+    "@vitus-labs/tools-babel": "^0.16.0",
+    "@vitus-labs/tools-rollup": "^0.16.0",
+    "@vitus-labs/tools-typescript": "^0.16.0"
   },
   "dependencies": {
     "@typescript-eslint/eslint-plugin": "^4.29.3",
