@@ -6,15 +6,33 @@
   "maintainers": [
     "Vit Bokisch <vit@bokisch.com>"
   ],
-  "main": "./index.js",
+  "main": "lib/vitus-tools-favicon.js",
+  "module": "lib/vitus-tools-favicon.module.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "lib/",
+    "bin/"
+  ],
   "bin": {
     "vl_favicon": "bin/run-favicon.js"
+  },
+  "scripts": {
+    "dev": "yarn vl_stories",
+    "prepublish": "yarn build",
+    "build": "yarn vl_build",
+    "build:watch": "yarn vl_build-watch",
+    "lint:css": "stylelint src/*.ts src/*.tsx",
+    "lint:ts": "eslint src/*",
+    "lint": "yarn lint:css && yarn lint:ts"
   },
   "publishConfig": {
     "access": "public"
   },
   "dependencies": {
     "@vitus-labs/tools-core": "0.17.0",
+    "@vitus-labs/tools-babel": "0.17.0",
+    "@vitus-labs/tools-rollup": "0.17.0",
+    "@vitus-labs/tools-typescript": "0.17.0",
     "favicons": "^6.2.2"
   }
 }

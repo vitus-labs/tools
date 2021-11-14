@@ -1,4 +1,4 @@
-module.exports = {
+const configuration = {
   dir: 'auto', // Primary text direction for name, short_name, and description
   lang: 'en-US', // Primary language for name and short_name
   background: '#fff', // Background colour for flattened icons. `string`
@@ -33,3 +33,7 @@ module.exports = {
     yandex: true, // Create Yandex browser icon. `boolean` or `{ offset, background, mask, overlayGlow, overlayShadow }` or an array of sources
   },
 }
+
+export type Configuration = typeof configuration
+
+export default configuration

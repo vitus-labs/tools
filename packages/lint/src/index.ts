@@ -1,4 +1,4 @@
 import eslint, { createEslint } from './eslint'
-import stylelint from './styles'
+import styles from './styles'
 
-export { eslint, stylelint, createEslint }
+export { eslint, styles, createEslint }

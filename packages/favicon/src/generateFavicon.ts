@@ -1,7 +1,7 @@
-const fs = require('fs')
-const favicons = require('favicons')
-const { loadConfig } = require('@vitus-labs/tools-core')
-const baseConfig = require('../baseConfig')
+import fs from 'fs'
+import favicons from 'favicons'
+import { loadConfig } from '@vitus-labs/tools-core'
+import baseConfig from '~/baseConfig'
 
 const { icons, path, ...CONFIG } = loadConfig('favicon', baseConfig)
 
@@ -35,4 +35,4 @@ const generateFavicons = () =>
     )
   })
 
-module.exports = generateFavicons
+export default generateFavicons
