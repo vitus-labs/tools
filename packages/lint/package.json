@@ -1,6 +1,6 @@
 {
   "name": "@vitus-labs/tools-lint",
-  "version": "0.17.0",
+  "version": "0.18.0",
   "license": "MIT",
   "author": "Vit Bokisch <vit@bokisch.com>",
   "maintainers": [
@@ -29,9 +29,9 @@
     "typescript": "*"
   },
   "devDependencies": {
-    "@vitus-labs/tools-babel": "0.17.0",
-    "@vitus-labs/tools-rollup": "0.17.0",
-    "@vitus-labs/tools-typescript": "0.17.0"
+    "@vitus-labs/tools-babel": "0.18.0",
+    "@vitus-labs/tools-rollup": "0.18.0",
+    "@vitus-labs/tools-typescript": "0.18.0"
   },
   "dependencies": {
     "@typescript-eslint/eslint-plugin": "^4.29.3",
