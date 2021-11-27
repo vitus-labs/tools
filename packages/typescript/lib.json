@@ -1,12 +1,13 @@
 {
   "compilerOptions": {
     "strict": false,
+    "strictNullChecks": true,
     "jsx": "react",
     "module": "ESNext",
     "target": "ESNext",
     "allowJs": true,
     "sourceMap": true,
-    "incremental": false,
+    "incremental": true,
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
     "lib": ["es2017", "es7", "es6", "dom"],
