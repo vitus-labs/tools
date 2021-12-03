@@ -19,6 +19,8 @@ const ADDONS_MAP = {
   mode: 'storybook-dark-mode',
   toolbars: '@storybook/addon-toolbars',
   viewport: '@storybook/addon-viewport',
+  measure: '@storybook/addon-measure',
+  outline: 'storybook-addon-outline',
 }
 
 // --------------------------------------------------------

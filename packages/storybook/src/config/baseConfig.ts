@@ -34,6 +34,8 @@ export default {
     viewport: {
       viewports: { ...MINIMAL_VIEWPORTS, ...INITIAL_VIEWPORTS },
     },
+    measure: true,
+    outline: true,
     darkMode: {
       dark: themes.dark,
       light: themes.normal,
