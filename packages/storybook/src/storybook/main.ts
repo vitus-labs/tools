@@ -100,7 +100,7 @@ export default {
     })
 
     console.log('webpack')
-    console.log(CONFIG_A)
+    console.log(CONFIG_A.config)
 
     // define global variables
     config.plugins.push(

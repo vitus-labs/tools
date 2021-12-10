@@ -12,7 +12,6 @@ const findFile = (filename) => findUp.sync(filename, { type: 'file' })
 
 const loadFile = (filename) => {
   const file = findFile(filename)
-  console.log(file)
 
   if (!file) return {}
 
