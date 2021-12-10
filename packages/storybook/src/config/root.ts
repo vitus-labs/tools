@@ -10,4 +10,4 @@ const internalConfig = Object.freeze({
   },
 })
 
-export { internalConfig }
+export { internalConfig, INTERNAL_CONFIG }
