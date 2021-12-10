@@ -104,6 +104,7 @@ export default {
       test: require.resolve('../../lib/config/root.js'),
       loader: 'expose-loader',
       options: {
+        globalName: '__VL_TEST__',
         exposes: ['__VL_TEST__'],
       },
     })
