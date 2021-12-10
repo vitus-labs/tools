@@ -1,6 +1,6 @@
 {
   "name": "@vitus-labs/tools-storybook",
-  "version": "0.22.0-alpha.10",
+  "version": "0.22.0-alpha.11",
   "license": "MIT",
   "types": "./lib/types",
   "bin": {
