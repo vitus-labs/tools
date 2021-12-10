@@ -101,7 +101,7 @@ export default {
     })
 
     config.module.rules.push({
-      test: internalConfig,
+      test: require.resolve('../config/root.ts'),
       loader: 'expose-loader',
       options: {
         exposes: ['__VL_TEST__'],
