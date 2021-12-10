@@ -100,6 +100,14 @@ export default {
       use: [{ loader: 'svg-inline-loader' }],
     })
 
+    config.module.rules.push({
+      test: internalConfig,
+      loader: 'expose-loader',
+      options: {
+        exposes: ['__VL_TEST__'],
+      },
+    })
+
     // define global variables
     config.plugins.push(
       new DefinePlugin({
@@ -109,9 +117,6 @@ export default {
         __WEB__: true,
         __CLIENT__: true,
         __VITUS_LABS_STORIES__: JSON.stringify(CONFIG),
-        __VL_TEST__: DefinePlugin.runtimeValue(() => {
-          return JSON.stringify(internalConfig.config)
-        }),
       })
     )
 

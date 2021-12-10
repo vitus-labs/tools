@@ -20,10 +20,6 @@ if (__VITUS_LABS_STORIES__.styles === 'styled-components') {
   }
 }
 
-console.log('preview config')
-console.log(internalConfig.config)
-console.log(INTERNAL_CONFIG)
-
 // if (__VITUS_LABS_STORIES__.styles === 'emotion') {
 //   try {
 //     const styled = require('@emotion/styled')
