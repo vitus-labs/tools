@@ -101,7 +101,7 @@ export default {
     })
 
     config.module.rules.push({
-      test: require.resolve('lodash'),
+      test: require.resolve('../config/root'),
       loader: 'expose-loader',
       options: {
         exposes: '__VL_TEST__',
