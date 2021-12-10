@@ -12,6 +12,7 @@ const findFile = (filename) => findUp.sync(filename, { type: 'file' })
 
 const loadFile = (filename) => {
   const file = findFile(filename)
+  console.log(file)
 
   if (!file) return {}
 
@@ -20,6 +21,9 @@ const loadFile = (filename) => {
   // try to read an exported module first
   try {
     data = require(file)
+    console.log('require')
+    console.log(filename)
+    console.log(data)
   } catch (e) {
     // ignore eror
   }
@@ -28,6 +32,9 @@ const loadFile = (filename) => {
   if (!data) {
     try {
       data = JSON.parse(fs.readFileSync(file, 'utf-8'))
+      console.log('readfile')
+      console.log(filename)
+      console.log(data)
     } catch (e) {
       // ignore error
     }
@@ -43,6 +50,9 @@ const getExternalConfig = () => loadFile('vl-tools.config.js')
 
 const loadConfig = (config = {}) => {
   const externalConfig = getExternalConfig()
+
+  console.log('externalConfig')
+  console.log(externalConfig)
 
   return merge(config, get(externalConfig, 'stories'))
 }
