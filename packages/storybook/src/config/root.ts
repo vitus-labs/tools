@@ -1,7 +1,13 @@
-let config = {}
+const INTERNAL_CONFIG = { CONFIG: {} }
 
 export const setConfig = (value) => {
-  config = value
+  INTERNAL_CONFIG.CONFIG = value
 }
 
-export const getConfig = () => config
+const internal = Object.freeze({
+  get config() {
+    return INTERNAL_CONFIG.CONFIG
+  },
+})
+
+export default internal

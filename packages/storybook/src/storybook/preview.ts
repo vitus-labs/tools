@@ -4,7 +4,7 @@
 /* eslint-disable no-undef */
 import { init } from '@vitus-labs/core'
 import * as d from '../decorators'
-import { getConfig } from '../config/root'
+import CONFIG from '../config/root'
 
 if (__VITUS_LABS_STORIES__.styles === 'styled-components') {
   try {
@@ -21,7 +21,7 @@ if (__VITUS_LABS_STORIES__.styles === 'styled-components') {
 }
 
 console.log('preview config')
-console.log(getConfig())
+console.log(CONFIG.config)
 
 // if (__VITUS_LABS_STORIES__.styles === 'emotion') {
 //   try {
