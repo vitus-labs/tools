@@ -4,7 +4,6 @@ import path from 'path'
 import get from 'lodash.get'
 import { DefinePlugin } from 'webpack'
 import CONFIG from '../config'
-import CONFIG_A from '../config/root'
 import { loadFile } from '../utils'
 
 const tsConfig = loadFile('tsconfig.json')
@@ -46,6 +45,7 @@ const getTSConfigAliases = () => {
 
     result[alias] = path.resolve(process.cwd(), baseUrl, dir)
   })
+
   return result
 }
 
@@ -98,9 +98,6 @@ export default {
       test: /\.svg$/,
       use: [{ loader: 'svg-inline-loader' }],
     })
-
-    console.log('webpack')
-    console.log(CONFIG_A.config)
 
     // define global variables
     config.plugins.push(
