@@ -4,6 +4,7 @@ import path from 'path'
 import get from 'lodash.get'
 import { DefinePlugin } from 'webpack'
 import CONFIG from '../config'
+import CONFIG_A from '../config/root'
 import { loadFile } from '../utils'
 
 const tsConfig = loadFile('tsconfig.json')
@@ -89,8 +90,7 @@ export default {
     config.module.rules = config.module.rules.map((data) => {
       if (/svg\|/.test(String(data.test)))
         // eslint-disable-next-line no-param-reassign
-        data.test =
-          /\.(ico|jpg|jpeg|png|gif|eot|otf|webp|ttf|woff|woff2|cur|ani)(\?.*)?$/
+        data.test = /\.(ico|jpg|jpeg|png|gif|eot|otf|webp|ttf|woff|woff2|cur|ani)(\?.*)?$/
       return data
     })
 
@@ -98,6 +98,9 @@ export default {
       test: /\.svg$/,
       use: [{ loader: 'svg-inline-loader' }],
     })
+
+    console.log('webpack')
+    console.log(CONFIG_A)
 
     // define global variables
     config.plugins.push(
