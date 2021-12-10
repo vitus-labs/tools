@@ -4,10 +4,10 @@ export const setConfig = (value) => {
   INTERNAL_CONFIG.CONFIG = value
 }
 
-const internal = Object.freeze({
+const internalConfig = Object.freeze({
   get config() {
     return INTERNAL_CONFIG.CONFIG
   },
 })
 
-export default internal
+export { internalConfig }
