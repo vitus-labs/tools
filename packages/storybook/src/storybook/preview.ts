@@ -20,7 +20,7 @@ if (__VITUS_LABS_STORIES__.styles === 'styled-components') {
   }
 }
 
-console.log('config')
+console.log('preview config')
 console.log(getConfig())
 
 // if (__VITUS_LABS_STORIES__.styles === 'emotion') {
