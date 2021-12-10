@@ -1,11 +1,8 @@
 import { loadConfig } from '../utils'
 import baseConfig from './baseConfig'
-import { updateConfig, getConfig } from './root'
+import { setConfig } from './root'
 
 const config = loadConfig(baseConfig)
-
-console.log('config - config')
-console.log(config)
 
 const updatedConfig = {
   ...config,
@@ -13,11 +10,6 @@ const updatedConfig = {
   storiesDir: config.storiesDir.map((item) => `${process.cwd()}${item}`),
 }
 
-console.log('updatedConfig')
-console.log(updatedConfig)
-
-updateConfig(updateConfig)
-
-export { getConfig }
+setConfig(updatedConfig)
 
 export default updatedConfig

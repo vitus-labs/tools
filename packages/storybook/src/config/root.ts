@@ -1,8 +1,6 @@
-import baseConfig from './baseConfig'
+let config = {}
 
-let config = baseConfig
-
-export const updateConfig = (value) => {
+export const setConfig = (value) => {
   config = value
 }
 
