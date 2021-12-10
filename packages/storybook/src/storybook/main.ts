@@ -4,6 +4,7 @@ import path from 'path'
 import get from 'lodash.get'
 import { DefinePlugin } from 'webpack'
 import CONFIG from '../config'
+import { internalConfig } from '../config/root'
 import { loadFile } from '../utils'
 
 const tsConfig = loadFile('tsconfig.json')
@@ -108,6 +109,9 @@ export default {
         __WEB__: true,
         __CLIENT__: true,
         __VITUS_LABS_STORIES__: JSON.stringify(CONFIG),
+        __VL_TEST__: DefinePlugin.runtimeValue(() => {
+          return JSON.stringify(internalConfig.config)
+        }),
       })
     )
 
