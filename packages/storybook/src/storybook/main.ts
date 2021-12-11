@@ -4,7 +4,6 @@ import path from 'path'
 import get from 'lodash.get'
 import { DefinePlugin } from 'webpack'
 import CONFIG from '../config'
-import { internalConfig } from '../config/root'
 import { loadFile } from '../utils'
 
 const tsConfig = loadFile('tsconfig.json')
@@ -98,16 +97,6 @@ export default {
     config.module.rules.push({
       test: /\.svg$/,
       use: [{ loader: 'svg-inline-loader' }],
-    })
-
-    config.module.rules.push({
-      test: require.resolve('../config/root'),
-      loader: 'expose-loader',
-      options: {
-        exposes: {
-          globalName: 'VL_TEST',
-        },
-      },
     })
 
     // define global variables
