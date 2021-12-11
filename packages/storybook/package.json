@@ -1,6 +1,6 @@
 {
   "name": "@vitus-labs/tools-storybook",
-  "version": "0.20.0",
+  "version": "0.22.0-alpha.15",
   "license": "MIT",
   "types": "./lib/types",
   "bin": {
@@ -19,8 +19,8 @@
     "build": "rm -rf lib && tsc"
   },
   "peerDependencies": {
-    "@vitus-labs/core": "0.14.9",
-    "@vitus-labs/unistyle": "0.14.9",
+    "@vitus-labs/core": "^0.17.0",
+    "@vitus-labs/unistyle": "^0.17.0",
     "react": ">=17",
     "react-dom": ">=17",
     "webpack": "*"
