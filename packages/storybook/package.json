@@ -1,6 +1,6 @@
 {
   "name": "@vitus-labs/tools-storybook",
-  "version": "0.22.0",
+  "version": "0.23.0",
   "license": "MIT",
   "types": "./lib/types",
   "bin": {
@@ -48,8 +48,8 @@
   },
   "devDependencies": {
     "@vitus-labs/core": "^0.14.9",
-    "@vitus-labs/tools-babel": "0.22.0",
-    "@vitus-labs/tools-typescript": "0.22.0",
+    "@vitus-labs/tools-babel": "0.23.0",
+    "@vitus-labs/tools-typescript": "0.23.0",
     "@vitus-labs/unistyle": "^0.14.9"
   }
 }
