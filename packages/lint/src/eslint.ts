@@ -100,10 +100,7 @@ const createEslint = ({
       'react/require-default-props': 'off',
       'react/prop-types': 'off',
       'react/jsx-props-no-spreading': 'off',
-      'react/function-component-definition': [
-        2,
-        { namedComponents: 'function-expression' },
-      ],
+      'react/function-component-definition': 'off',
       'react/jsx-filename-extension': [
         1,
         { extensions: ['.js', '.jsx', '.ts', '.tsx'] },
