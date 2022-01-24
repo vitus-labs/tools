@@ -3,6 +3,7 @@ module.exports = {
   outputDir: 'lib',
   typesDir: 'lib/types',
   typescript: true,
+  replaceGlobals: true,
   visualise: {
     template: 'network',
     gzipSize: true,

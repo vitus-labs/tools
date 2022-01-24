@@ -60,28 +60,31 @@ const loadPlugins = ({ env, platform, typings, file }) => {
     tsConfig.tsconfigDefaults.compilerOptions.declarationDir = CONFIG.typesDir
   }
 
-  const replaceOptions = {
-    __VERSION__: JSON.stringify(PKG.version),
-    __SERVER__: JSON.stringify(platform === 'server'),
-    __WEB__: JSON.stringify(
-      ['server', 'browser', 'universal'].includes(platform)
-    ),
-    __BROWSER__: JSON.stringify(platform === 'browser'),
-    __NATIVE__: JSON.stringify(platform === 'native'),
-    __CLIENT__: JSON.stringify(['native', 'browser'].includes(platform)),
-  }
-
-  if (env === 'production') {
-    replaceOptions['process.env.NODE_ENV'] = JSON.stringify(env)
-  }
-
   const plugins = [nodeResolve({ extensions, browser: platform === 'browser' })]
 
   if (CONFIG.typescript) {
     plugins.push(typescript(tsConfig))
   }
 
-  plugins.push(replace({ preventAssignment: true, values: replaceOptions }))
+  if (CONFIG.replaceGlobals) {
+    const replaceOptions = {
+      __VERSION__: JSON.stringify(PKG.version),
+      __SERVER__: JSON.stringify(platform === 'server'),
+      __WEB__: JSON.stringify(
+        ['server', 'browser', 'universal'].includes(platform)
+      ),
+      __BROWSER__: JSON.stringify(platform === 'browser'),
+      __NATIVE__: JSON.stringify(platform === 'native'),
+      __CLIENT__: JSON.stringify(['native', 'browser'].includes(platform)),
+    }
+
+    if (env === 'production') {
+      replaceOptions['process.env.NODE_ENV'] = JSON.stringify(env)
+    }
+
+    plugins.push(replace({ preventAssignment: true, values: replaceOptions }))
+  }
+
   plugins.push(babel(babelConfig))
 
   // generate visualised graphs in dist folder
