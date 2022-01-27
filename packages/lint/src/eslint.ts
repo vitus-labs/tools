@@ -56,7 +56,7 @@ const createEslint = ({
           extensions: ['.js', '.jsx', '.ts', '.tsx'],
         },
         typescript: {
-          project: [...tsProjects, 'tsconfig.json'],
+          project: ['tsconfig.json', ...tsProjects],
         },
       },
     },
@@ -113,11 +113,11 @@ const createEslint = ({
           '.eslintrc.js',
           '*.eslintrc.js',
           '*.eslintrc.*.js',
-          'stylelint.config.js',
-          'vl-tools.config.js',
+          '*.config.js',
           '.babelrc.js',
         ],
         rules: {
+          '@typescript-eslint/no-var-requires': 'off',
           'import/no-extraneous-dependencies': [
             'error',
             {
