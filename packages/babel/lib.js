@@ -11,16 +11,13 @@ module.exports = {
     '@babel/react',
     '@babel/typescript',
   ],
-  plugins: [
-    '@babel/proposal-class-properties',
-    '@babel/proposal-object-rest-spread',
-    '@babel/transform-react-jsx',
-  ],
   env: {
     build: {
       ignore: [
         '**/*.test.tsx',
         '**/*.test.ts',
+        '**/*.spec.ts',
+        '**/*.spec.tsx',
         '**/*.story.tsx',
         '**/*.stories.tsx',
         '__snapshots__',
