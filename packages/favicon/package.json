@@ -1,6 +1,6 @@
 {
   "name": "@vitus-labs/tools-favicon",
-  "version": "0.25.0",
+  "version": "0.26.0",
   "license": "MIT",
   "author": "Vit Bokisch <vit@bokisch.com>",
   "maintainers": [
@@ -29,10 +29,10 @@
     "access": "public"
   },
   "dependencies": {
-    "@vitus-labs/tools-babel": "0.25.0",
-    "@vitus-labs/tools-core": "0.25.0",
-    "@vitus-labs/tools-rollup": "0.25.0",
-    "@vitus-labs/tools-typescript": "0.25.0",
+    "@vitus-labs/tools-babel": "0.26.0",
+    "@vitus-labs/tools-core": "0.26.0",
+    "@vitus-labs/tools-rollup": "0.26.0",
+    "@vitus-labs/tools-typescript": "0.26.0",
     "favicons": "^6.2.2"
   }
 }
