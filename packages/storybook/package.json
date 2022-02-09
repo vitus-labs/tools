@@ -19,8 +19,8 @@
     "build": "rm -rf lib && tsc"
   },
   "peerDependencies": {
-    "@vitus-labs/core": "^0.17.0",
-    "@vitus-labs/unistyle": "^0.17.0",
+    "@vitus-labs/core": "*",
+    "@vitus-labs/unistyle": "*",
     "react": ">=17",
     "react-dom": ">=17",
     "webpack": "*"
@@ -47,9 +47,9 @@
     "svg-inline-loader": "^0.8.2"
   },
   "devDependencies": {
-    "@vitus-labs/core": "^0.22.1",
+    "@vitus-labs/core": "*",
     "@vitus-labs/tools-babel": "0.26.0",
     "@vitus-labs/tools-typescript": "0.26.0",
-    "@vitus-labs/unistyle": "^0.22.1"
+    "@vitus-labs/unistyle": "*"
   }
 }
