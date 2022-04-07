@@ -54,6 +54,9 @@ const getTSConfigAliases = () => {
 // --------------------------------------------------------
 
 export default {
+  features: {
+    babelModeV7: true,
+  },
   stories: CONFIG.storiesDir,
   addons: Object.entries(CONFIG.addons).reduce((acc, [key, value]) => {
     const addon = ADDONS_MAP[key]
@@ -90,7 +93,8 @@ export default {
     config.module.rules = config.module.rules.map((data) => {
       if (/svg\|/.test(String(data.test)))
         // eslint-disable-next-line no-param-reassign
-        data.test = /\.(ico|jpg|jpeg|png|gif|eot|otf|webp|ttf|woff|woff2|cur|ani)(\?.*)?$/
+        data.test =
+          /\.(ico|jpg|jpeg|png|gif|eot|otf|webp|ttf|woff|woff2|cur|ani)(\?.*)?$/
       return data
     })
 
