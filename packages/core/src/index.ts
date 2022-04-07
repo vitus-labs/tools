@@ -1,11 +1,11 @@
 import fs from 'fs'
-import { findUpSync } from 'find-up'
+import findUp from 'find-up'
 import { get, merge } from 'lodash'
 
 // --------------------------------------------------------
 // FIND & READ file helpers
 // --------------------------------------------------------
-const findFile = (filename: string) => findUpSync(filename, { type: 'file' })
+const findFile = (filename: string) => findUp.sync(filename, { type: 'file' })
 
 const loadFileToJSON = (filename: string) => {
   const file = findFile(filename)

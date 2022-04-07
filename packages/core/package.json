@@ -20,7 +20,7 @@
     "lint": "yarn lint:ts"
   },
   "dependencies": {
-    "find-up": "^6.3.0",
+    "find-up": "5.0.0",
     "lodash": "^4.17.21"
   },
   "devDependencies": {
