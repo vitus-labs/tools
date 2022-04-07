@@ -1,15 +1,14 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-const fs = require('fs')
-const findUp = require('find-up')
-const merge = require('lodash.merge')
-const get = require('lodash.get')
+import fs from 'fs'
+import { findUpSync } from 'find-up'
+import { get, merge } from 'lodash'
 
 // --------------------------------------------------------
 // FIND & READ file helpers
 // --------------------------------------------------------
-const findFile = (filename) => findUp.sync(filename, { type: 'file' })
+const findFile = (filename: string) => findUpSync(filename, { type: 'file' })
 
-const loadFileToJSON = (filename) => {
+const loadFileToJSON = (filename: string) => {
   const file = findFile(filename)
 
   if (!file) return {}
@@ -49,11 +48,11 @@ const getPackageJSON = () => {
 // --------------------------------------------------------
 
 // GET LIST OF DEPENDENCIES from package.json
-const getDependenciesList = (types) => {
+const getDependenciesList = (types: any) => {
   const pkg = getPackageJSON()
-  let result = []
+  let result: any = []
 
-  types.forEach((item) => {
+  types.forEach((item: any) => {
     const data = pkg[item]
     result = [...result, ...Object.keys(data || {})]
   })
@@ -67,10 +66,10 @@ const getDependenciesList = (types) => {
 
 // converts package name to umd or iife valid format
 // example: napespace-package-name => namespacePackageName
-const camelspaceBundleName = (name) => {
+const camelspaceBundleName = (name: string) => {
   const parsedName = name.replace('@', '').replace('/', '-')
-  const arrayStringsCamel = (arr) =>
-    arr.map((item, i) =>
+  const arrayStringsCamel = (arr: any) =>
+    arr.map((item: any, i: any) =>
       i === 0
         ? item
         : item.charAt(0).toUpperCase() + item.substr(1).toLowerCase()
@@ -108,26 +107,23 @@ const getPkgData = () => {
 // --------------------------------------------------------
 const getExternalConfig = () => loadFileToJSON('vl-tools.config.js')
 
-const loadConfig = (key, config = {}) => {
-  const externalConfig = getExternalConfig()
+const loadConfig =
+  (config = {}) =>
+  (key: string, defaultValue) => {
+    const externalConfig = getExternalConfig()
 
-  return merge(config, get(externalConfig, key))
-}
+    return merge(config, get(externalConfig, key, defaultValue))
+  }
 
-const swapGlobals = (globals) => {
-  const result = {}
+const swapGlobals = (globals: Record<string, string>) =>
+  Object.entries(globals).reduce((acc, [key, value]) => {
+    // eslint-disable-next-line no-param-reassign
+    acc[value] = key
+    return acc
+  }, {})
 
-  Object.entries(globals).forEach(([key, value]) => {
-    result[value] = key
-  })
+const PKG = getPkgData()
+const CONFIG = getExternalConfig()
+const TS_CONFIG = getExternalConfig()
 
-  return result
-}
-
-module.exports = {
-  findFile,
-  loadConfig,
-  swapGlobals,
-  PKG: getPkgData(),
-  CONFIG: getExternalConfig(),
-}
+export { findFile, loadConfig, swapGlobals, PKG, CONFIG, TS_CONFIG }

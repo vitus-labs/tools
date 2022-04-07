@@ -6,13 +6,27 @@
   "maintainers": [
     "Vit Bokisch <vit@bokisch.com>"
   ],
-  "main": "./index.js",
+  "main": "lib/vitus-tools-core.js",
+  "module": "lib/vitus-tools-core.module.js",
+  "types": "lib/index.d.ts",
   "publishConfig": {
     "access": "public"
   },
+  "scripts": {
+    "prepublish": "yarn build",
+    "build": "yarn vl_build",
+    "build:watch": "yarn vl_build-watch",
+    "lint:ts": "eslint src/*",
+    "lint": "yarn lint:ts"
+  },
   "dependencies": {
-    "find-up": "^5.0.0",
-    "lodash.get": "^4.4.2",
-    "lodash.merge": "^4.6.2"
+    "find-up": "^6.3.0",
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "@vitus-labs/tools-babel": "0.28.0-alpha.0",
+    "@vitus-labs/tools-core": "0.28.0-alpha.0",
+    "@vitus-labs/tools-rollup": "0.28.0-alpha.0",
+    "@vitus-labs/tools-typescript": "0.28.0-alpha.0"
   }
 }
