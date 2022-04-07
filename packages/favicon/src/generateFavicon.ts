@@ -1,9 +1,11 @@
 import fs from 'fs'
 import favicons from 'favicons'
-import { loadConfig } from '@vitus-labs/tools-core'
+import { loadVLToolsConfig } from '@vitus-labs/tools-core'
 import baseConfig from '~/baseConfig'
 
-const { icons, path, ...CONFIG } = loadConfig('favicon', baseConfig)
+const VL_CONFIG = loadVLToolsConfig('favicon')
+
+const { icons, path, ...restConfig } = VL_CONFIG.merge(baseConfig)
 
 const callback = (outputPath) => (error, response) => {
   if (error) {
@@ -30,7 +32,7 @@ const generateFavicons = () =>
     // favicons(source, configuration, callback)
     favicons(
       inputPath,
-      { ...CONFIG, path: `${path}/${item.path}` },
+      { ...restConfig, path: `${path}/${item.path}` },
       callback(outputPath)
     )
   })
