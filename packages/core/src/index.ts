@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 import fs from 'fs'
 import { findUpSync } from 'find-up'
 import { get, merge } from 'lodash'
@@ -107,13 +106,30 @@ const getPkgData = () => {
 // --------------------------------------------------------
 const getExternalConfig = () => loadFileToJSON('vl-tools.config.js')
 
-const loadConfig =
-  (config = {}) =>
-  (key: string, defaultValue) => {
-    const externalConfig = getExternalConfig()
+const loadConfigParam =
+  (filename: string) =>
+  (key: string, defaultValue = {}) => {
+    const externalConfig = loadFileToJSON(filename)
 
-    return merge(config, get(externalConfig, key, defaultValue))
+    return get(externalConfig, key, defaultValue)
   }
+
+const loadVLToolsConfig = (key: string) => {
+  const externalConfig = getExternalConfig()
+  const result = get(externalConfig, key)
+
+  const cloneAndEnhance = (config) => ({
+    get config() {
+      return config
+    },
+    get: (param: string, defaultValue?: any) =>
+      get(config, param, defaultValue),
+    merge: (param: Record<string, any>) =>
+      cloneAndEnhance(merge(param, config)),
+  })
+
+  return cloneAndEnhance(result)
+}
 
 const swapGlobals = (globals: Record<string, string>) =>
   Object.entries(globals).reduce((acc, [key, value]) => {
@@ -124,6 +140,15 @@ const swapGlobals = (globals: Record<string, string>) =>
 
 const PKG = getPkgData()
 const CONFIG = getExternalConfig()
-const TS_CONFIG = getExternalConfig()
+const TS_CONFIG = loadFileToJSON('tsconfig.json')
 
-export { findFile, loadConfig, swapGlobals, PKG, CONFIG, TS_CONFIG }
+export {
+  findFile,
+  loadConfigParam,
+  loadFileToJSON,
+  loadVLToolsConfig,
+  swapGlobals,
+  PKG,
+  CONFIG,
+  TS_CONFIG,
+}

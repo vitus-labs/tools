@@ -16,7 +16,9 @@
   ],
   "scripts": {
     "prepublish": "yarn build",
-    "build": "rm -rf lib && tsc"
+    "build": "rm -rf lib && tsc",
+    "lint:ts": "eslint src/*",
+    "lint": "yarn lint:ts"
   },
   "peerDependencies": {
     "@vitus-labs/core": "*",
@@ -38,10 +40,8 @@
     "@storybook/addons": "^6.4.20",
     "@storybook/react": "^6.4.20",
     "@storybook/theming": "^6.4.20",
+    "@vitus-labs/tools-core": "0.28.0-alpha.0",
     "babel-loader": "8.2.4",
-    "find-up": "^5.0.0",
-    "lodash.get": "^4.4.2",
-    "lodash.merge": "^4.6.2",
     "storybook-addon-outline": "^1.4.2",
     "storybook-dark-mode": "^1.0.9",
     "svg-inline-loader": "^0.8.2"

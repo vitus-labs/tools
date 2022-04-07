@@ -1,14 +1,11 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable no-param-reassign */
 import path from 'path'
-import get from 'lodash.get'
 import { DefinePlugin } from 'webpack'
 import CONFIG from '../config'
-import { loadFile } from '../utils'
+import { TS_CONFIG } from '../utils'
 
-const tsConfig = loadFile('tsconfig.json')
-const aliases = get(tsConfig, 'compilerOptions.paths', {})
-const baseUrl = get(tsConfig, 'compilerOptions.baseUrl', '')
+const aliases = TS_CONFIG('compilerOptions.paths', {})
+const baseUrl = TS_CONFIG('compilerOptions.baseUrl', '')
 
 const ADDONS_MAP = {
   a11y: '@storybook/addon-a11y',

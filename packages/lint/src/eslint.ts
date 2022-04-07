@@ -23,7 +23,7 @@ const createEslint = ({
       ...globals,
     },
     parser: '@typescript-eslint/parser',
-    plugins: ['react', '@typescript-eslint', 'jest', 'prettier'],
+    plugins: ['react', '@typescript-eslint', 'prettier'],
     parserOptions: {
       ecmaFeatures: {
         jsx: true,
@@ -40,13 +40,9 @@ const createEslint = ({
       'plugin:@typescript-eslint/eslint-recommended',
       'plugin:@typescript-eslint/recommended',
       'airbnb',
-      'plugin:jest/all',
       'prettier',
     ],
     settings: {
-      jest: {
-        version: 27,
-      },
       'import/extensions': ['.js', '.jsx', '.ts', '.tsx'],
       'import/parsers': {
         '@typescript-eslint/parser': ['.ts', '.tsx'],
@@ -166,8 +162,26 @@ const createEslint = ({
       },
       {
         files: ['**/__tests__/**', '**/__specs__/**', '*.spec.*', '*.test.*'],
+        plugins: ['react', '@typescript-eslint', 'jest', 'prettier'],
         env: {
           'jest/globals': true,
+        },
+        extends: [
+          'plugin:import/errors',
+          'plugin:import/warnings',
+          'plugin:import/typescript',
+          'plugin:react/recommended',
+          'plugin:prettier/recommended',
+          'plugin:@typescript-eslint/eslint-recommended',
+          'plugin:@typescript-eslint/recommended',
+          'airbnb',
+          'plugin:jest/all',
+          'prettier',
+        ],
+        settings: {
+          jest: {
+            version: 27,
+          },
         },
       },
     ],

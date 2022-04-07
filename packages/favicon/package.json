@@ -17,7 +17,6 @@
     "vl_favicon": "bin/run-favicon.js"
   },
   "scripts": {
-    "dev": "yarn vl_stories",
     "prepublish": "yarn build",
     "build": "yarn vl_build",
     "build:watch": "yarn vl_build-watch",
