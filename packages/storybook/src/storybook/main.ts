@@ -53,7 +53,6 @@ const getTSConfigAliases = () => {
 export default {
   features: {
     babelModeV7: true,
-    storyStoreV7: true,
     postcss: false,
   },
   stories: CONFIG.storiesDir,
