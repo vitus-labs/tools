@@ -53,7 +53,10 @@ const getTSConfigAliases = () => {
 export default {
   features: {
     babelModeV7: true,
+    storyStoreV7: true,
+    postcss: false,
   },
+  core: { builder: 'webpack5' },
   stories: CONFIG.storiesDir,
   addons: Object.entries(CONFIG.addons).reduce((acc, [key, value]) => {
     const addon = ADDONS_MAP[key]
