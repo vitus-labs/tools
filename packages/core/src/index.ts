@@ -116,16 +116,16 @@ const loadConfigParam =
 
 const loadVLToolsConfig = (key: string) => {
   const externalConfig = getExternalConfig()
-  const result = get(externalConfig, key)
+  const result = get(externalConfig, key, {})
 
-  const cloneAndEnhance = (config) => ({
+  const cloneAndEnhance = (object) => ({
     get config() {
-      return config
+      return object
     },
     get: (param: string, defaultValue?: any) =>
-      get(config, param, defaultValue),
+      get(object, param, defaultValue),
     merge: (param: Record<string, any>) =>
-      cloneAndEnhance(merge(param, config)),
+      cloneAndEnhance(merge(param, object)),
   })
 
   return cloneAndEnhance(result)

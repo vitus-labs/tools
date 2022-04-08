@@ -5,7 +5,7 @@ import baseConfig from '~/baseConfig'
 
 const VL_CONFIG = loadVLToolsConfig('favicon')
 
-const { icons, path, ...restConfig } = VL_CONFIG.merge(baseConfig)
+const { icons, path, ...restConfig } = VL_CONFIG.merge(baseConfig).config
 
 const callback = (outputPath) => (error, response) => {
   if (error) {

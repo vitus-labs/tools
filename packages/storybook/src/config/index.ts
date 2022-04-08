@@ -2,9 +2,7 @@ import { VL_CONFIG } from '../utils'
 import baseConfig from './baseConfig'
 import { setConfig } from './root'
 
-const config = VL_CONFIG.merge(baseConfig)
-
-console.log(config)
+const { config } = VL_CONFIG.merge(baseConfig)
 
 const updatedConfig = {
   ...config,
