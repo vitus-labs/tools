@@ -4,6 +4,8 @@ import { setConfig } from './root'
 
 const config = VL_CONFIG.merge(baseConfig)
 
+console.log(config)
+
 const updatedConfig = {
   ...config,
   outDir: `${process.cwd()}${config.outDir}`,
