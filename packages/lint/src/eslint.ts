@@ -133,6 +133,7 @@ const createEslint = ({
           '**/__specs__/**',
           '*.spec.*',
           '*.test.*',
+          '*.storyOf.*',
         ],
         rules: {
           '@typescript-eslint/explicit-module-boundary-types': 'off',
