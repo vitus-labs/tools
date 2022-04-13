@@ -28,18 +28,18 @@
     "webpack": "*"
   },
   "dependencies": {
-    "@storybook/addon-a11y": "^6.4.20",
-    "@storybook/addon-actions": "^6.4.20",
-    "@storybook/addon-backgrounds": "^6.4.20",
-    "@storybook/addon-controls": "^6.4.20",
-    "@storybook/addon-docs": "^6.4.20",
-    "@storybook/addon-measure": "^6.4.20",
-    "@storybook/addon-storyshots": "^6.4.20",
-    "@storybook/addon-toolbars": "^6.4.20",
-    "@storybook/addon-viewport": "^6.4.20",
-    "@storybook/addons": "^6.4.20",
-    "@storybook/react": "^6.4.20",
-    "@storybook/theming": "^6.4.20",
+    "@storybook/addon-a11y": "^6.4.21",
+    "@storybook/addon-actions": "^6.4.21",
+    "@storybook/addon-backgrounds": "^6.4.21",
+    "@storybook/addon-controls": "^6.4.21",
+    "@storybook/addon-docs": "^6.4.21",
+    "@storybook/addon-measure": "^6.4.21",
+    "@storybook/addon-storyshots": "^6.4.21",
+    "@storybook/addon-toolbars": "^6.4.21",
+    "@storybook/addon-viewport": "^6.4.21",
+    "@storybook/addons": "^6.4.21",
+    "@storybook/react": "^6.4.21",
+    "@storybook/theming": "^6.4.21",
     "@vitus-labs/tools-core": "0.29.0",
     "babel-loader": "8.2.4",
     "storybook-addon-outline": "^1.4.2",
@@ -47,9 +47,9 @@
     "svg-inline-loader": "^0.8.2"
   },
   "devDependencies": {
-    "@vitus-labs/core": "0.44.0",
+    "@vitus-labs/core": "0.53.0",
     "@vitus-labs/tools-babel": "0.29.0",
     "@vitus-labs/tools-typescript": "0.29.0",
-    "@vitus-labs/unistyle": "0.44.0"
+    "@vitus-labs/unistyle": "0.53.0"
   }
 }
