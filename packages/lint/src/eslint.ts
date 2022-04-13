@@ -11,7 +11,7 @@ const createEslint = ({
     env: {
       browser: true,
       node: true,
-      es6: true,
+      es2022: true,
       ...env,
     },
     globals: {
@@ -28,7 +28,7 @@ const createEslint = ({
       ecmaFeatures: {
         jsx: true,
       },
-      ecmaVersion: 2018,
+      ecmaVersion: 'latest',
       sourceType: 'module',
     },
     extends: [
