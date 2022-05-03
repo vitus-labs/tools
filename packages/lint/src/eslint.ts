@@ -25,6 +25,8 @@ const createEslint = ({
     parser: '@typescript-eslint/parser',
     plugins: ['react', '@typescript-eslint', 'prettier'],
     parserOptions: {
+      tsconfigRootDir: __dirname,
+      project: ['tsconfig.json', ...tsProjects],
       ecmaFeatures: {
         jsx: true,
       },
@@ -39,6 +41,7 @@ const createEslint = ({
       'plugin:prettier/recommended',
       'plugin:@typescript-eslint/eslint-recommended',
       'plugin:@typescript-eslint/recommended',
+      'plugin:@typescript-eslint/recommended-requiring-type-checking',
       'airbnb',
       'prettier',
     ],
