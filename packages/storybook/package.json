@@ -1,6 +1,6 @@
 {
   "name": "@vitus-labs/tools-storybook",
-  "version": "0.31.0-alpha.4",
+  "version": "0.31.0-alpha.5",
   "license": "MIT",
   "types": "./lib/types",
   "bin": {
@@ -42,7 +42,7 @@
     "@storybook/manager-webpack5": "^6.4.22",
     "@storybook/react": "^6.4.22",
     "@storybook/theming": "^6.4.22",
-    "@vitus-labs/tools-core": "0.31.0-alpha.4",
+    "@vitus-labs/tools-core": "0.31.0-alpha.5",
     "babel-loader": "8.2.5",
     "storybook-addon-outline": "^1.4.2",
     "storybook-dark-mode": "^1.1.0",
@@ -51,8 +51,8 @@
   },
   "devDependencies": {
     "@vitus-labs/core": "0.55.0",
-    "@vitus-labs/tools-babel": "0.31.0-alpha.4",
-    "@vitus-labs/tools-typescript": "0.31.0-alpha.4",
+    "@vitus-labs/tools-babel": "0.31.0-alpha.5",
+    "@vitus-labs/tools-typescript": "0.31.0-alpha.5",
     "@vitus-labs/unistyle": "0.55.0"
   }
 }
