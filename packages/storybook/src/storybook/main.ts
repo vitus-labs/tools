@@ -52,9 +52,9 @@ const getTSConfigAliases = () => {
 // --------------------------------------------------------
 
 export default {
-  // core: {
-  //   builder: 'webpack5',
-  // },
+  core: {
+    builder: 'webpack5',
+  },
   features: {
     storyStoreV7: true,
     babelModeV7: true,
@@ -112,11 +112,11 @@ export default {
     // define global variables
     config.plugins.push(
       new DefinePlugin({
-        __BROWSER__: true,
-        __NATIVE__: false,
-        __SERVER__: true,
-        __WEB__: true,
-        __CLIENT__: true,
+        __BROWSER__: JSON.stringify(true),
+        __NATIVE__: JSON.stringify(false),
+        __SERVER__: JSON.stringify(true),
+        __WEB__: JSON.stringify(true),
+        __CLIENT__: JSON.stringify(true),
         __VITUS_LABS_STORIES__: JSON.stringify(CONFIG),
       })
     )
