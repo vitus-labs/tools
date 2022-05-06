@@ -1,6 +1,7 @@
 /* eslint-disable no-param-reassign */
 import path from 'path'
 import { DefinePlugin } from 'webpack'
+import babelConfig from './babel'
 import CONFIG from '../config'
 import { TS_CONFIG } from '../utils'
 
@@ -51,7 +52,11 @@ const getTSConfigAliases = () => {
 // --------------------------------------------------------
 
 export default {
+  core: {
+    builder: 'webpack5',
+  },
   features: {
+    storyStoreV7: true,
     babelModeV7: true,
     postcss: false,
   },
@@ -65,21 +70,8 @@ export default {
     return acc
   }, [] as any),
 
-  babel: async (options) => ({
-    ...options,
-    presets: [
-      [
-        '@babel/env',
-        {
-          targets: {
-            node: 'current',
-          },
-        },
-      ],
-      '@babel/react',
-      '@babel/typescript',
-    ],
-    ignore: ['node_modules'],
+  babel: async () => ({
+    ...babelConfig,
   }),
   webpackFinal: async (config) => {
     const aliases = { ...config.resolve.alias, ...getTSConfigAliases() }

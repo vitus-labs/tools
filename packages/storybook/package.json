@@ -47,9 +47,12 @@
     "svg-inline-loader": "^0.8.2"
   },
   "devDependencies": {
+    "@storybook/builder-webpack5": "^6.4.22",
+    "@storybook/manager-webpack5": "^6.4.22",
     "@vitus-labs/core": "0.55.0",
     "@vitus-labs/tools-babel": "0.31.0-alpha.2",
     "@vitus-labs/tools-typescript": "0.31.0-alpha.2",
-    "@vitus-labs/unistyle": "0.55.0"
+    "@vitus-labs/unistyle": "0.55.0",
+    "webpack": "5"
   }
 }
