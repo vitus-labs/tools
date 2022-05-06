@@ -1,6 +1,6 @@
 {
   "name": "@vitus-labs/tools-core",
-  "version": "0.31.0-alpha.1",
+  "version": "0.31.0-alpha.2",
   "license": "MIT",
   "author": "Vit Bokisch <vit@bokisch.com>",
   "maintainers": [
@@ -24,9 +24,9 @@
     "lodash": "^4.17.21"
   },
   "devDependencies": {
-    "@vitus-labs/tools-babel": "0.31.0-alpha.1",
-    "@vitus-labs/tools-core": "0.31.0-alpha.1",
-    "@vitus-labs/tools-rollup": "0.31.0-alpha.1",
-    "@vitus-labs/tools-typescript": "0.31.0-alpha.1"
+    "@vitus-labs/tools-babel": "0.31.0-alpha.2",
+    "@vitus-labs/tools-core": "0.31.0-alpha.2",
+    "@vitus-labs/tools-rollup": "0.31.0-alpha.2",
+    "@vitus-labs/tools-typescript": "0.31.0-alpha.2"
   }
 }
