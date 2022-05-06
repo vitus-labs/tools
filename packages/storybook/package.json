@@ -38,21 +38,21 @@
     "@storybook/addon-toolbars": "^6.4.22",
     "@storybook/addon-viewport": "^6.4.22",
     "@storybook/addons": "^6.4.22",
+    "@storybook/builder-webpack5": "^6.4.22",
+    "@storybook/manager-webpack5": "^6.4.22",
     "@storybook/react": "^6.4.22",
     "@storybook/theming": "^6.4.22",
     "@vitus-labs/tools-core": "0.31.0-alpha.3",
     "babel-loader": "8.2.5",
     "storybook-addon-outline": "^1.4.2",
     "storybook-dark-mode": "^1.1.0",
-    "svg-inline-loader": "^0.8.2"
+    "svg-inline-loader": "^0.8.2",
+    "webpack": "5"
   },
   "devDependencies": {
-    "@storybook/builder-webpack5": "^6.4.22",
-    "@storybook/manager-webpack5": "^6.4.22",
     "@vitus-labs/core": "0.55.0",
     "@vitus-labs/tools-babel": "0.31.0-alpha.3",
     "@vitus-labs/tools-typescript": "0.31.0-alpha.3",
-    "@vitus-labs/unistyle": "0.55.0",
-    "webpack": "5"
+    "@vitus-labs/unistyle": "0.55.0"
   }
 }
