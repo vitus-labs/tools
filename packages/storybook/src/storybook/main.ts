@@ -52,9 +52,6 @@ const getTSConfigAliases = () => {
 // --------------------------------------------------------
 
 export default {
-  core: {
-    builder: 'webpack5',
-  },
   features: {
     storyStoreV7: true,
     babelModeV7: true,
