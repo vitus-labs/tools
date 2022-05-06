@@ -65,13 +65,22 @@ export default {
     return acc
   }, [] as any),
 
-  babel: async (options) => {
-    console.log(options)
-    return {
-      ...options,
-    }
-  },
-
+  babel: async (options) => ({
+    ...options,
+    presets: [
+      [
+        '@babel/env',
+        {
+          targets: {
+            node: 'current',
+          },
+        },
+      ],
+      '@babel/react',
+      '@babel/typescript',
+    ],
+    ignore: ['node_modules'],
+  }),
   webpackFinal: async (config) => {
     const aliases = { ...config.resolve.alias, ...getTSConfigAliases() }
 
