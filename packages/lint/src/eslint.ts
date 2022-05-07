@@ -1,5 +1,5 @@
 const createEslint = ({
-  rootPath = __dirname,
+  rootPath = './',
   projects = ['packages', 'apps', 'tools', 'features'],
   env = {},
   globals = {},
@@ -68,7 +68,8 @@ const createEslint = ({
           extensions: ['.js', '.jsx', '.ts', '.tsx'],
         },
         typescript: {
-          project: ['tsconfig.json', ...tsProjects],
+          alwaysTryTypes: true,
+          project: [...tsProjects, 'tsconfig.json'],
         },
       },
     },
