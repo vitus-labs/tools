@@ -1,21 +1,30 @@
 {
-  "extends": "@vitus-labs/tools-typescript/lib",
   "compilerOptions": {
-    "types": ["@vitus-labs/tools-rollup"],
-    "outDir": "lib",
-    "rootDir": "src",
-    "baseUrl": ".",
-    "declarationDir": "./lib/types",
-    "paths": {
-      "~/*": [
-        "src/*"
-      ]
-    },
+    "types": [
+      "@types/node"
+    ],
+    "allowSyntheticDefaultImports": true,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "declaration": true,
+    "declarationMap": true,
+    "esModuleInterop": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "noImplicitReturns": true,
+    "pretty": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "strict": true,
+    "target": "es2017",
+    "lib": [
+      "es2017"
+    ],
+    "paths": {},
+    "noEmit": true,
+    "allowJs": true
   },
-  "include": ["*"],
-  "exclude": [
-    "**/node_modules",
-    "**/__stories__",
-    "**/lib"
+  "include": [
+    ".eslintrc.js",
   ]
 }
