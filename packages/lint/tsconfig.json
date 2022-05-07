@@ -1,5 +1,17 @@
 {
   "extends": "@vitus-labs/tools-typescript/lib",
+  "compilerOptions": {
+    "types": ["@vitus-labs/tools-rollup"],
+    "outDir": "lib",
+    "rootDir": "src",
+    "baseUrl": ".",
+    "declarationDir": "./lib/types",
+    "paths": {
+      "~/*": [
+        "src/*"
+      ]
+    },
+  },
   "include": [
     "src"
   ],
@@ -7,17 +19,5 @@
     "node_modules",
     "__stories__",
     "lib"
-  ],
-  "compilerOptions": {
-    "strictNullChecks": true,
-    "types": ["@vitus-labs/tools-rollup"],
-    "rootDir": "src",
-    "outDir": "lib",
-    "baseUrl": ".",
-    "paths": {
-      "~/*": [
-        "src/*"
-      ]
-    }
-  }
+  ]
 }

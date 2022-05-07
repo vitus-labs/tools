@@ -5,6 +5,13 @@ const createEslint = ({
   rules = {},
 } = {}) => {
   const tsProjects = projects.map((item) => `${item}/**/*/tsconfig.json`)
+  const plugins = [
+    'react',
+    '@typescript-eslint',
+    'jsx-a11y',
+    'markdown',
+    'prettier',
+  ]
 
   return {
     root: true,
@@ -22,10 +29,11 @@ const createEslint = ({
       __CLIENT__: true,
       ...globals,
     },
+    ignorePatterns: ['lib/*'],
     parser: '@typescript-eslint/parser',
-    plugins: ['react', '@typescript-eslint', 'prettier'],
+    plugins,
     parserOptions: {
-      tsconfigRootDir: __dirname,
+      // tsconfigRootDir: __dirname,
       project: ['tsconfig.json', ...tsProjects],
       ecmaFeatures: {
         jsx: true,
@@ -43,6 +51,8 @@ const createEslint = ({
       'plugin:@typescript-eslint/recommended',
       'plugin:@typescript-eslint/recommended-requiring-type-checking',
       'airbnb',
+      'plugin:jsx-a11y/recommended',
+      'plugin:react-hooks/recommended',
       'prettier',
     ],
     settings: {
@@ -107,6 +117,11 @@ const createEslint = ({
       ...rules,
     },
     overrides: [
+      {
+        files: ['**/*.md', '**/*.mdx'],
+        processor: 'markdown/markdown',
+      },
+
       {
         files: [
           '.eslintrc.js',

@@ -6,13 +6,16 @@
   "maintainers": [
     "Vit Bokisch <vit@bokisch.com>"
   ],
-  "main": "./index.json",
-  "module": "./index.json",
+  "main": "./index.js",
+  "module": "./index.js",
   "files": [
     "index.json",
     "lib.json",
     "nextjs.json"
   ],
+  "engines": {
+    "node": ">= 14"
+  },
   "publishConfig": {
     "access": "public"
   },

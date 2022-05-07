@@ -7,6 +7,9 @@
     "vl_stories": "bin/run-stories.js",
     "vl_stories-build": "bin/run-stories-build.js"
   },
+  "engines": {
+    "node": ">= 14"
+  },
   "publishConfig": {
     "access": "public"
   },

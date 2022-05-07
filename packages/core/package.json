@@ -9,6 +9,9 @@
   "main": "lib/vitus-tools-core.js",
   "module": "lib/vitus-tools-core.module.js",
   "types": "lib/index.d.ts",
+  "engines": {
+    "node": ">= 14"
+  },
   "publishConfig": {
     "access": "public"
   },

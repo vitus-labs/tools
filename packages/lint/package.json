@@ -12,6 +12,9 @@
   "files": [
     "lib/"
   ],
+  "engines": {
+    "node": ">= 14"
+  },
   "publishConfig": {
     "access": "public"
   },
@@ -20,9 +23,8 @@
     "prepublish": "yarn build",
     "build": "yarn vl_build",
     "build:watch": "yarn vl_build-watch",
-    "lint:css": "stylelint src/*.ts src/*.tsx",
     "lint:ts": "eslint src/*",
-    "lint": "yarn lint:css && yarn lint:ts"
+    "lint": "yarn lint:ts"
   },
   "peerDependencies": {
     "prettier": "*",
@@ -36,7 +38,7 @@
   "dependencies": {
     "@typescript-eslint/eslint-plugin": "^5.22.0",
     "@typescript-eslint/parser": "^5.22.0",
-    "eslint": "^8.14.0",
+    "eslint": "^8.15.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-prettier": "^8.5.0",
     "eslint-import-resolver-typescript": "^2.7.1",

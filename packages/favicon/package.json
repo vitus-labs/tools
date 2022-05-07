@@ -13,6 +13,12 @@
     "lib/",
     "bin/"
   ],
+  "engines": {
+    "node": ">= 14"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "bin": {
     "vl_favicon": "bin/run-favicon.js"
   },
@@ -23,9 +29,6 @@
     "lint:css": "stylelint src/*.ts src/*.tsx",
     "lint:ts": "eslint src/*",
     "lint": "yarn lint:css && yarn lint:ts"
-  },
-  "publishConfig": {
-    "access": "public"
   },
   "dependencies": {
     "@vitus-labs/tools-babel": "0.31.0",

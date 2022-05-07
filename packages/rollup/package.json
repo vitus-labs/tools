@@ -12,6 +12,9 @@
     "vl_build": "bin/run-build.js",
     "vl_build-watch": "bin/run-watch.js"
   },
+  "engines": {
+    "node": ">= 14"
+  },
   "publishConfig": {
     "access": "public"
   },

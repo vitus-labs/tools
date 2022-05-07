@@ -5,20 +5,19 @@
   ],
   "exclude": [
     "node_modules",
+    "__stories__",
     "lib"
   ],
   "compilerOptions": {
     "target": "ES5",
     "module": "commonjs",
+    "types": [
+      "@vitus-labs/tools-rollup"
+    ],
     "incremental": false,
-    "declarationDir": "./lib/types",
-    "rootDir": "src",
     "outDir": "lib",
+    "rootDir": "src",
     "baseUrl": ".",
-    "paths": {
-      "~/*": [
-        "src/*"
-      ]
-    }
+    "declarationDir": "./lib/types"
   }
 }

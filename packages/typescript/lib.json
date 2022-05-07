@@ -10,7 +10,9 @@
     "incremental": true,
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
-    "lib": ["es2017", "es7", "es6", "dom"],
+    "lib": ["ESNext", "es2017", "es7", "es6", "dom"],
+    "rootDir": "src",
+    "outDir": "lib",
     "esModuleInterop": true,
     "preserveSymlinks": true,
     "resolveJsonModule": true,
@@ -21,6 +23,9 @@
         "name": "typescript-styled-plugin"
       }
     ],
-    "declaration": true
-  }
+    "declaration": true,
+    "declarationDir": "./lib/types"
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "__stories__", "lib/*"]
 }

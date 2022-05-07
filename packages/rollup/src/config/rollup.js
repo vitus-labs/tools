@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 const typescript = require('rollup-plugin-typescript2')
 const ttypescript = require('ttypescript')
 const { nodeResolve } = require('@rollup/plugin-node-resolve')
@@ -44,7 +43,6 @@ const loadPlugins = ({ env, platform, typings, file }) => {
       include: CONFIG.include,
       compilerOptions: {
         types: ['@vitus-labs/tools-rollup'],
-        declaration: false,
         plugins: [
           {
             transform: '@zerollup/ts-transform-paths',
