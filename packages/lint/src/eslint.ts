@@ -4,7 +4,9 @@ const createEslint = ({
   env = {},
   globals = {},
   rules = {},
+  graphqlClient = undefined,
 } = {}) => {
+  const extensions = ['.js', '.jsx', '.ts', '.tsx']
   const tsProjects = projects.map((item) => `${item}/**/*/tsconfig.json`)
   const plugins = [
     'react',
@@ -12,6 +14,7 @@ const createEslint = ({
     'jsx-a11y',
     'markdown',
     'prettier',
+    'graphql',
   ]
 
   return {
@@ -58,13 +61,13 @@ const createEslint = ({
       'prettier',
     ],
     settings: {
-      'import/extensions': ['.js', '.jsx', '.ts', '.tsx'],
+      'import/extensions': extensions,
       'import/parsers': {
         '@typescript-eslint/parser': ['.ts', '.tsx'],
       },
       'import/resolver': {
         node: {
-          extensions: ['.js', '.jsx', '.ts', '.tsx'],
+          extensions,
         },
         typescript: {
           alwaysTryTypes: true,
@@ -113,9 +116,15 @@ const createEslint = ({
       'react/prop-types': 'off',
       'react/jsx-props-no-spreading': 'off',
       'react/function-component-definition': 'off',
-      'react/jsx-filename-extension': [
-        1,
-        { extensions: ['.js', '.jsx', '.ts', '.tsx'] },
+      'react/jsx-filename-extension': [1, { extensions }],
+      'graphql/template-strings': [
+        'error',
+        {
+          // Import default settings for your GraphQL client. Supported values:
+          // 'apollo', 'relay', 'lokka', 'fraql', 'literal'
+          env: graphqlClient || 'literal',
+          // no need to specify schema here, it will be automatically determined using .graphqlconfig
+        },
       ],
       ...rules,
     },
