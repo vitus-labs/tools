@@ -26,8 +26,11 @@
     "lint:ts": "eslint src/*",
     "lint": "yarn lint:ts"
   },
+  "optionalDependencies": {
+    "graphql": "*",
+    "prettier": "*"
+  },
   "peerDependencies": {
-    "prettier": "*",
     "typescript": "*"
   },
   "devDependencies": {
@@ -50,6 +53,7 @@
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-react": "^7.29.4",
     "eslint-plugin-react-hooks": "^4.5.0",
+    "lodash": "^4.17.21",
     "stylelint": "^14.8.2",
     "stylelint-config-prettier": "^9.0.3",
     "stylelint-config-recommended": "^7.0.0",
