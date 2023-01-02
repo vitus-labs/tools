@@ -8,7 +8,7 @@ if (__VITUS_LABS_STORIES__.styles === 'styled-components') {
   init({
     styled: styled.default,
     css: styled.css,
-    context: styled.ThemeContext,
+    provider: styled.ThemeProvider,
   })
 }
 
