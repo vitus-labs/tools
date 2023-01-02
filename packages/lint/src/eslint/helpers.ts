@@ -21,26 +21,22 @@ const loadExtendsConfigs = (options: Options) => {
   const RESULT: string[] = ['eslint:recommended']
 
   if (options.import)
-    RESULT.concat(['plugin:import/recommended', 'plugin:import/typescript'])
+    RESULT.push('plugin:import/recommended', 'plugin:import/typescript')
 
-  if (options.react)
-    RESULT.concat([
-      'plugin:react/recommended',
-      'plugin:react-hooks/recommended',
-    ])
-
-  RESULT.concat([
+  RESULT.push(
     'plugin:@typescript-eslint/eslint-recommended',
     'plugin:@typescript-eslint/recommended',
-    'airbnb',
-  ])
+    'airbnb'
+  )
 
-  if (options.a11y) RESULT.concat(['plugin:jsx-a11y/recommended'])
+  if (options.react)
+    RESULT.push('plugin:react/recommended', 'plugin:react-hooks/recommended')
 
-  if (options.prettier)
-    RESULT.concat(['plugin:prettier/recommended', 'prettier'])
+  if (options.a11y) RESULT.push('plugin:jsx-a11y/recommended')
 
-  if (options.jest) RESULT.concat(['plugin:jest/all'])
+  if (options.prettier) RESULT.push('plugin:prettier/recommended', 'prettier')
+
+  if (options.jest) RESULT.push('plugin:jest/all')
 
   return RESULT
 }
