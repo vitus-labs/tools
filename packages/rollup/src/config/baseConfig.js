@@ -10,7 +10,7 @@ module.exports = {
     outputDir: 'analysis',
   },
   filesize: true,
-  extensions: ['.js', '.jsx', '.ts', '.tsx', '.es6', '.es', '.mjs'],
+  extensions: ['.json', '.js', '.jsx', '.ts', '.tsx', '.es6', '.es', '.mjs'],
   include: ['src'],
   exclude: [
     'lib',

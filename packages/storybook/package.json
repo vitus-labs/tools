@@ -44,15 +44,15 @@
     "@storybook/react": "^6.5.15",
     "@storybook/theming": "^6.5.15",
     "@vitus-labs/tools-core": "0.36.0",
-    "babel-loader": "9.1.0",
+    "babel-loader": "9.1.2",
     "storybook-addon-outline": "^1.4.2",
     "storybook-dark-mode": "^1.1.0",
     "svg-inline-loader": "^0.8.2"
   },
   "devDependencies": {
-    "@vitus-labs/core": "0.65.0",
+    "@vitus-labs/core": "0.66.0",
     "@vitus-labs/tools-babel": "0.36.0",
     "@vitus-labs/tools-typescript": "0.36.0",
-    "@vitus-labs/unistyle": "0.65.0"
+    "@vitus-labs/unistyle": "0.66.0"
   }
 }

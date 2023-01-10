@@ -4,8 +4,8 @@ const { nodeResolve } = require('@rollup/plugin-node-resolve')
 const filesize = require('rollup-plugin-filesize')
 const { visualizer } = require('rollup-plugin-visualizer')
 const replace = require('@rollup/plugin-replace')
-const { terser } = require('rollup-plugin-terser')
-const babel = require('rollup-plugin-babel')
+const { terser } = require('@rollup/plugin-terser')
+const babel = require('@rollup/plugin-babel')
 const dts = require('rollup-plugin-dts').default
 const baseConfig = require('./baseConfig')
 const { PKG, loadConfig, swapGlobals } = require('../utils')
@@ -24,13 +24,14 @@ const defineExtensions = (platform) => {
   return platformExtensions.concat(CONFIG.extensions)
 }
 
-const loadPlugins = ({ env, platform, typings, file }) => {
+const loadPlugins = ({ env, platform, types, file }) => {
   const extensions = defineExtensions(platform)
 
   const babelConfig = {
     extensions,
     include: [CONFIG.sourceDir],
     exclude: CONFIG.exclude,
+    babelHelpers: 'runtime',
   }
 
   const tsConfig = {
@@ -53,8 +54,8 @@ const loadPlugins = ({ env, platform, typings, file }) => {
     },
   }
 
-  if (typings) {
-    tsConfig.tsconfigDefaults.compilerOptions.declaration = typings
+  if (types) {
+    tsConfig.tsconfigDefaults.compilerOptions.declaration = types
     tsConfig.tsconfigDefaults.compilerOptions.declarationDir = CONFIG.typesDir
   }
 
@@ -119,8 +120,8 @@ const typescriptConfig = () => ({
   plugins: [dts()],
 })
 
-const rollupConfig = ({ file, format, env, typings, platform }) => {
-  const plugins = loadPlugins({ file, env, typings, platform })
+const rollupConfig = ({ file, format, env, types, platform }) => {
+  const plugins = loadPlugins({ file, env, types, platform })
 
   const buildOutput = {
     input: CONFIG.sourceDir,
@@ -136,7 +137,7 @@ const rollupConfig = ({ file, format, env, typings, platform }) => {
     plugins,
   }
 
-  if (typings) {
+  if (types) {
     return [buildOutput, typescriptConfig()]
   }
 
