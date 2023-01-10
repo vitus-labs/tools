@@ -172,7 +172,7 @@ const createEslint =
         es2022: true,
       },
       globals: {
-        __SERVER__: true,
+        __NODE__: true,
         __WEB__: true,
         __BROWSER__: true,
         __NATIVE__: true,

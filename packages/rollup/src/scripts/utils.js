@@ -34,8 +34,63 @@ const BASE_VARIANTS = {
   unpkg: { format: 'umd', env: 'production' },
 }
 
+const getExportsOptions = () => {
+  const exportsOptions = PKG['exports']
+
+  if (!exportsOptions) return []
+
+  if (typeof exportsOptions === 'string') {
+    return [
+      {
+        file: PKG['exports'],
+        ...BASE_VARIANTS['module'],
+      },
+    ]
+  }
+
+  if (typeof exportsOptions === 'object') {
+    const result = []
+
+    if (exportsOptions.import) {
+      result.push({
+        file: exportsOptions.import,
+        ...BASE_VARIANTS['module'],
+      })
+    }
+
+    if (exportsOptions.require) {
+      result.push({
+        file: exportsOptions.require,
+        ...BASE_VARIANTS['main'],
+      })
+    }
+
+    if (exportsOptions.node) {
+      result.push({
+        file: exportsOptions.node,
+        ...BASE_VARIANTS['module'],
+        platform: 'node',
+      })
+    }
+
+    if (exportsOptions.default) {
+      result.push({
+        file: exportsOptions.default,
+        ...BASE_VARIANTS['module'],
+      })
+    }
+
+    return result
+  }
+
+  return []
+}
+
 const createBasicBuildVariants = () => {
-  const result = []
+  const isModule = PKG['type'] === 'module'
+  let result = []
+
+  if (isModule) result = [...getExportsOptions()]
 
   Object.keys(BASE_VARIANTS).forEach((key) => {
     const PKGOutDir = PKG[key]
@@ -54,9 +109,9 @@ const createBasicBuildVariants = () => {
           add()
         }
       } else if (hasBrowserBuild) {
-        // if has a different browser build, set default platform to server
+        // if has a different browser build, set default platform to node
         // as there is going to be created a separate browser build as well
-        add({ platform: 'server' })
+        add({ platform: 'node' })
       } else {
         add()
       }

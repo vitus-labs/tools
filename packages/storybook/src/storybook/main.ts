@@ -111,7 +111,7 @@ export default {
       new DefinePlugin({
         __BROWSER__: JSON.stringify(true),
         __NATIVE__: JSON.stringify(false),
-        __SERVER__: JSON.stringify(true),
+        __NODE__: JSON.stringify(true),
         __WEB__: JSON.stringify(true),
         __CLIENT__: JSON.stringify(true),
         __VITUS_LABS_STORIES__: JSON.stringify(CONFIG),

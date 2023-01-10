@@ -15,7 +15,7 @@ const CONFIG = loadConfig(baseConfig)
 const defineExtensions = (platform) => {
   const platformExtensions = []
 
-  if (['browser', 'server', 'web', 'native'].includes(platform)) {
+  if (['browser', 'node', 'web', 'native'].includes(platform)) {
     CONFIG.extensions.forEach((item) => {
       platformExtensions.push(`.${platform}${item}`)
     })
@@ -67,9 +67,9 @@ const loadPlugins = ({ env, platform, typings, file }) => {
   if (CONFIG.replaceGlobals) {
     const replaceOptions = {
       __VERSION__: JSON.stringify(PKG.version),
-      __SERVER__: JSON.stringify(platform === 'server'),
+      __NODE__: JSON.stringify(platform === 'node'),
       __WEB__: JSON.stringify(
-        ['server', 'browser', 'universal'].includes(platform)
+        ['node', 'browser', 'universal'].includes(platform)
       ),
       __BROWSER__: JSON.stringify(platform === 'browser'),
       __NATIVE__: JSON.stringify(platform === 'native'),
