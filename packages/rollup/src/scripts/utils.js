@@ -150,7 +150,7 @@ const createBuildPipeline = () => {
   ]
 
   // add generate typings for the first bundle only
-  result[0] = { ...result[0], typings: shouldGenerateTypes }
+  result[0] = { ...result[0], types: shouldGenerateTypes }
 
   return result
 }
