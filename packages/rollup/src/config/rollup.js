@@ -1,12 +1,12 @@
 const typescript = require('rollup-plugin-typescript2')
 const ttypescript = require('ttypescript')
+const { apiExtractor } = require('rollup-plugin-api-extractor')
 const { nodeResolve } = require('@rollup/plugin-node-resolve')
 const filesize = require('rollup-plugin-filesize')
 const { visualizer } = require('rollup-plugin-visualizer')
 const replace = require('@rollup/plugin-replace')
 const { terser } = require('@rollup/plugin-terser')
 const babel = require('@rollup/plugin-babel')
-const dts = require('rollup-plugin-dts').default
 const baseConfig = require('./baseConfig')
 const { PKG, loadConfig, swapGlobals } = require('../utils')
 
@@ -44,17 +44,13 @@ const loadPlugins = ({ env, platform, types, file }) => {
       include: CONFIG.include,
       compilerOptions: {
         types: ['@vitus-labs/tools-rollup'],
-        plugins: [
-          {
-            transform: '@zerollup/ts-transform-paths',
-            exclude: ['*'],
-          },
-        ],
+        plugins: [{ transform: 'ts-transform-paths' }],
       },
     },
   }
 
   if (types) {
+    tsConfig.tsconfigDefaults.compilerOptions.declarationMap = types
     tsConfig.tsconfigDefaults.compilerOptions.declaration = types
     tsConfig.tsconfigDefaults.compilerOptions.declarationDir = CONFIG.typesDir
   }
@@ -63,6 +59,25 @@ const loadPlugins = ({ env, platform, types, file }) => {
 
   if (CONFIG.typescript) {
     plugins.push(typescript(tsConfig))
+
+    if (types) {
+      plugins.push(
+        apiExtractor({
+          cleanUpRollup: true,
+          configuration: {
+            mainEntryPointFilePath: `${CONFIG.typesDir}/index.d.ts`,
+            projectFolder: process.cwd(),
+            compiler: {
+              tsconfigFilePath: '<projectFolder>/tsconfig.json',
+            },
+            dtsRollup: {
+              enabled: true,
+              untrimmedFilePath: `<projectFolder>${PKG.typings || PKG.types}`,
+            },
+          },
+        })
+      )
+    }
   }
 
   if (CONFIG.replaceGlobals) {
@@ -114,12 +129,6 @@ const loadPlugins = ({ env, platform, types, file }) => {
   return plugins
 }
 
-const typescriptConfig = () => ({
-  input: `${CONFIG.typesDir}/index.d.ts`,
-  output: { file: PKG.typings || PKG.types, format: 'es' },
-  plugins: [dts()],
-})
-
 const rollupConfig = ({ file, format, env, types, platform }) => {
   const plugins = loadPlugins({ file, env, types, platform })
 
@@ -135,10 +144,6 @@ const rollupConfig = ({ file, format, env, types, platform }) => {
     },
     external: PKG.externalDependencies,
     plugins,
-  }
-
-  if (types) {
-    return [buildOutput, typescriptConfig()]
   }
 
   return buildOutput
