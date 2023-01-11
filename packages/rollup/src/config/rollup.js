@@ -1,5 +1,6 @@
 const typescript = require('rollup-plugin-typescript2')
 const ttypescript = require('ttypescript')
+const pathsTransformer = require('ts-transform-paths').default
 const { apiExtractor } = require('rollup-plugin-api-extractor')
 const { nodeResolve } = require('@rollup/plugin-node-resolve')
 const filesize = require('rollup-plugin-filesize')
@@ -36,6 +37,7 @@ const loadPlugins = ({ env, platform, types, file }) => {
 
   const tsConfig = {
     typescript: ttypescript,
+    transformers: [(service) => pathsTransformer(service)],
     exclude: CONFIG.exclude,
     useTsconfigDeclarationDir: true,
     clean: true,
@@ -44,7 +46,6 @@ const loadPlugins = ({ env, platform, types, file }) => {
       include: CONFIG.include,
       compilerOptions: {
         types: ['@vitus-labs/tools-rollup'],
-        plugins: [{ transform: 'ts-transform-paths' }],
       },
     },
   }
