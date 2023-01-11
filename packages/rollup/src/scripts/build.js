@@ -96,7 +96,7 @@ const runBuild = async () => {
 
   log('\n')
 
-  Promise.resolve()
+  await Promise.resolve()
     .then(() => createBuilds())
     .then(() => {
       log(`${chalk.bold.bgBlue.black('[4/4]')} ${chalk.blue('🎉  Done!')}`)

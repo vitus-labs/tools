@@ -1,4 +1,4 @@
 #!/usr/bin/env node
-const runBuild = require('../src/scripts/build')
+const runBuild = require('../src')
 
 runBuild()

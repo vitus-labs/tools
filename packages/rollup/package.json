@@ -7,7 +7,7 @@
     "Vit Bokisch <vit@bokisch.com>"
   ],
   "main": "./index.js",
-  "typings": "typings/index.d.ts",
+  "types": "typings/index.d.ts",
   "bin": {
     "vl_build": "bin/run-build.js",
     "vl_build-watch": "bin/run-watch.js"
