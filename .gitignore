@@ -45,7 +45,7 @@ junit.xml
 
 # Output
 *.js.map
-*.d.ts
+**/tsconfig.tsbuildinfo
 
 # Runtime data
 pids
@@ -73,9 +73,6 @@ bower_components
 
 # Compiled binary addons (http://nodejs.org/api/addons.html)
 build/Release
-
-# Typescript v1 declaration files
-typings/
 
 # Optional npm cache directory
 .npm
