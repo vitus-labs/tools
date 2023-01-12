@@ -7,7 +7,7 @@ const filesize = require('rollup-plugin-filesize')
 const { visualizer } = require('rollup-plugin-visualizer')
 const replace = require('@rollup/plugin-replace')
 const { terser } = require('@rollup/plugin-terser')
-const babel = require('@rollup/plugin-babel')
+// const babel = require('@rollup/plugin-babel')
 const baseConfig = require('./baseConfig')
 const { PKG, loadConfig, swapGlobals } = require('../utils')
 
@@ -28,12 +28,12 @@ const defineExtensions = (platform) => {
 const loadPlugins = ({ env, platform, types, file }) => {
   const extensions = defineExtensions(platform)
 
-  const babelConfig = {
-    extensions,
-    include: [CONFIG.sourceDir],
-    exclude: CONFIG.exclude,
-    babelHelpers: 'runtime',
-  }
+  // const babelConfig = {
+  //   extensions,
+  //   include: [CONFIG.sourceDir],
+  //   exclude: CONFIG.exclude,
+  //   babelHelpers: 'bundled',
+  // }
 
   const tsConfig = {
     typescript: ttypescript,
@@ -100,7 +100,7 @@ const loadPlugins = ({ env, platform, types, file }) => {
     plugins.push(replace({ preventAssignment: true, values: replaceOptions }))
   }
 
-  plugins.push(babel(babelConfig))
+  // plugins.push(babel(babelConfig))
 
   // generate visualised graphs in dist folder
   if (CONFIG.visualise) {
@@ -134,6 +134,8 @@ const rollupConfig = ({ file, format, env, types, platform }) => {
   const plugins = loadPlugins({ file, env, types, platform })
 
   const buildOutput = {
+    makeAbsoluteExternalsRelative: true,
+    preserveEntrySignatures: 'strict',
     input: CONFIG.sourceDir,
     output: {
       file,
@@ -142,6 +144,12 @@ const rollupConfig = ({ file, format, env, types, platform }) => {
       sourcemap: true,
       exports: ['cjs', 'umd'].includes(format) ? 'named' : undefined,
       name: ['umd', 'iife'].includes(format) ? PKG.bundleName : undefined,
+      esModule: true,
+      generatedCode: {
+        reservedNamesAsProps: false,
+      },
+      interop: 'compat',
+      systemNullSetters: false,
     },
     external: PKG.externalDependencies,
     plugins,

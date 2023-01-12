@@ -21,6 +21,7 @@ module.exports = {
     '*.test.*',
     '*.spec.*',
     '*.stories.*',
+    'stories.*',
     '*.story.*',
   ],
   globals: {

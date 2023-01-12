@@ -50,9 +50,9 @@
     "svg-inline-loader": "^0.8.2"
   },
   "devDependencies": {
-    "@vitus-labs/core": "0.66.0",
+    "@vitus-labs/core": "0.68.0",
     "@vitus-labs/tools-babel": "0.40.0",
     "@vitus-labs/tools-typescript": "0.40.0",
-    "@vitus-labs/unistyle": "0.66.0"
+    "@vitus-labs/unistyle": "0.68.0"
   }
 }
