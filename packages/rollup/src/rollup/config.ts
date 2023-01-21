@@ -1,21 +1,19 @@
-const typescript = require('rollup-plugin-typescript2')
-const ttypescript = require('ttypescript')
-const pathsTransformer = require('ts-transform-paths').default
-const { apiExtractor } = require('rollup-plugin-api-extractor')
-const { nodeResolve } = require('@rollup/plugin-node-resolve')
-const filesize = require('rollup-plugin-filesize')
-const { visualizer } = require('rollup-plugin-visualizer')
-const replace = require('@rollup/plugin-replace')
-const { terser } = require('@rollup/plugin-terser')
-const baseConfig = require('./baseConfig')
-const { PKG, loadConfig, swapGlobals } = require('../utils')
-
-const CONFIG = loadConfig(baseConfig)
+import { swapGlobals } from '@vitus-labs/tools-core'
+import typescript from 'rollup-plugin-typescript2'
+import ttypescript from 'ttypescript'
+import pathsTransformer from 'ts-transform-paths'
+import { apiExtractor } from 'rollup-plugin-api-extractor'
+import { nodeResolve } from '@rollup/plugin-node-resolve'
+import filesize from 'rollup-plugin-filesize'
+import { visualizer } from 'rollup-plugin-visualizer'
+import replace from '@rollup/plugin-replace'
+import terser from '@rollup/plugin-terser'
+import { CONFIG, PKG, PLATFORMS } from '../config'
 
 const defineExtensions = (platform) => {
-  const platformExtensions = []
+  const platformExtensions: string[] = []
 
-  if (['browser', 'node', 'web', 'native'].includes(platform)) {
+  if (PLATFORMS.includes(platform)) {
     CONFIG.extensions.forEach((item) => {
       platformExtensions.push(`.${platform}${item}`)
     })
@@ -26,31 +24,30 @@ const defineExtensions = (platform) => {
 
 const loadPlugins = ({ env, platform, types, file }) => {
   const extensions = defineExtensions(platform)
-
-  const tsConfig = {
-    typescript: ttypescript,
-    transformers: [(service) => pathsTransformer(service)],
-    exclude: CONFIG.exclude,
-    useTsconfigDeclarationDir: true,
-    clean: true,
-    tsconfigDefaults: {
-      exclude: CONFIG.exclude,
-      include: CONFIG.include,
-      compilerOptions: {
-        types: ['@vitus-labs/tools-rollup'],
-      },
-    },
-  }
-
-  if (types) {
-    tsConfig.tsconfigDefaults.compilerOptions.declarationMap = types
-    tsConfig.tsconfigDefaults.compilerOptions.declaration = types
-    tsConfig.tsconfigDefaults.compilerOptions.declarationDir = CONFIG.typesDir
-  }
-
   const plugins = [nodeResolve({ extensions, browser: platform === 'browser' })]
 
   if (CONFIG.typescript) {
+    const tsConfig: Record<string, any> = {
+      typescript: ttypescript,
+      transformers: [(service) => pathsTransformer(service)],
+      exclude: CONFIG.exclude,
+      useTsconfigDeclarationDir: true,
+      clean: true,
+      tsconfigDefaults: {
+        exclude: CONFIG.exclude,
+        include: CONFIG.include,
+        compilerOptions: {
+          types: ['@vitus-labs/tools-rollup'],
+        },
+      },
+    }
+
+    if (types) {
+      tsConfig.tsconfigDefaults.compilerOptions.declarationMap = types
+      tsConfig.tsconfigDefaults.compilerOptions.declaration = types
+      tsConfig.tsconfigDefaults.compilerOptions.declarationDir = CONFIG.typesDir
+    }
+
     plugins.push(typescript(tsConfig))
 
     if (types) {
@@ -122,7 +119,13 @@ const loadPlugins = ({ env, platform, types, file }) => {
   return plugins
 }
 
-const rollupConfig = ({ file, format, env, types, platform }) => {
+const rollupConfig = ({
+  file,
+  format,
+  env,
+  types,
+  platform,
+}: Record<string, any>) => {
   const plugins = loadPlugins({ file, env, types, platform })
 
   const buildOutput = {
@@ -150,4 +153,4 @@ const rollupConfig = ({ file, format, env, types, platform }) => {
   return buildOutput
 }
 
-module.exports = rollupConfig
+export default rollupConfig

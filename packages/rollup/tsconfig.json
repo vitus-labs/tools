@@ -1,7 +1,8 @@
 {
   "extends": "@vitus-labs/tools-typescript/lib",
   "compilerOptions": {
-    "types": ["@vitus-labs/tools-rollup/typings"],
+    "target": "es5",
+    "module": "commonjs",
     "outDir": "lib",
     "rootDir": "src",
     "baseUrl": ".",
@@ -13,7 +14,8 @@
     },
   },
   "include": [
-    "src"
+    "typings",
+    "src",
   ],
   "exclude": [
     "node_modules",

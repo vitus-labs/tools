@@ -1,16 +1,19 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-const chalk = require('chalk')
-const rimraf = require('rimraf')
-const rollup = require('rollup')
-const { rollupConfig, baseConfig } = require('../config')
-const { loadConfig } = require('../utils')
-const createBuildPipeline = require('./utils')
+import chalk from 'chalk'
+import rimraf from 'rimraf'
+import rollup from 'rollup'
+import { CONFIG } from '../config'
+import { config as rollupConfig, createBuildPipeline } from '../rollup'
 
 const { log } = console
-const CONFIG = loadConfig(baseConfig)
 const allBuilds = createBuildPipeline()
-// const allBuilds = allBuildOptions.map((item) => rollupConfig(item)).flat()
 const allBuildsCount = allBuilds.length
+
+const MODULE_TYPES = {
+  cjs: 'CommonJS',
+  es: 'ES Module',
+  umd: 'UMD module',
+}
 
 // --------------------------------------------------------
 // BUILD rollup
@@ -29,32 +32,17 @@ const createBuilds = async () => {
 
   // serialize builds
   allBuilds.forEach((item, i) => {
-    const buildOptions = rollupConfig(item)
+    const { output, ...input } = rollupConfig(item)
+    const type = output.format
 
-    // it might be an array for such a cases like typescript optimization file
-    // which we want to do in one iteration only
-    if (Array.isArray(buildOptions)) {
-      const [buildConfig, typescriptConfig] = buildOptions
-
-      const { output, ...input } = buildConfig
-      const { output: tsOutput, ...tsInput } = typescriptConfig
-
-      p = p.then(() => {
-        log(chalk.green(`🚧  Creating a build ${i + 1}/${allBuildsCount}`))
-        return build({ inputOptions: input, outputOptions: output })
-      })
-
-      p = p.then(() =>
-        build({ inputOptions: tsInput, outputOptions: tsOutput })
+    p = p.then(() => {
+      log(
+        chalk.green(`🚧  Creating a build ${i + 1}/${allBuildsCount}`),
+        chalk.gray(`(format: ${MODULE_TYPES[type]})`)
       )
-    } else {
-      const { output, ...input } = buildOptions
 
-      p = p.then(() => {
-        log(chalk.green(`🚧  Creating a build ${i + 1}/${allBuildsCount}`))
-        return build({ inputOptions: input, outputOptions: output })
-      })
-    }
+      return build({ inputOptions: input, outputOptions: output })
+    })
   })
 
   p.catch((e) => {
@@ -103,4 +91,4 @@ const runBuild = async () => {
     })
 }
 
-module.exports = runBuild
+export default runBuild
