@@ -1,7 +1,7 @@
 {
   "extends": "@vitus-labs/tools-typescript/lib",
   "compilerOptions": {
-    "types": ["@vitus-labs/tools-rollup/typings"],
+    "types": ["@vitus-labs/tools-rollup/global"],
     "outDir": "lib",
     "rootDir": "src",
     "baseUrl": ".",
