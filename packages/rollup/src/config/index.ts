@@ -1,7 +1,7 @@
 import { loadVLToolsConfig, PKG } from '@vitus-labs/tools-core'
 import baseConfig from './baseConfig'
 
-const CONFIG_KEY = 'rollup'
+const CONFIG_KEY = 'build'
 
 const CONFIG = loadVLToolsConfig(CONFIG_KEY).merge(baseConfig).config
 
