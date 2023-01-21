@@ -1,8 +1,9 @@
-module.exports = {
+export default {
   sourceDir: 'src',
   outputDir: 'lib',
   typesDir: 'lib/types',
   typescript: true,
+  esModulesOnly: false,
   replaceGlobals: true,
   visualise: {
     template: 'network',

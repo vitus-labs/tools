@@ -1,4 +1,4 @@
 #!/usr/bin/env node
-const runBuild = require('../src')
+const runBuild = require('../lib').default
 
 runBuild()

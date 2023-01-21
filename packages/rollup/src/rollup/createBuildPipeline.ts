@@ -1,12 +1,14 @@
-const { PKG } = require('../utils')
+import { PKG, CONFIG } from '../config'
 
+const isESMModule = PKG.type === 'module'
+const { esModulesOnly } = CONFIG
 const shouldBuildNative = PKG['react-native'] !== PKG.module
 const shouldGenerateTypes = !!(PKG.types || PKG.typings)
 
 const hasDifferentBrowserBuild = (type) => {
   if (!PKG.browser) return false
 
-  return Object.entries(PKG.browser).some(([key, value]) => {
+  return Object.entries(PKG.browser).some(([key, value]: [string, string]) => {
     const source = key.substring(2)
     const output = value.substring(2)
 
@@ -16,7 +18,7 @@ const hasDifferentBrowserBuild = (type) => {
 
 const BASE_VARIANTS = {
   main: {
-    format: 'cjs',
+    format: esModulesOnly ? 'es' : 'cjs',
     env: 'development',
     platform: 'universal',
   },
@@ -35,40 +37,40 @@ const BASE_VARIANTS = {
 }
 
 const getExportsOptions = () => {
-  const exportsOptions = PKG['exports']
+  const exportsOptions = PKG.exports
 
   if (!exportsOptions) return []
 
   if (typeof exportsOptions === 'string') {
     return [
       {
-        file: PKG['exports'],
-        ...BASE_VARIANTS['module'],
+        file: PKG.exports,
+        ...BASE_VARIANTS.module,
       },
     ]
   }
 
   if (typeof exportsOptions === 'object') {
-    const result = []
+    const result: Record<string, any>[] = []
 
     if (exportsOptions.import) {
       result.push({
         file: exportsOptions.import,
-        ...BASE_VARIANTS['module'],
+        ...BASE_VARIANTS.module,
       })
     }
 
     if (exportsOptions.require) {
       result.push({
         file: exportsOptions.require,
-        ...BASE_VARIANTS['main'],
+        ...BASE_VARIANTS.main,
       })
     }
 
     if (exportsOptions.node) {
       result.push({
         file: exportsOptions.node,
-        ...BASE_VARIANTS['module'],
+        ...BASE_VARIANTS.module,
         platform: 'node',
       })
     }
@@ -76,7 +78,7 @@ const getExportsOptions = () => {
     if (exportsOptions.default) {
       result.push({
         file: exportsOptions.default,
-        ...BASE_VARIANTS['module'],
+        ...BASE_VARIANTS.module,
       })
     }
 
@@ -87,10 +89,9 @@ const getExportsOptions = () => {
 }
 
 const createBasicBuildVariants = () => {
-  const isModule = PKG['type'] === 'module'
-  let result = []
+  let result: Record<string, any>[] = []
 
-  if (isModule) result = [...getExportsOptions()]
+  if (isESMModule) result = [...getExportsOptions()]
 
   Object.keys(BASE_VARIANTS).forEach((key) => {
     const PKGOutDir = PKG[key]
@@ -108,7 +109,9 @@ const createBasicBuildVariants = () => {
         if (shouldBuildNative) {
           add()
         }
-      } else if (hasBrowserBuild) {
+      }
+
+      if (hasBrowserBuild) {
         // if has a different browser build, set default platform to node
         // as there is going to be created a separate browser build as well
         add({ platform: 'node' })
@@ -122,10 +125,10 @@ const createBasicBuildVariants = () => {
 }
 
 const createBrowserBuildVariants = () => {
-  const result = []
+  const result: Record<string, any>[] = []
   if (!PKG.browser) return result
 
-  Object.entries(PKG.browser).forEach(([key, value]) => {
+  Object.entries(PKG.browser).forEach(([key, value]: [string, string]) => {
     const source = key.substring(2) // strip './' from the beginning of path
     const output = value.substring(2) // strip './' from the beginning of path
 
@@ -155,4 +158,4 @@ const createBuildPipeline = () => {
   return result
 }
 
-module.exports = createBuildPipeline
+export default createBuildPipeline

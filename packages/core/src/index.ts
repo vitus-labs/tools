@@ -1,6 +1,10 @@
 import fs from 'fs'
 import findUp from 'find-up'
-import { get, merge } from 'lodash'
+import { get as _get, merge } from 'lodash'
+
+const VITUS_LABS_FILE_NAME = 'vl-tools.config.js'
+const PACKAGE_FILE_NAME = 'package.json'
+const TYPESCRIPT_FILE_NAME = 'package.json'
 
 // --------------------------------------------------------
 // FIND & READ file helpers
@@ -37,7 +41,7 @@ const loadFileToJSON = (filename: string) => {
 // GET PACKAGE.JSON info
 // --------------------------------------------------------
 const getPackageJSON = () => {
-  const data = loadFileToJSON('package.json')
+  const data = loadFileToJSON(PACKAGE_FILE_NAME)
 
   return data
 }
@@ -104,26 +108,26 @@ const getPkgData = () => {
 // --------------------------------------------------------
 // LOAD EXTERNAL CONFIGURATION
 // --------------------------------------------------------
-const getExternalConfig = () => loadFileToJSON('vl-tools.config.js')
+const getExternalConfig = () => loadFileToJSON(VITUS_LABS_FILE_NAME)
 
 const loadConfigParam =
   (filename: string) =>
   (key: string, defaultValue = {}) => {
     const externalConfig = loadFileToJSON(filename)
 
-    return get(externalConfig, key, defaultValue)
+    return _get(externalConfig, key, defaultValue)
   }
 
 const loadVLToolsConfig = (key: string) => {
   const externalConfig = getExternalConfig()
-  const result = get(externalConfig, key, {})
+  const result = _get(externalConfig, key, {})
 
   const cloneAndEnhance = (object) => ({
     get config() {
       return object
     },
     get: (param: string, defaultValue?: any) =>
-      get(object, param, defaultValue),
+      _get(object, param, defaultValue),
     merge: (param: Record<string, any>) =>
       cloneAndEnhance(merge(param, object)),
   })
@@ -140,7 +144,7 @@ const swapGlobals = (globals: Record<string, string>) =>
 
 const PKG = getPkgData()
 const CONFIG = getExternalConfig()
-const TS_CONFIG = loadFileToJSON('tsconfig.json')
+const TS_CONFIG = loadFileToJSON(TYPESCRIPT_FILE_NAME)
 
 export {
   findFile,

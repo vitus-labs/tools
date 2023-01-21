@@ -1,23 +1,20 @@
 {
   "extends": "@vitus-labs/tools-typescript/lib",
-  "include": [
+  "compilerOptions": {
+    "target": "ES5",
+    "module": "commonjs",
+    "types": ["@vitus-labs/tools-rollup/global"],
+    "incremental": false,
+    "outDir": "lib",
+    "rootDir": "src",
+    "baseUrl": ".",
+    "declarationDir": "./lib/types"
+  },"include": [
     "src"
   ],
   "exclude": [
     "node_modules",
     "__stories__",
     "lib"
-  ],
-  "compilerOptions": {
-    "target": "ES5",
-    "module": "commonjs",
-    "types": [
-      "@vitus-labs/tools-rollup"
-    ],
-    "incremental": false,
-    "outDir": "lib",
-    "rootDir": "src",
-    "baseUrl": ".",
-    "declarationDir": "./lib/types"
-  }
+  ]
 }
