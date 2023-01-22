@@ -109,9 +109,7 @@ const createBasicBuildVariants = () => {
         if (shouldBuildNative) {
           add()
         }
-      }
-
-      if (hasBrowserBuild) {
+      } else if (hasBrowserBuild) {
         // if has a different browser build, set default platform to node
         // as there is going to be created a separate browser build as well
         add({ platform: 'node' })
