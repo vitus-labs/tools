@@ -1,18 +1,13 @@
-import fs from 'fs'
+import fs from 'node:fs'
 import favicons from 'favicons'
 import { loadVLToolsConfig } from '@vitus-labs/tools-core'
-import baseConfig from '~/baseConfig'
+import { configuration } from './baseConfig.js'
 
 const VL_CONFIG = await loadVLToolsConfig('favicon')
 
-const { icons, path, ...restConfig } = VL_CONFIG.merge(baseConfig).config
+const { icons, path, ...restConfig } = VL_CONFIG.merge(configuration).config
 
-const callback = (outputPath) => (error, response) => {
-  if (error) {
-    console.log(error.message) // Error description e.g. "An unknown error has occurred"
-    return
-  }
-
+const handleSuccess = (outputPath, response) => {
   console.log('Creating images...')
   response.images.forEach((item) => {
     fs.writeFileSync(`${outputPath}${item.name}`, item.contents)
@@ -24,17 +19,20 @@ const callback = (outputPath) => (error, response) => {
   })
 }
 
+const handleError = (error) => {
+  console.log(error.message) // Error description e.g. "An unknown error has occurred"
+}
+
 const generateFavicons = () =>
   icons.forEach((item) => {
     const inputPath = `${process.cwd()}/${item.input}`
     const outputPath = `${process.cwd()}/${item.output}/`
 
     // favicons(source, configuration, callback)
-    favicons(
-      inputPath,
-      { ...restConfig, path: `${path}/${item.path}` },
-      callback(outputPath)
+    favicons(inputPath, { ...restConfig, path: `${path}/${item.path}` }).then(
+      (res) => handleSuccess(outputPath, res),
+      (err) => handleError(err)
     )
   })
 
-export default generateFavicons
+export { generateFavicons }

@@ -37,5 +37,3 @@ const configuration = {
 export type Configuration = typeof configuration
 
 export { configuration }
-
-export default configuration

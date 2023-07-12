@@ -1,5 +1,5 @@
-import generateFavicons from '~/generateFavicon'
-import configuration, { Configuration } from '~/baseConfig'
+import { generateFavicons } from './generateFavicon.js'
+import { configuration, Configuration } from './baseConfig.js'
 
 export type { Configuration }
 
