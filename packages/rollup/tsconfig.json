@@ -1,8 +1,9 @@
 {
   "extends": "@vitus-labs/tools-typescript/lib",
   "compilerOptions": {
-    "target": "es5",
-    "module": "commonjs",
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
     "outDir": "lib",
     "rootDir": "src",
     "baseUrl": ".",
@@ -12,6 +13,7 @@
         "src/*"
       ]
     },
+    "plugins": []
   },
   "include": [
     "typings",

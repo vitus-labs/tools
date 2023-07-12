@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import chalk from 'chalk'
-import rimraf from 'rimraf'
-import rollup from 'rollup'
-import { CONFIG } from '../config'
-import { config as rollupConfig, createBuildPipeline } from '../rollup'
+import { rimraf } from 'rimraf'
+import { rollup } from 'rollup'
+import { CONFIG } from '../config/index.js'
+import { config as rollupConfig, createBuildPipeline } from '../rollup/index.js'
 
 const { log } = console
 const allBuilds = createBuildPipeline()
@@ -19,7 +19,7 @@ const MODULE_TYPES = {
 // BUILD rollup
 // --------------------------------------------------------
 async function build({ inputOptions, outputOptions }) {
-  const bundle = await rollup.rollup(inputOptions)
+  const bundle = await rollup(inputOptions)
 
   await bundle.write(outputOptions)
 }
@@ -91,4 +91,4 @@ const runBuild = async () => {
     })
 }
 
-export default runBuild
+export { runBuild }

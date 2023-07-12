@@ -1,11 +1,11 @@
-import { filter, merge, omit, isEmpty } from 'lodash'
+import { filter, merge, omit, isEmpty } from 'lodash-es'
 import {
   loadTsProjects,
   loadPlugins,
   loadExtendsConfigs,
   extendObject,
 } from './helpers'
-import type { Options } from './types'
+import { Options } from './types'
 
 type Config = Partial<{
   rootPath: string
@@ -214,6 +214,7 @@ const createEslint =
         'no-unused-vars': 'off',
         'no-useless-constructor': 'off',
         'no-shadow': 'off',
+        'import/prefer-default-export': 'off',
         'no-use-before-define': 'off', // is being used @typescript-eslint/no-use-before-define
         'no-param-reassign': [
           'error',

@@ -1,4 +1,4 @@
-import type { Options } from './types'
+import { Options } from './types'
 
 const loadTsProjects = (projects) =>
   projects.map((item) => `${item}/**/*/tsconfig.json`)

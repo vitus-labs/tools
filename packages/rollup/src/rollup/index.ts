@@ -1,4 +1,4 @@
-import config from './config'
-import createBuildPipeline from './createBuildPipeline'
+import config from './config.js'
+import createBuildPipeline from './createBuildPipeline.js'
 
 export { createBuildPipeline, config }

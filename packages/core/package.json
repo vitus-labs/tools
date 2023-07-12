@@ -1,35 +1,31 @@
 {
   "name": "@vitus-labs/tools-core",
-  "version": "0.45.0",
+  "version": "0.46.0",
   "license": "MIT",
   "author": "Vit Bokisch <vit@bokisch.com>",
   "maintainers": [
     "Vit Bokisch <vit@bokisch.com>"
   ],
-  "main": "lib/vitus-tools-core.js",
-  "module": "lib/vitus-tools-core.module.js",
-  "types": "lib/index.d.ts",
+  "type": "module",
+  "exports": "./lib/index.js",
+  "types": "./lib/types/index.d.ts",
   "engines": {
-    "node": ">= 14"
+    "node": ">= 16"
   },
   "publishConfig": {
     "access": "public"
   },
   "scripts": {
     "prepublish": "yarn build",
-    "build": "yarn vl_build",
-    "build:watch": "yarn vl_build-watch",
-    "lint:ts": "eslint src/*",
-    "lint": "yarn lint:ts"
+    "build": "tsc"
   },
   "dependencies": {
-    "find-up": "5.0.0",
-    "lodash": "^4.17.21"
+    "find-up": "^6.3.0",
+    "lodash-es": "^4.17.21"
   },
   "devDependencies": {
-    "@vitus-labs/tools-babel": "0.45.0",
-    "@vitus-labs/tools-core": "0.45.0",
-    "@vitus-labs/tools-rollup": "0.45.0",
-    "@vitus-labs/tools-typescript": "0.45.0"
+    "@types/lodash-es": "^4.17.7",
+    "@vitus-labs/tools-typescript": "*",
+    "typescript": "*"
   }
 }

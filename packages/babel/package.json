@@ -1,26 +1,37 @@
 {
   "name": "@vitus-labs/tools-babel",
-  "version": "0.45.0",
+  "version": "0.46.0",
   "license": "MIT",
   "author": "Vit Bokisch <vit@bokisch.com>",
   "maintainers": [
     "Vit Bokisch <vit@bokisch.com>"
   ],
-  "main": "./index.js",
-  "files": [
-    "index.js",
-    "lib.js"
-  ],
+  "type": "module",
+  "exports": "./lib/index.module.js",
+  "types": "./lib/index.d.ts",
   "engines": {
-    "node": ">= 14"
+    "node": ">= 16"
   },
   "publishConfig": {
     "access": "public"
   },
+  "scripts": {
+    "prepublish": "yarn build",
+    "build": "yarn vl_build",
+    "build:watch": "yarn vl_build-watch",
+    "lint:css": "stylelint src/*.ts src/*.tsx",
+    "lint:ts": "eslint src/*",
+    "lint": "yarn lint:css && yarn lint:ts"
+  },
   "dependencies": {
-    "@babel/core": "^7.22.1",
-    "@babel/preset-env": "^7.22.4",
-    "@babel/preset-react": "^7.22.3",
-    "@babel/preset-typescript": "^7.21.5"
+    "@babel/core": "^7.22.8",
+    "@babel/preset-env": "^7.22.7",
+    "@babel/preset-react": "^7.22.5",
+    "@babel/preset-typescript": "^7.22.5"
+  },
+  "devDependencies": {
+    "@vitus-labs/tools-core": "*",
+    "@vitus-labs/tools-rollup": "*",
+    "@vitus-labs/tools-typescript": "*"
   }
 }

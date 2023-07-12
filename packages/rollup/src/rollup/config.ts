@@ -1,14 +1,18 @@
-import { swapGlobals } from '@vitus-labs/tools-core'
-import typescript from 'rollup-plugin-typescript2'
-import ttypescript from 'ttypescript'
-import pathsTransformer from 'ts-transform-paths'
+import { createRequire } from 'node:module'
+import { merge } from 'lodash-es'
+
+import typescript, { RollupTypescriptOptions } from '@rollup/plugin-typescript'
 import { apiExtractor } from 'rollup-plugin-api-extractor'
 import { nodeResolve } from '@rollup/plugin-node-resolve'
 import filesize from 'rollup-plugin-filesize'
 import { visualizer } from 'rollup-plugin-visualizer'
 import replace from '@rollup/plugin-replace'
 import terser from '@rollup/plugin-terser'
-import { CONFIG, PKG, PLATFORMS } from '../config'
+import { swapGlobals } from '@vitus-labs/tools-core'
+import { CONFIG, TS_CONFIG, PKG, PLATFORMS } from '../config/index.js'
+
+const require = createRequire(import.meta.url)
+const tspCompiler = require('ts-patch/compiler')
 
 const defineExtensions = (platform) => {
   const platformExtensions: string[] = []
@@ -27,48 +31,76 @@ const loadPlugins = ({ env, platform, types, file }) => {
   const plugins = [nodeResolve({ extensions, browser: platform === 'browser' })]
 
   if (CONFIG.typescript) {
-    const tsConfig: Record<string, any> = {
-      typescript: ttypescript,
-      transformers: [(service) => pathsTransformer(service)],
+    const tsConfig: RollupTypescriptOptions = {
+      typescript: tspCompiler,
+      // transformers: [
+      //   (service) => ({
+      //     before: [keysTransformer(service.getProgram())],
+      //     after: [],
+      //   }),
+      // ],
       exclude: CONFIG.exclude,
       useTsconfigDeclarationDir: true,
-      clean: true,
-      tsconfigDefaults: {
-        exclude: CONFIG.exclude,
-        include: CONFIG.include,
-        compilerOptions: {
-          types: ['@vitus-labs/tools-rollup'],
-        },
-      },
+      // clean: true,
+      include: CONFIG.include,
+
+      // tsconfigDefaults: {
+      // compilerOptions: {
+      //   types: ['@vitus-labs/tools-rollup'],
+      //   plugins: [
+      //     { transform: 'typescript-transform-paths' },
+      //     {
+      //       transform: 'typescript-transform-paths',
+      //       afterDeclarations: true,
+      //     },
+      //   ],
+      // },
+      // },
     }
 
-    if (types) {
-      tsConfig.tsconfigDefaults.compilerOptions.declarationMap = types
-      tsConfig.tsconfigDefaults.compilerOptions.declaration = types
-      tsConfig.tsconfigDefaults.compilerOptions.declarationDir = CONFIG.typesDir
-    }
-
-    plugins.push(typescript(tsConfig))
-
-    if (types) {
-      plugins.push(
-        apiExtractor({
-          cleanUpRollup: true,
-          configuration: {
-            mainEntryPointFilePath: `<projectFolder>/${CONFIG.typesDir}/index.d.ts`,
-            projectFolder: process.cwd(),
-            compiler: {
-              tsconfigFilePath: '<projectFolder>/tsconfig.json',
-              skipLibCheck: true,
-            },
-            dtsRollup: {
-              enabled: true,
-              untrimmedFilePath: `<projectFolder>${PKG.typings || PKG.types}`,
-            },
+    const EXTEND_TS_CONFIG = types
+      ? {
+          compilerOptions: {
+            declarationMap: types,
+            declaration: types,
+            declarationDir: CONFIG.typesDir,
           },
-        })
-      )
-    }
+        }
+      : {}
+
+    // if (types) {
+    //   if (!tsConfig.tsconfigDefaults.compilerOptions) {
+    //     tsConfig.tsconfigDefaults.compilerOptions = {}
+    //   }
+
+    //   tsConfig.tsconfigDefaults.compilerOptions.declarationMap = types
+    //   tsConfig.tsconfigDefaults.compilerOptions.declaration = types
+    //   tsConfig.tsconfigDefaults.compilerOptions.declarationDir = CONFIG.typesDir
+    // }
+
+    console.log(merge(TS_CONFIG, EXTEND_TS_CONFIG))
+
+    plugins.push(typescript(merge(TS_CONFIG, EXTEND_TS_CONFIG)))
+
+    // if (types) {
+    //   plugins.push(
+    //     apiExtractor({
+    //       cleanUpRollup: true,
+    //       configuration: {
+    //         mainEntryPointFilePath: `<projectFolder>/lib/index.d.ts`,
+    //         projectFolder: process.cwd(),
+    //         compiler: {
+    //           tsconfigFilePath: '<projectFolder>/tsconfig.json',
+    //           skipLibCheck: true,
+    //         },
+    //         dtsRollup: {
+    //           enabled: true,
+    //           untrimmedFilePath: `<projectFolder>/${PKG.typings || PKG.types}`,
+    //         },
+    //       },
+    //     })
+    //   )
+    // }
   }
 
   if (CONFIG.replaceGlobals) {
@@ -91,7 +123,6 @@ const loadPlugins = ({ env, platform, types, file }) => {
   }
 
   // generate visualised graphs in dist folder
-
   if (CONFIG.visualise) {
     const filePath = file.split('/')
     const fileName = filePath.pop()

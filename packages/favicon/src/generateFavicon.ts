@@ -3,7 +3,7 @@ import favicons from 'favicons'
 import { loadVLToolsConfig } from '@vitus-labs/tools-core'
 import baseConfig from '~/baseConfig'
 
-const VL_CONFIG = loadVLToolsConfig('favicon')
+const VL_CONFIG = await loadVLToolsConfig('favicon')
 
 const { icons, path, ...restConfig } = VL_CONFIG.merge(baseConfig).config
 

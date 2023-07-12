@@ -1,19 +1,20 @@
 {
   "name": "@vitus-labs/tools-rollup",
-  "version": "0.45.0",
+  "version": "0.46.0",
   "license": "MIT",
   "author": "Vit Bokisch <vit@bokisch.com>",
   "maintainers": [
     "Vit Bokisch <vit@bokisch.com>"
   ],
-  "main": "lib/index.js",
-  "types": "lib/typings/index.d.ts",
+  "type": "module",
+  "exports": "./lib/vitus-tools-core.module.js",
+  "types": "./lib/types/index.d.ts",
   "bin": {
-    "vl_build": "bin/run-build.js",
-    "vl_build-watch": "bin/run-watch.js"
+    "vl_build": "./lib/bin/run-build.js",
+    "vl_build-watch": "./lib/bin/run-watch.js"
   },
   "engines": {
-    "node": ">= 14"
+    "node": ">= 16"
   },
   "scripts": {
     "prepublish": "yarn build",
@@ -23,23 +24,35 @@
     "access": "public"
   },
   "dependencies": {
-    "@microsoft/api-extractor": "^7.35.1",
+    "@microsoft/api-extractor": "^7.36.1",
     "@rollup/plugin-node-resolve": "^15.1.0",
     "@rollup/plugin-replace": "^5.0.2",
     "@rollup/plugin-terser": "^0.4.3",
-    "@types/node": "^18.16.16",
-    "@vitus-labs/tools-core": "0.45.0",
-    "chalk": "^4.1.2",
-    "find-up": "^5.0.0",
+    "@rollup/plugin-typescript": "^11.1.2",
+    "@types/node": "^18.16.19",
+    "@vitus-labs/tools-core": "*",
+    "chalk": "^5.3.0",
+    "find-up": "^6.3.0",
+    "lodash-es": "^4.17.21",
     "lodash.merge": "^4.6.2",
-    "rimraf": "^3.0.2",
-    "rollup": "^3.23.1",
+    "rimraf": "^5.0.1",
+    "rollup": "^3.26.2",
     "rollup-plugin-api-extractor": "^0.2.5",
-    "rollup-plugin-filesize": "^9.1.2",
-    "rollup-plugin-typescript2": "^0.34.1",
-    "rollup-plugin-visualizer": "^5.9.0",
+    "rollup-plugin-filesize": "^10.0.0",
+    "rollup-plugin-tsconfig-paths": "^1.5.1",
+    "rollup-plugin-typescript-paths": "^1.4.0",
+    "rollup-plugin-typescript2": "^0.35.0",
+    "rollup-plugin-visualizer": "^5.9.2",
+    "ts-patch": "^3.0.1",
     "ts-transform-paths": "^3.0.0",
-    "tslib": "^2.5.3",
-    "ttypescript": "^1.5.15"
+    "ts-transformer-keys": "^0.4.4",
+    "tslib": "^2.6.0",
+    "ttypescript": "^1.5.15",
+    "typescript-transform-paths": "^3.4.6"
+  },
+  "devDependencies": {
+    "@types/lodash-es": "^4.17.7",
+    "@vitus-labs/tools-typescript": "*",
+    "typescript": "*"
   }
 }

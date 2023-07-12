@@ -1,19 +1,22 @@
 {
   "extends": "@vitus-labs/tools-typescript/lib",
   "compilerOptions": {
-    "strictNullChecks": true,
-    "types": ["@vitus-labs/tools-rollup/global"],
-    "rootDir": "src",
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
     "outDir": "lib",
+    "rootDir": "src",
     "baseUrl": ".",
+    "declarationDir": "./lib/types",
     "paths": {
       "~/*": [
         "src/*"
       ]
-    }
+    },
   },
   "include": [
-    "src"
+    "typings",
+    "src",
   ],
   "exclude": [
     "node_modules",

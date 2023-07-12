@@ -1,6 +1,6 @@
 {
   "name": "@vitus-labs/tools-typescript",
-  "version": "0.45.0",
+  "version": "0.46.0",
   "license": "MIT",
   "author": "Vit Bokisch <vit@bokisch.com>",
   "maintainers": [
@@ -14,7 +14,7 @@
     "nextjs.json"
   ],
   "engines": {
-    "node": ">= 14"
+    "node": ">= 16"
   },
   "publishConfig": {
     "access": "public"
