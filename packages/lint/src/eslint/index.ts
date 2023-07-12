@@ -182,7 +182,7 @@ const createEslint =
       plugins: pluginsConfig,
       parserOptions: {
         tsconfigRootDir: rootPath,
-        project: ['tsconfig.json', ...tsProjects],
+        project: true,
         ecmaFeatures: {
           jsx: true,
         },
@@ -214,7 +214,6 @@ const createEslint =
         'no-unused-vars': 'off',
         'no-useless-constructor': 'off',
         'no-shadow': 'off',
-        'import/prefer-default-export': 'off',
         'no-use-before-define': 'off', // is being used @typescript-eslint/no-use-before-define
         'no-param-reassign': [
           'error',
@@ -243,6 +242,7 @@ const createEslint =
         // IMPORT rules
         // --------------------------------------------------
         ...extendObject(finalOptions.import, {
+          'import/prefer-default-export': 'off',
           'import/extensions': [
             'error',
             'ignorePackages',
