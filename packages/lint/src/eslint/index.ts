@@ -5,7 +5,7 @@ import {
   loadExtendsConfigs,
   extendObject,
 } from './helpers'
-import { Options } from './types'
+import type { Options } from './types'
 
 type Config = Partial<{
   rootPath: string
