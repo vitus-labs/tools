@@ -20,7 +20,7 @@
     "access": "public"
   },
   "peerDependencies": {
-    "typescript": "*"
+    "typescript": ">=5"
   },
   "dependencies": {
     "typescript-styled-plugin": "^0.18.3"

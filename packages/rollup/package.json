@@ -7,7 +7,7 @@
     "Vit Bokisch <vit@bokisch.com>"
   ],
   "type": "module",
-  "exports": "./lib/vitus-tools-core.module.js",
+  "exports": "./lib/index.js",
   "types": "./lib/types/index.d.ts",
   "bin": {
     "vl_build": "./lib/bin/run-build.js",
@@ -24,7 +24,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@microsoft/api-extractor": "^7.36.1",
+    "@microsoft/api-extractor": "^7.36.2",
     "@rollup/plugin-node-resolve": "^15.1.0",
     "@rollup/plugin-replace": "^5.0.2",
     "@rollup/plugin-terser": "^0.4.3",
@@ -49,6 +49,6 @@
   "devDependencies": {
     "@types/lodash-es": "^4.17.7",
     "@vitus-labs/tools-typescript": "*",
-    "typescript": "*"
+    "typescript": "^5.1.6"
   }
 }
