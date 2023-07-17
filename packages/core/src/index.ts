@@ -22,7 +22,7 @@ const loadFileToJSON = async (filename: string) => {
   // try to read an exported module first
   try {
     const importedFile = await import(file)
-    console.log(importedFile)
+    console.log(importedFile.default)
     data = importedFile.default
   } catch (e) {
     // ignore eror

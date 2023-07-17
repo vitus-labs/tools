@@ -4,6 +4,7 @@
   "license": "MIT",
   "type": "module",
   "types": "./lib/types",
+  "exports": "./lib/storybook/index.js",
   "bin": {
     "vl_stories": "./lib/bin/run-stories.js",
     "vl_stories-build": "./lib/bin/run-stories-build.js"
@@ -15,7 +16,6 @@
     "access": "public"
   },
   "files": [
-    "bin/",
     "lib/"
   ],
   "scripts": {
