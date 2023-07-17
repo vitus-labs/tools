@@ -1,7 +1,10 @@
 import path from 'node:path'
+import { URL } from 'node:url'
 import { CONFIG } from '../config/index.js'
 
-const storybookConfigDir = path.resolve(__dirname)
+const newDirname = new URL('.', import.meta.url).pathname
+
+const storybookConfigDir = path.resolve(newDirname)
 
 const storybookStandalone = {
   mode: 'dev',
