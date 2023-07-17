@@ -11,11 +11,9 @@
   "bugs": {
     "url": "https://github.com/vitus-labs/tools/issues"
   },
-  "workspaces": {
-    "packages": [
-      "packages/*"
-    ]
-  },
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "release": "lerna publish --force-publish",
     "pkgs:clean": "rm -rf node_modules/ yarn.lock && yarn",
