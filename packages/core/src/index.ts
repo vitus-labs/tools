@@ -22,7 +22,6 @@ const loadFileToJSON = async (filename: string) => {
   // try to read an exported module first
   try {
     const importedFile = await import(file)
-    console.log(importedFile.default)
     data = importedFile.default
   } catch (e) {
     // ignore eror
@@ -121,21 +120,26 @@ const loadConfigParam =
     return _get(externalConfig, key, defaultValue)
   }
 
-const loadVLToolsConfig = async (key?: string) => {
+const loadVLToolsConfig = async () => {
   const externalConfig = await getExternalConfig()
-  const result = key ? _get(externalConfig, key, {}) : externalConfig
 
   const cloneAndEnhance = (object) => ({
     get config() {
       return object
     },
     get: (param: string, defaultValue?: any) =>
-      _get(object, param, defaultValue),
+      _get(object, param, defaultValue || {}),
     merge: (param: Record<string, any>) =>
       cloneAndEnhance(merge(param, object)),
   })
 
-  return cloneAndEnhance(result)
+  const getOutput = (key: string) => {
+    const result = _get(externalConfig, key, {})
+
+    return cloneAndEnhance(result)
+  }
+
+  return getOutput
 }
 
 const swapGlobals = (globals: Record<string, string>) =>

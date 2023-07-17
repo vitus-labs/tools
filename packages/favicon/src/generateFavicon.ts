@@ -1,11 +1,10 @@
 import fs from 'node:fs'
 import favicons from 'favicons'
-import { loadVLToolsConfig } from '@vitus-labs/tools-core'
+import { VL_CONFIG } from '@vitus-labs/tools-core'
 import { configuration } from './baseConfig.js'
 
-const VL_CONFIG = await loadVLToolsConfig('favicon')
-
-const { icons, path, ...restConfig } = VL_CONFIG.merge(configuration).config
+const { icons, path, ...restConfig } =
+  VL_CONFIG('favicon').merge(configuration).config
 
 const handleSuccess = (outputPath, response) => {
   console.log('Creating images...')
