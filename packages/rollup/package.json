@@ -1,6 +1,6 @@
 {
   "name": "@vitus-labs/tools-rollup",
-  "version": "0.46.0",
+  "version": "1.0.0-alpha.0",
   "license": "MIT",
   "author": "Vit Bokisch <vit@bokisch.com>",
   "maintainers": [
@@ -30,7 +30,7 @@
     "@rollup/plugin-terser": "^0.4.3",
     "@rollup/plugin-typescript": "^11.1.2",
     "@types/node": "^18.16.19",
-    "@vitus-labs/tools-core": "*",
+    "@vitus-labs/tools-core": "1.0.0-alpha.0",
     "chalk": "^5.3.0",
     "find-up": "^6.3.0",
     "lodash-es": "^4.17.21",
@@ -48,7 +48,7 @@
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.8",
-    "@vitus-labs/tools-typescript": "*",
+    "@vitus-labs/tools-typescript": "1.0.0-alpha.0",
     "typescript": "^5.1.6"
   }
 }
