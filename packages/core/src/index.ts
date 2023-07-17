@@ -2,7 +2,7 @@ import fs from 'node:fs'
 import { findUpSync } from 'find-up'
 import { get as _get, merge } from 'lodash-es'
 
-const VITUS_LABS_FILE_NAME = 'vl-tools.config.js'
+const VITUS_LABS_FILE_NAME = 'vl-tools.config.mjs'
 const PACKAGE_FILE_NAME = 'package.json'
 const TYPESCRIPT_FILE_NAME = 'tsconfig.json'
 
