@@ -1,14 +1,16 @@
-import { swapGlobals } from '@vitus-labs/tools-core'
+import { createRequire } from 'node:module'
 import typescript from 'rollup-plugin-typescript2'
-import ttypescript from 'ttypescript'
-import pathsTransformer from 'ts-transform-paths'
 import { apiExtractor } from 'rollup-plugin-api-extractor'
 import { nodeResolve } from '@rollup/plugin-node-resolve'
 import filesize from 'rollup-plugin-filesize'
 import { visualizer } from 'rollup-plugin-visualizer'
 import replace from '@rollup/plugin-replace'
 import terser from '@rollup/plugin-terser'
-import { CONFIG, PKG, PLATFORMS } from '../config'
+import { swapGlobals } from '@vitus-labs/tools-core'
+import { CONFIG, PKG, PLATFORMS } from '../config/index.js'
+
+const require = createRequire(import.meta.url)
+const tspCompiler = require('ts-patch/compiler')
 
 const defineExtensions = (platform) => {
   const platformExtensions: string[] = []
@@ -28,8 +30,7 @@ const loadPlugins = ({ env, platform, types, file }) => {
 
   if (CONFIG.typescript) {
     const tsConfig: Record<string, any> = {
-      typescript: ttypescript,
-      transformers: [(service) => pathsTransformer(service)],
+      typescript: tspCompiler,
       exclude: CONFIG.exclude,
       useTsconfigDeclarationDir: true,
       clean: true,
@@ -38,6 +39,13 @@ const loadPlugins = ({ env, platform, types, file }) => {
         include: CONFIG.include,
         compilerOptions: {
           types: ['@vitus-labs/tools-rollup'],
+          plugins: [
+            { transform: 'typescript-transform-paths' },
+            {
+              transform: 'typescript-transform-paths',
+              afterDeclarations: true,
+            },
+          ],
         },
       },
     }

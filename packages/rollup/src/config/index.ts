@@ -1,10 +1,10 @@
-import { loadVLToolsConfig, PKG } from '@vitus-labs/tools-core'
-import baseConfig from './baseConfig'
+import { loadVLToolsConfig, PKG, TS_CONFIG } from '@vitus-labs/tools-core'
+import baseConfig from './baseConfig.js'
 
 const CONFIG_KEY = 'build'
 
-const CONFIG = loadVLToolsConfig(CONFIG_KEY).merge(baseConfig).config
+const CONFIG = (await loadVLToolsConfig(CONFIG_KEY)).merge(baseConfig).config
 
-const PLATFORMS = ['browser', 'node', 'web', 'native']
+const PLATFORMS = ['browser', 'node', 'web', 'native'] as const
 
-export { CONFIG, PKG, PLATFORMS }
+export { CONFIG, TS_CONFIG, PKG, PLATFORMS }

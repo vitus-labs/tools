@@ -1,18 +1,19 @@
-import fs from 'fs'
-import findUp from 'find-up'
-import { get as _get, merge } from 'lodash'
+import fs from 'node:fs'
+import { findUpSync } from 'find-up'
+import { get as _get, merge } from 'lodash-es'
 
 const VITUS_LABS_FILE_NAME = 'vl-tools.config.js'
 const PACKAGE_FILE_NAME = 'package.json'
-const TYPESCRIPT_FILE_NAME = 'package.json'
+const TYPESCRIPT_FILE_NAME = 'tsconfig.json'
 
 // --------------------------------------------------------
 // FIND & READ file helpers
 // --------------------------------------------------------
-const findFile = (filename: string) => findUp.sync(filename, { type: 'file' })
+const findFile = async (filename: string) =>
+  findUpSync(filename, { type: 'file' })
 
-const loadFileToJSON = (filename: string) => {
-  const file = findFile(filename)
+const loadFileToJSON = async (filename: string) => {
+  const file = await findFile(filename)
 
   if (!file) return {}
 
@@ -20,7 +21,7 @@ const loadFileToJSON = (filename: string) => {
 
   // try to read an exported module first
   try {
-    data = require(file)
+    data = await import(file)
   } catch (e) {
     // ignore eror
   }
@@ -40,8 +41,8 @@ const loadFileToJSON = (filename: string) => {
 // --------------------------------------------------------
 // GET PACKAGE.JSON info
 // --------------------------------------------------------
-const getPackageJSON = () => {
-  const data = loadFileToJSON(PACKAGE_FILE_NAME)
+const getPackageJSON = async () => {
+  const data = await loadFileToJSON(PACKAGE_FILE_NAME)
 
   return data
 }
@@ -51,8 +52,8 @@ const getPackageJSON = () => {
 // --------------------------------------------------------
 
 // GET LIST OF DEPENDENCIES from package.json
-const getDependenciesList = (types: any) => {
-  const pkg = getPackageJSON()
+const getDependenciesList = async (types: any) => {
+  const pkg = await getPackageJSON()
   let result: any = []
 
   types.forEach((item: any) => {
@@ -86,8 +87,8 @@ const camelspaceBundleName = (name: string) => {
 // --------------------------------------------------------
 // PACKAGE JSON DATA
 // --------------------------------------------------------
-const getPkgData = () => {
-  const pkg = getPackageJSON()
+const getPkgData = async () => {
+  const pkg = await getPackageJSON()
   const { name } = pkg
   // const namespace = parseNamespace(name)
 
@@ -98,7 +99,7 @@ const getPkgData = () => {
     // namespaceName: namespace.replace('@', ''),
     // rootPath: findFilePath('package.json'),
     bundleName: camelspaceBundleName(name),
-    externalDependencies: getDependenciesList([
+    externalDependencies: await getDependenciesList([
       'dependencies',
       'peerDependencies',
     ]),
@@ -108,18 +109,18 @@ const getPkgData = () => {
 // --------------------------------------------------------
 // LOAD EXTERNAL CONFIGURATION
 // --------------------------------------------------------
-const getExternalConfig = () => loadFileToJSON(VITUS_LABS_FILE_NAME)
+const getExternalConfig = async () => loadFileToJSON(VITUS_LABS_FILE_NAME)
 
 const loadConfigParam =
   (filename: string) =>
-  (key: string, defaultValue = {}) => {
-    const externalConfig = loadFileToJSON(filename)
+  async (key: string, defaultValue = {}) => {
+    const externalConfig = await loadFileToJSON(filename)
 
     return _get(externalConfig, key, defaultValue)
   }
 
-const loadVLToolsConfig = (key: string) => {
-  const externalConfig = getExternalConfig()
+const loadVLToolsConfig = async (key: string) => {
+  const externalConfig = await getExternalConfig()
   const result = _get(externalConfig, key, {})
 
   const cloneAndEnhance = (object) => ({
@@ -142,9 +143,9 @@ const swapGlobals = (globals: Record<string, string>) =>
     return acc
   }, {})
 
-const PKG = getPkgData()
-const CONFIG = getExternalConfig()
-const TS_CONFIG = loadFileToJSON(TYPESCRIPT_FILE_NAME)
+const PKG = await getPkgData()
+const VL_CONFIG = await getExternalConfig()
+const TS_CONFIG = await loadFileToJSON(TYPESCRIPT_FILE_NAME)
 
 export {
   findFile,
@@ -153,6 +154,6 @@ export {
   loadVLToolsConfig,
   swapGlobals,
   PKG,
-  CONFIG,
+  VL_CONFIG,
   TS_CONFIG,
 }

@@ -24,8 +24,8 @@ const loadExtendsConfigs = (options: Options) => {
     RESULT.push('plugin:import/recommended', 'plugin:import/typescript')
 
   RESULT.push(
-    'plugin:@typescript-eslint/eslint-recommended',
-    'plugin:@typescript-eslint/recommended',
+    'plugin:@typescript-eslint/recommended-type-checked',
+    'plugin:@typescript-eslint/stylistic-type-checked',
     'airbnb'
   )
 

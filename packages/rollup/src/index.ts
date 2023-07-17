@@ -1,3 +1,3 @@
-import runBuild from './scripts/build'
+import { runBuild } from './scripts/build.js'
 
-export default runBuild
+export { runBuild }

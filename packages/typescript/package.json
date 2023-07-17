@@ -14,13 +14,13 @@
     "nextjs.json"
   ],
   "engines": {
-    "node": ">= 14"
+    "node": ">= 16"
   },
   "publishConfig": {
     "access": "public"
   },
   "peerDependencies": {
-    "typescript": "*"
+    "typescript": ">=5"
   },
   "dependencies": {
     "typescript-styled-plugin": "^0.18.3"

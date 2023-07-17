@@ -1,4 +1,4 @@
-import { filter, merge, omit, isEmpty } from 'lodash'
+import { filter, merge, omit, isEmpty } from 'lodash-es'
 import {
   loadTsProjects,
   loadPlugins,
@@ -182,7 +182,7 @@ const createEslint =
       plugins: pluginsConfig,
       parserOptions: {
         tsconfigRootDir: rootPath,
-        project: ['tsconfig.json', ...tsProjects],
+        project: true,
         ecmaFeatures: {
           jsx: true,
         },
@@ -242,6 +242,7 @@ const createEslint =
         // IMPORT rules
         // --------------------------------------------------
         ...extendObject(finalOptions.import, {
+          'import/prefer-default-export': 'off',
           'import/extensions': [
             'error',
             'ignorePackages',

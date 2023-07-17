@@ -43,8 +43,8 @@
     "react": "*"
   },
   "devDependencies": {
-    "@vitus-labs/tools-babel": "0.46.0",
-    "@vitus-labs/tools-rollup": "0.46.0",
-    "@vitus-labs/tools-typescript": "0.46.0"
+    "@vitus-labs/tools-babel": "*",
+    "@vitus-labs/tools-rollup": "*",
+    "@vitus-labs/tools-typescript": "*"
   }
 }
