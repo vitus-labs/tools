@@ -121,9 +121,9 @@ const loadConfigParam =
     return _get(externalConfig, key, defaultValue)
   }
 
-const loadVLToolsConfig = async (key: string) => {
+const loadVLToolsConfig = async (key?: string) => {
   const externalConfig = await getExternalConfig()
-  const result = _get(externalConfig, key, {})
+  const result = key ? _get(externalConfig, key, {}) : externalConfig
 
   const cloneAndEnhance = (object) => ({
     get config() {
@@ -146,7 +146,7 @@ const swapGlobals = (globals: Record<string, string>) =>
   }, {})
 
 const PKG = await getPkgData()
-const VL_CONFIG = await getExternalConfig()
+const VL_CONFIG = await loadVLToolsConfig()
 const TS_CONFIG = await loadFileToJSON(TYPESCRIPT_FILE_NAME)
 
 export {
