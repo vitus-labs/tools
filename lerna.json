@@ -1,6 +1,5 @@
 {
   "npmClient": "yarn",
-  "hoist": true,
   "packages": ["packages/*"],
   "version": "0.46.0",
   "command": {
