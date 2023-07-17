@@ -1,6 +1,6 @@
 {
   "name": "@vitus-labs/tools-lint",
-  "version": "1.0.1-alpha.4",
+  "version": "1.0.1-alpha.5",
   "license": "MIT",
   "author": "Vit Bokisch <vit@bokisch.com>",
   "maintainers": [
@@ -57,9 +57,9 @@
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.8",
-    "@vitus-labs/tools-babel": "1.0.1-alpha.4",
-    "@vitus-labs/tools-rollup": "1.0.1-alpha.4",
-    "@vitus-labs/tools-typescript": "1.0.1-alpha.4"
+    "@vitus-labs/tools-babel": "1.0.1-alpha.5",
+    "@vitus-labs/tools-rollup": "1.0.1-alpha.5",
+    "@vitus-labs/tools-typescript": "1.0.1-alpha.5"
   },
   "gitHead": "83ccbf166b1123776610623a0f1a0869c586af8f"
 }
