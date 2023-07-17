@@ -28,7 +28,7 @@
   },
   "optionalDependencies": {
     "graphql": "*",
-    "prettier": "*"
+    "prettier": ">=2"
   },
   "peerDependencies": {
     "typescript": ">=5"
