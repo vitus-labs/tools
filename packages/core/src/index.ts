@@ -21,7 +21,9 @@ const loadFileToJSON = async (filename: string) => {
 
   // try to read an exported module first
   try {
-    data = await import(file)
+    const importedFile = await import(file)
+    console.log(importedFile)
+    data = importedFile.default
   } catch (e) {
     // ignore eror
   }
