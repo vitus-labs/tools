@@ -5230,7 +5230,6 @@ __metadata:
     "@vitus-labs/unistyle": "*"
     react: ">=17"
     react-dom: ">=17"
-    webpack: "*"
   bin:
     vl_stories: ./lib/bin/run-stories.js
     vl_stories-build: ./lib/bin/run-stories-build.js
