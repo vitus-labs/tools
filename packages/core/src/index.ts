@@ -144,7 +144,7 @@ const swapGlobals = (globals: Record<string, string>) =>
   }, {})
 
 const PKG = await getPkgData()
-const CONFIG = await getExternalConfig()
+const VL_CONFIG = await getExternalConfig()
 const TS_CONFIG = await loadFileToJSON(TYPESCRIPT_FILE_NAME)
 
 export {
@@ -154,6 +154,6 @@ export {
   loadVLToolsConfig,
   swapGlobals,
   PKG,
-  CONFIG,
+  VL_CONFIG,
   TS_CONFIG,
 }

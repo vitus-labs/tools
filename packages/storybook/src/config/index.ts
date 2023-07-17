@@ -1,4 +1,4 @@
-import { VL_CONFIG } from '../utils'
+import { VL_CONFIG, TS_CONFIG } from './initialConfig'
 import baseConfig from './baseConfig'
 import { setConfig } from './root'
 
@@ -12,4 +12,4 @@ const updatedConfig = {
 
 setConfig(updatedConfig)
 
-export default updatedConfig
+export { updatedConfig as CONFIG, TS_CONFIG }

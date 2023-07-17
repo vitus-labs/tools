@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-import path from 'path'
-import CONFIG from '../config'
+import path from 'node:path'
+import { CONFIG } from '../config'
 
 const storybookConfigDir = path.resolve(__dirname)
 

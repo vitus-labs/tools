@@ -7,7 +7,7 @@ import * as d from '../decorators'
 
 if (__VITUS_LABS_STORIES__.styles === 'styled-components') {
   try {
-    const styled = require('styled-components')
+    const styled = await import('styled-components')
 
     init({
       styled: styled.default,
@@ -15,7 +15,7 @@ if (__VITUS_LABS_STORIES__.styles === 'styled-components') {
       context: styled.ThemeProvider,
     })
   } catch (e) {
-    // ignore
+    throw Error(e)
   }
 }
 

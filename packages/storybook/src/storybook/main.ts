@@ -1,12 +1,10 @@
-/* eslint-disable no-param-reassign */
 import path from 'path'
 import { DefinePlugin } from 'webpack'
 import babelConfig from './babel'
-import CONFIG from '../config'
-import { TS_CONFIG } from '../utils'
+import { CONFIG, TS_CONFIG } from '../config'
 
-const aliases = TS_CONFIG('compilerOptions.paths', {})
-const baseUrl = TS_CONFIG('compilerOptions.baseUrl', '')
+const aliases = TS_CONFIG.get('compilerOptions.paths', {})
+const baseUrl = TS_CONFIG.get('compilerOptions.baseUrl', '')
 
 const ADDONS_MAP = {
   a11y: '@storybook/addon-a11y',

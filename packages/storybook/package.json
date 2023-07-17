@@ -5,8 +5,8 @@
   "type": "module",
   "types": "./lib/types",
   "bin": {
-    "vl_stories": "bin/run-stories.js",
-    "vl_stories-build": "bin/run-stories-build.js"
+    "vl_stories": "./lib/bin/run-stories.js",
+    "vl_stories-build": "./lib/bin/run-stories-build.js"
   },
   "engines": {
     "node": ">= 16"
@@ -42,6 +42,7 @@
     "@storybook/addon-toolbars": "^7.0.27",
     "@storybook/addon-viewport": "^7.0.27",
     "@storybook/addons": "^7.0.27",
+    "@storybook/core-server": "^7.0.27",
     "@storybook/react": "^7.0.27",
     "@storybook/theming": "^7.0.27",
     "@vitus-labs/tools-core": "0.46.0",
@@ -55,6 +56,8 @@
     "@vitus-labs/tools-babel": "*",
     "@vitus-labs/tools-typescript": "*",
     "@vitus-labs/unistyle": "0.79.0",
-    "typescript": "^5.1.6"
+    "styled-components": "^6.0.4",
+    "typescript": "^5.1.6",
+    "webpack": "^5.88.1"
   }
 }
