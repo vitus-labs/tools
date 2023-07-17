@@ -1,6 +1,6 @@
 {
   "name": "@vitus-labs/tools-typescript",
-  "version": "1.0.0-alpha.0",
+  "version": "1.0.1-alpha.0",
   "license": "MIT",
   "author": "Vit Bokisch <vit@bokisch.com>",
   "maintainers": [
@@ -24,5 +24,6 @@
   },
   "dependencies": {
     "typescript-styled-plugin": "^0.18.3"
-  }
+  },
+  "gitHead": "e5eaa8d5be1730784a871a3046f61af4c6a9b6c7"
 }

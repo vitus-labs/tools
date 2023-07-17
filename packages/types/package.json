@@ -1,19 +1,19 @@
 {
   "name": "@vitus-labs/tools-types",
-  "version": "1.0.0-alpha.0",
+  "version": "1.0.1-alpha.0",
   "license": "MIT",
   "author": "Vit Bokisch <vit@bokisch.com>",
   "maintainers": [
     "\"Vit Bokisch <vit@bokisch.com>\""
   ],
-  "types": "./lib/types/index.d.ts",
+  "type": "module",
+  "types": "./src/index.d.ts",
   "engines": {
     "node": ">= 14"
   },
   "publishConfig": {
     "access": "public"
   },
-  "main": "lib/vitus-labs-tools-types.js",
   "files": [
     "lib/"
   ],
@@ -27,24 +27,13 @@
   "bugs": {
     "url": "https://github.com/airaflex/frontend/issues"
   },
-  "scripts": {
-    "prepublish": "yarn build",
-    "build": "yarn vl_build",
-    "build:watch": "yarn vl_build-watch",
-    "lint:css": "stylelint src/*.ts src/*.tsx",
-    "lint:ts": "eslint src/*",
-    "lint": "yarn lint:css && yarn lint:ts",
-    "test": "jest --runInBand",
-    "test:coverage": "jest --runInBand --coverage",
-    "test:watch": "jest --runInBand --watch",
-    "cover": "coveralls < .coverage/lcov.info"
-  },
   "peerDependencies": {
     "react": "*"
   },
   "devDependencies": {
-    "@vitus-labs/tools-babel": "1.0.0-alpha.0",
-    "@vitus-labs/tools-rollup": "1.0.0-alpha.0",
-    "@vitus-labs/tools-typescript": "1.0.0-alpha.0"
-  }
+    "@vitus-labs/tools-babel": "1.0.1-alpha.0",
+    "@vitus-labs/tools-rollup": "1.0.1-alpha.0",
+    "@vitus-labs/tools-typescript": "1.0.1-alpha.0"
+  },
+  "gitHead": "e5eaa8d5be1730784a871a3046f61af4c6a9b6c7"
 }
