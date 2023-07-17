@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { CONFIG } from '../config'
+import { CONFIG } from '../config/index.js'
 
 const storybookConfigDir = path.resolve(__dirname)
 

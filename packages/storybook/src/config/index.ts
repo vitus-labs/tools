@@ -1,6 +1,6 @@
-import { VL_CONFIG, TS_CONFIG } from './initialConfig'
-import baseConfig from './baseConfig'
-import { setConfig } from './root'
+import { VL_CONFIG, TS_CONFIG } from './initialConfig.js'
+import baseConfig from './baseConfig.js'
+import { setConfig } from './root.js'
 
 const { config } = VL_CONFIG.merge(baseConfig)
 

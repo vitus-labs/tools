@@ -3,7 +3,7 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable no-undef */
 import { init } from '@vitus-labs/core'
-import * as d from '../decorators'
+import * as d from '../decorators/index.js'
 
 if (__VITUS_LABS_STORIES__.styles === 'styled-components') {
   try {
