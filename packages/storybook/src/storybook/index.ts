@@ -3,7 +3,6 @@ import { URL } from 'node:url'
 import { CONFIG } from '../config/index.js'
 
 const newDirname = new URL('.', import.meta.url).pathname
-
 const storybookConfigDir = path.resolve(newDirname)
 
 const storybookStandalone = {

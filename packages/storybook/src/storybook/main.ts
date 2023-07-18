@@ -19,7 +19,7 @@ const ADDONS_MAP = {
   toolbars: '@storybook/addon-toolbars',
   viewport: '@storybook/addon-viewport',
   measure: '@storybook/addon-measure',
-  outline: 'storybook-addon-outline',
+  outline: '@storybook/addon-outline',
 }
 
 // --------------------------------------------------------

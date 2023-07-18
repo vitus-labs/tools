@@ -24,8 +24,9 @@ const loadFileToJSON = (filename: string) => {
   // try to read an exported module first
   try {
     const importedFile = require(file)
-    console.log(importedFile.default)
-    data = importedFile.default
+    if (importedFile) {
+      data = importedFile.default
+    }
   } catch (e) {
     // ignore eror
   }
