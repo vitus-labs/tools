@@ -1,5 +1,4 @@
 // @ts-nocheck
-/* eslint-disable global-require */
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable no-undef */
 import { init } from '@vitus-labs/core'

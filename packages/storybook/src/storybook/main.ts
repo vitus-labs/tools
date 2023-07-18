@@ -1,6 +1,6 @@
-import path from 'path'
+import path from 'node:path'
 import { DefinePlugin } from 'webpack'
-import babelConfig from './babel'
+import babelConfig from './babel.js'
 import { CONFIG, TS_CONFIG } from '../config/index.js'
 
 const aliases = TS_CONFIG.get('compilerOptions.paths', {})
