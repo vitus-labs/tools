@@ -1,10 +1,11 @@
 import path from 'node:path'
 import { DefinePlugin } from 'webpack'
+import { get } from 'lodash-es'
 import babelConfig from './babel.js'
 import { CONFIG, TS_CONFIG } from '../config/index.js'
 
-const aliases = TS_CONFIG.get('compilerOptions.paths', {})
-const baseUrl = TS_CONFIG.get('compilerOptions.baseUrl', '')
+const aliases = get(TS_CONFIG, 'compilerOptions.paths', {})
+const baseUrl = get(TS_CONFIG, 'compilerOptions.baseUrl', '')
 
 const ADDONS_MAP = {
   a11y: '@storybook/addon-a11y',
