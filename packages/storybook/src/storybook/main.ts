@@ -1,7 +1,9 @@
 import path from 'node:path'
 import { DefinePlugin } from 'webpack'
 import { get } from 'lodash-es'
-import babelConfig from './babel.js'
+import type { StorybookConfig } from '@storybook/react-webpack5'
+
+// import babelConfig from './babel.js'
 import { CONFIG, TS_CONFIG } from '../config/index.js'
 
 const aliases = get(TS_CONFIG, 'compilerOptions.paths', {})
@@ -50,13 +52,12 @@ const getTSConfigAliases = () => {
 // STORYBOOK configuration
 // --------------------------------------------------------
 
-export default {
-  features: {
-    storyStoreV7: true,
-    babelModeV7: true,
-    postcss: false,
+const STORYBOOK_CONFIG: StorybookConfig = {
+  framework: {
+    name: '@storybook/react-webpack5',
+    options: {},
   },
-  stories: CONFIG.storiesDir,
+  stories: [{ directory: CONFIG.storiesDir }],
   addons: Object.entries(CONFIG.addons).reduce((acc, [key, value]) => {
     const addon = ADDONS_MAP[key]
     if (addon && value && value !== null) {
@@ -65,24 +66,27 @@ export default {
 
     return acc
   }, [] as any),
-
-  babel: async () => ({
-    ...babelConfig,
-  }),
+  // babel: async () => ({
+  //   ...babelConfig,
+  // }),
   webpackFinal: async (config) => {
-    const aliases = { ...config.resolve.alias, ...getTSConfigAliases() }
+    const aliases = { ...config.resolve?.alias, ...getTSConfigAliases() }
 
     // add aliases from tsConfig file
-    config.resolve.alias = aliases
+    if (config.resolve) {
+      config.resolve.alias = aliases
+    }
 
     // add fonts
-    config.module.rules.push({
+    config.module?.rules?.push({
       test: /\.(png|woff|woff2|eot|ttf|svg)$/,
       use: [
         {
           loader: 'file-loader',
-          query: {
-            name: '[name].[ext]',
+          options: {
+            name() {
+              return '[name].[ext]'
+            },
           },
         },
       ],
@@ -91,22 +95,23 @@ export default {
 
     // add loading svg icons
     // https://www.gitmemory.com/issue/storybookjs/storybook/5708/515384927
-    // eslint-disable-next-line no-param-reassign
-    config.module.rules = config.module.rules.map((data) => {
-      if (/svg\|/.test(String(data.test)))
-        // eslint-disable-next-line no-param-reassign
-        data.test =
-          /\.(ico|jpg|jpeg|png|gif|eot|otf|webp|ttf|woff|woff2|cur|ani)(\?.*)?$/
-      return data
-    })
+    // if (config.module) {
+    //   config.module.rules = config.module.rules?.map((data) => {
+    //     if (/svg\|/.test(String(data?.test)))
+    //       data.test =
+    //         /\.(ico|jpg|jpeg|png|gif|eot|otf|webp|ttf|woff|woff2|cur|ani)(\?.*)?$/
+    //     return data
+    //   })
+    // }
 
-    config.module.rules.push({
+    config.module?.rules?.push({
       test: /\.svg$/,
       use: [{ loader: 'svg-inline-loader' }],
     })
 
     // define global variables
-    config.plugins.push(
+    config.plugins?.push(
+      // @ts-ignore
       new DefinePlugin({
         __BROWSER__: JSON.stringify(true),
         __NATIVE__: JSON.stringify(false),
@@ -120,3 +125,5 @@ export default {
     return config
   },
 }
+
+export default STORYBOOK_CONFIG

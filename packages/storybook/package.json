@@ -43,6 +43,7 @@
     "@storybook/addons": "^7.0.27",
     "@storybook/core-server": "^7.0.27",
     "@storybook/react": "^7.0.27",
+    "@storybook/react-webpack5": "^7.1.0",
     "@storybook/theming": "^7.0.27",
     "@vitus-labs/tools-core": "1.0.1-alpha.12",
     "babel-loader": "9.1.3",
