@@ -5210,7 +5210,7 @@ __metadata:
     "@types/react": ^18.2.15
     "@vitus-labs/tools-lint": "*"
     lerna: ^7.1.4
-    prettier: 3.0.0
+    prettier: ^3.0.0
     react: ^18.2.0
     typescript: 5.1.6
   languageName: unknown
@@ -13740,7 +13740,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier@npm:3.0.0, prettier@npm:>=2":
+"prettier@npm:>=2, prettier@npm:^3.0.0":
   version: 3.0.0
   resolution: "prettier@npm:3.0.0"
   bin:
