@@ -26,6 +26,9 @@ const STORYBOOK_CONFIG: StorybookConfig = {
     name: '@storybook/react-vite',
     options: {},
   },
+  docs: {
+    autodocs: true,
+  },
   stories: CONFIG.storiesDir,
   addons: Object.entries(CONFIG.addons).reduce((acc, [key, value]) => {
     const addon = ADDONS_MAP[key]
