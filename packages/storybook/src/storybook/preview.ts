@@ -1,46 +1,18 @@
-// @ts-nocheck
-/* eslint-disable no-underscore-dangle */
-/* eslint-disable no-undef */
-import { init } from '@vitus-labs/core'
 import * as d from '../decorators/index.js'
 
-if (__VITUS_LABS_STORIES__.styles === 'styled-components') {
-  try {
-    const styled = await import('styled-components')
-
-    init({
-      styled: styled.default,
-      css: styled.css,
-      context: styled.ThemeProvider,
-    })
-  } catch (e) {
-    throw Error(e)
-  }
-}
-
-// if (__VITUS_LABS_STORIES__.styles === 'emotion') {
-//   try {
-//     const styled = require('@emotion/styled')
-//     const helper = require('@emotion/react')
-//     const { ThemeProvider } = require('emotion-theming')
-
-//     init({
-//       styled: styled.default,
-//       css: helper.css,
-//       context: ThemeProvider,
-//     })
-//   } catch (e) {
-//     // ignore
-//   }
-// }
+type VLStories = {
+  globals: any
+  decorators: any
+  addons: any
+} & Record<string, any>
 
 declare global {
-  const __VITUS_LABS_STORIES__: Record<string, unknown>
+  const __VITUS_LABS_STORIES__: VLStories
 }
 
 declare global {
   interface Window {
-    __VITUS_LABS_STORIES__: Record<string, unknown>
+    __VITUS_LABS_STORIES__: VLStories
   }
 }
 
@@ -56,7 +28,7 @@ export const decorators = Object.entries(
     acc.push(d[key](value))
   }
   return acc
-}, [])
+}, [] as any)
 
 export const parameters = Object.entries(__VITUS_LABS_STORIES__.addons).reduce(
   (acc, [key, value]) => {
