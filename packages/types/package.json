@@ -31,6 +31,5 @@
     "@vitus-labs/tools-babel": "1.0.1",
     "@vitus-labs/tools-rollup": "1.0.1",
     "@vitus-labs/tools-typescript": "1.0.1"
-  },
-  "gitHead": "83ccbf166b1123776610623a0f1a0869c586af8f"
+  }
 }

@@ -9,6 +9,7 @@ const loadPlugins = (options: Options) => {
   if (options.import) RESULT.push('import')
   if (options.react) RESULT.push('react')
   if (options.a11y) RESULT.push('jsx-a11y')
+  if (options.storybook) RESULT.push('storybook')
   if (options.graphql) RESULT.push('graphql')
   if (options.markdown) RESULT.push('markdown')
   if (options.jest) RESULT.push('jest')
@@ -26,13 +27,15 @@ const loadExtendsConfigs = (options: Options) => {
   RESULT.push(
     'plugin:@typescript-eslint/recommended-type-checked',
     'plugin:@typescript-eslint/stylistic-type-checked',
-    'airbnb'
+    'airbnb',
   )
 
   if (options.react)
     RESULT.push('plugin:react/recommended', 'plugin:react-hooks/recommended')
 
   if (options.a11y) RESULT.push('plugin:jsx-a11y/recommended')
+
+  if (options.storybook) RESULT.push('plugin:storybook/recommended')
 
   if (options.prettier) RESULT.push('plugin:prettier/recommended', 'prettier')
 
@@ -43,7 +46,7 @@ const loadExtendsConfigs = (options: Options) => {
 
 const extendObject = (
   condition: boolean | null | undefined,
-  object: Record<string, any> = {}
+  object: Record<string, any> = {},
 ): Record<string, any> => (condition ? object : {})
 
 export { loadTsProjects, loadPlugins, loadExtendsConfigs, extendObject }

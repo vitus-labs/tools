@@ -1,4 +1,4 @@
-import { filter, merge, omit, isEmpty } from 'lodash-es'
+import { filter, merge, omit, isEmpty } from 'lodash'
 import {
   loadTsProjects,
   loadPlugins,
@@ -34,6 +34,7 @@ const createEslint =
       prettier: true,
       markdown: true,
       graphql: false,
+      storybook: true,
       jest: false,
     }
     const finalOptions = merge(defaultOptions, options)
@@ -82,6 +83,7 @@ const createEslint =
           '*stories.*',
           '*.storyOf.*',
         ],
+        extends: loadExtendsConfigs(optionsConfig),
         rules: {
           '@typescript-eslint/explicit-module-boundary-types': 'off',
           'no-console': 'off',
@@ -111,14 +113,12 @@ const createEslint =
       // --------------------------------------------------
       {
         files: [
-          '.eslintrc.js',
-          '*.eslintrc.js',
-          '*.eslintrc.*.js',
-          '*.config.js',
-          '.babelrc.js',
+          'eslint.config.js',
+          'prettier.config.js',
+          '.config.js',
+          '.config.mjs',
         ],
         rules: {
-          '@typescript-eslint/no-var-requires': 'off',
           ...extendObject(finalOptions.import, {
             'import/no-extraneous-dependencies': [
               'error',
@@ -238,6 +238,7 @@ const createEslint =
             },
           ],
         }),
+
         // --------------------------------------------------
         // IMPORT rules
         // --------------------------------------------------
@@ -254,6 +255,7 @@ const createEslint =
             },
           ],
         }),
+
         // --------------------------------------------------
         // REACT rules
         // --------------------------------------------------
@@ -264,6 +266,7 @@ const createEslint =
           'react/function-component-definition': 'off',
           'react/jsx-filename-extension': [1, { extensions: extensionsConfig }],
         }),
+
         // --------------------------------------------------
         // GRAPHQL rules
         // --------------------------------------------------
@@ -278,6 +281,7 @@ const createEslint =
             },
           ],
         }),
+
         // --------------------------------------------------
         // PRETTIER rules
         // --------------------------------------------------

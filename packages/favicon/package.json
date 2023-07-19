@@ -29,6 +29,5 @@
   "devDependencies": {
     "@vitus-labs/tools-typescript": "1.0.1",
     "typescript": "^5.1.6"
-  },
-  "gitHead": "83ccbf166b1123776610623a0f1a0869c586af8f"
+  }
 }

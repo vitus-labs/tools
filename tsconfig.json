@@ -17,11 +17,12 @@
     "sourceMap": true,
     "strict": true,
     "target": "ESNext",
-    "paths": {},
     "noEmit": true,
     "allowJs": true
   },
   "include": [
-    ".eslintrc.js"
+    "./*.js",
+    "./*.cjs",
+    "./*.mjs"
   ]
 }

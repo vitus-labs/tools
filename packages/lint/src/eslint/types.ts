@@ -6,5 +6,6 @@ export type Options = Partial<{
   markdown: boolean
   prettier: boolean
   graphql: boolean
+  storybook: boolean
   jest: boolean
 }>
