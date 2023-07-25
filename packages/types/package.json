@@ -1,6 +1,6 @@
 {
   "name": "@vitus-labs/tools-types",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "license": "MIT",
   "author": "Vit Bokisch <vit@bokisch.com>",
   "maintainers": [
@@ -28,8 +28,8 @@
     "react": "*"
   },
   "devDependencies": {
-    "@vitus-labs/tools-babel": "1.0.2",
-    "@vitus-labs/tools-rollup": "1.0.2",
-    "@vitus-labs/tools-typescript": "1.0.2"
+    "@vitus-labs/tools-babel": "1.0.3",
+    "@vitus-labs/tools-rollup": "1.0.3",
+    "@vitus-labs/tools-typescript": "1.0.3"
   }
 }
