@@ -48,7 +48,8 @@ const createEslint =
       '.d.ts',
       ...extensions,
     ]
-    const tsProjects = loadTsProjects(projects)
+    const tsProjects: ReturnType<typeof loadTsProjects> =
+      loadTsProjects(projects)
 
     const pluginsConfig = loadPlugins(optionsConfig)
     const extendsConfig = loadExtendsConfigs(optionsConfig)
@@ -172,11 +173,11 @@ const createEslint =
         es2022: true,
       },
       globals: {
-        __NODE__: true,
-        __WEB__: true,
-        __BROWSER__: true,
-        __NATIVE__: true,
-        __CLIENT__: true,
+        __NODE__: 'readonly',
+        __WEB__: 'readonly',
+        __BROWSER__: 'readonly',
+        __NATIVE__: 'readonly',
+        __CLIENT__: 'readonly',
       },
       parser: '@typescript-eslint/parser',
       plugins: pluginsConfig,
@@ -276,7 +277,7 @@ const createEslint =
             {
               // Import default settings for your GraphQL client. Supported values:
               // 'apollo', 'relay', 'lokka', 'fraql', 'literal'
-              env: graphqlClient || 'literal',
+              env: graphqlClient ?? 'literal',
               // no need to specify schema here, it will be automatically determined using .graphqlconfig
             },
           ],

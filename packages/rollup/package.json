@@ -29,7 +29,7 @@
     "@rollup/plugin-replace": "^5.0.2",
     "@rollup/plugin-terser": "^0.4.3",
     "@rollup/plugin-typescript": "^11.1.2",
-    "@types/node": "^18.16.19",
+    "@types/node": "^18.17.0",
     "@vitus-labs/tools-core": "1.0.2",
     "chalk": "^5.3.0",
     "find-up": "^6.3.0",
@@ -42,8 +42,8 @@
     "rollup-plugin-typescript-paths": "^1.4.0",
     "rollup-plugin-typescript2": "^0.35.0",
     "rollup-plugin-visualizer": "^5.9.2",
-    "ts-patch": "^3.0.1",
-    "tslib": "^2.6.0",
+    "ts-patch": "^3.0.2",
+    "tslib": "^2.6.1",
     "typescript-transform-paths": "^3.4.6"
   },
   "devDependencies": {

@@ -74,7 +74,7 @@ const loadPlugins = ({ env, platform, types, file }) => {
               untrimmedFilePath: `<projectFolder>${PKG.typings || PKG.types}`,
             },
           },
-        })
+        }),
       )
     }
   }
@@ -84,7 +84,7 @@ const loadPlugins = ({ env, platform, types, file }) => {
       __VERSION__: JSON.stringify(PKG.version),
       __NODE__: JSON.stringify(platform === 'node'),
       __WEB__: JSON.stringify(
-        ['node', 'browser', 'universal'].includes(platform)
+        ['node', 'browser', 'universal'].includes(platform),
       ),
       __BROWSER__: JSON.stringify(platform === 'browser'),
       __NATIVE__: JSON.stringify(platform === 'native'),

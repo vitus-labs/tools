@@ -3,7 +3,7 @@ import { createRequire } from 'module'
 import { findUpSync } from 'find-up'
 import { get as _get, merge } from 'lodash-es'
 
-const VITUS_LABS_FILE_NAME = 'vl-tools.config.mjs'
+const VITUS_LABS_FILE_NAME = 'vl-tools.config.js'
 const PACKAGE_FILE_NAME = 'package.json'
 const TYPESCRIPT_FILE_NAME = 'tsconfig.json'
 
@@ -24,8 +24,9 @@ const loadFileToJSON = (filename: string) => {
   // try to read an exported module first
   try {
     const importedFile = require(file)
+
     if (importedFile) {
-      data = importedFile.default
+      data = importedFile
     }
   } catch (e) {
     // ignore eror
@@ -81,7 +82,7 @@ const camelspaceBundleName = (name: string) => {
     arr.map((item: any, i: any) =>
       i === 0
         ? item
-        : item.charAt(0).toUpperCase() + item.substr(1).toLowerCase()
+        : item.charAt(0).toUpperCase() + item.substr(1).toLowerCase(),
     )
   const arr = parsedName.split('-')
   const result = arrayStringsCamel(arr).join('')
