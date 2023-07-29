@@ -23,6 +23,6 @@
     "typescript": ">=5"
   },
   "dependencies": {
-    "typescript-styled-plugin": "^0.18.3"
+    "@styled/typescript-styled-plugin": "^1.0.0"
   }
 }
