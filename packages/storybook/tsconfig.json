@@ -1,8 +1,6 @@
 {
   "extends": "@vitus-labs/tools-typescript/lib",
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "ESNext",
     "incremental": false,
     "outDir": "lib",
     "rootDir": "src",

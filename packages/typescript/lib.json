@@ -9,7 +9,7 @@
     "allowJs": true,
     "sourceMap": true,
     "incremental": true,
-    "moduleResolution": "nodenext",
+    "moduleResolution": "Bundler",
     "allowSyntheticDefaultImports": true,
     "lib": ["ESNext", "dom"],
     "esModuleInterop": true,
