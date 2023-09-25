@@ -3,18 +3,12 @@
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",
-    "types": ["@vitus-labs/tools-rollup/global"],
     "incremental": false,
     "outDir": "lib",
     "rootDir": "src",
     "baseUrl": ".",
     "declarationDir": "./lib/types"
-  },"include": [
-    "src"
-  ],
-  "exclude": [
-    "node_modules",
-    "__stories__",
-    "lib"
-  ]
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "__stories__", "lib"]
 }

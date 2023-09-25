@@ -1,7 +1,7 @@
 import { themes } from '@storybook/theming'
 import { MINIMAL_VIEWPORTS, INITIAL_VIEWPORTS } from '@storybook/addon-viewport'
 
-export default {
+const CONFIG: Record<string, any> = {
   outDir: '/docs',
   port: 6006,
   ui: {
@@ -60,3 +60,5 @@ export default {
     theme: {},
   },
 }
+
+export default CONFIG

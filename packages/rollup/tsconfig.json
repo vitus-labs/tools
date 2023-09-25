@@ -7,21 +7,13 @@
     "outDir": "lib",
     "rootDir": "src",
     "baseUrl": ".",
+    "declaration": true,
     "declarationDir": "./lib/types",
     "paths": {
-      "~/*": [
-        "src/*"
-      ]
+      "~/*": ["src/*"]
     },
     "plugins": []
   },
-  "include": [
-    "typings",
-    "src",
-  ],
-  "exclude": [
-    "node_modules",
-    "__stories__",
-    "lib"
-  ]
+  "include": ["typings", "src"],
+  "exclude": ["node_modules", "__stories__", "lib"]
 }
