@@ -3776,9 +3776,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rollup/plugin-typescript@npm:^11.1.2":
-  version: 11.1.2
-  resolution: "@rollup/plugin-typescript@npm:11.1.2"
+"@rollup/plugin-typescript@npm:^11.1.4":
+  version: 11.1.4
+  resolution: "@rollup/plugin-typescript@npm:11.1.4"
   dependencies:
     "@rollup/pluginutils": ^5.0.1
     resolve: ^1.22.1
@@ -3791,7 +3791,7 @@ __metadata:
       optional: true
     tslib:
       optional: true
-  checksum: f4655a35e08639574e86dbce578b76468ee8627e4a3d8a46b7e0703d5d98c39a9bda9aa7144510aae11c5d8ce9c3b065e7f3e52dd31fbc6780015dd7802e01f7
+  checksum: 662647ef92dc7af2b502ce5c871fc58151ca9660e5b9e88c42cc9fa257e8f453bf14b9b82793ab191c7c200112f1a886d7493727e3be847b1a94f9b68b21e503
   languageName: node
   linkType: hard
 
@@ -6168,7 +6168,7 @@ __metadata:
     "@rollup/plugin-node-resolve": ^15.2.1
     "@rollup/plugin-replace": ^5.0.2
     "@rollup/plugin-terser": ^0.4.3
-    "@rollup/plugin-typescript": ^11.1.2
+    "@rollup/plugin-typescript": ^11.1.4
     "@types/lodash-es": ^4.17.8
     "@types/node": ^18.17.0
     "@vitus-labs/tools-core": 1.1.1
