@@ -1,6 +1,7 @@
 {
   "extends": "@vitus-labs/tools-typescript/lib",
   "compilerOptions": {
+    "incremental": false,
     "moduleResolution": "Bundler",
     "outDir": "lib",
     "rootDir": "src",
