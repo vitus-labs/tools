@@ -21,8 +21,8 @@
     "prettier": "prettier \"./*.+(js|json|md)\" \"./src/**/*.*\" --write"
   },
   "devDependencies": {
-    "@types/node": "^18.17.0",
-    "@types/react": "^18.2.16",
+    "@types/node": "^18.18.3",
+    "@types/react": "^18.2.24",
     "@vitus-labs/tools-lint": "*",
     "lerna": "^7.1.4",
     "prettier": "^3.0.0",

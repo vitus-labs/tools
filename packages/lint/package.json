@@ -58,7 +58,7 @@
     "stylelint-processor-styled-components": "^1.10.0"
   },
   "devDependencies": {
-    "@types/lodash": "^4.14.195",
+    "@types/lodash": "^4.14.199",
     "@vitus-labs/tools-babel": "1.1.1",
     "@vitus-labs/tools-rollup": "1.1.1",
     "@vitus-labs/tools-typescript": "1.1.1"
