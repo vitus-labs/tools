@@ -24,7 +24,7 @@ const defineExtensions = (platform) => {
   return platformExtensions.concat(CONFIG.extensions)
 }
 
-const loadPlugins = ({ env, platform, types, file }) => {
+const loadPlugins = ({ env, platform, file, typesFilePath }) => {
   const extensions = defineExtensions(platform)
   const plugins = [nodeResolve({ extensions, browser: platform === 'browser' })]
 
@@ -50,15 +50,21 @@ const loadPlugins = ({ env, platform, types, file }) => {
       },
     }
 
-    if (types) {
-      tsConfig.tsconfigDefaults.compilerOptions.declarationMap = types
-      tsConfig.tsconfigDefaults.compilerOptions.declaration = types
+    if (!typesFilePath) {
+      tsConfig.tsconfigDefaults.compilerOptions.declarationMap = false
+      tsConfig.tsconfigDefaults.compilerOptions.declaration = false
+      tsConfig.tsconfigDefaults.compilerOptions.declarationDir = undefined
+    }
+
+    if (typesFilePath) {
+      tsConfig.tsconfigDefaults.compilerOptions.declarationMap = true
+      tsConfig.tsconfigDefaults.compilerOptions.declaration = true
       tsConfig.tsconfigDefaults.compilerOptions.declarationDir = CONFIG.typesDir
     }
 
     plugins.push(typescript(tsConfig))
 
-    if (types) {
+    if (typesFilePath) {
       plugins.push(
         apiExtractor({
           cleanUpRollup: true,
@@ -71,7 +77,7 @@ const loadPlugins = ({ env, platform, types, file }) => {
             },
             dtsRollup: {
               enabled: true,
-              untrimmedFilePath: `<projectFolder>${PKG.typings || PKG.types}`,
+              untrimmedFilePath: `<projectFolder>${typesFilePath}`,
             },
           },
         }),
@@ -131,10 +137,10 @@ const rollupConfig = ({
   file,
   format,
   env,
-  types,
+  typesFilePath,
   platform,
 }: Record<string, any>) => {
-  const plugins = loadPlugins({ file, env, types, platform })
+  const plugins = loadPlugins({ file, env, typesFilePath, platform })
 
   const buildOutput = {
     makeAbsoluteExternalsRelative: true,

@@ -7,8 +7,15 @@
     "Vit Bokisch <vit@bokisch.com>"
   ],
   "type": "module",
-  "exports": "./lib/index.js",
-  "types": "./lib/types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./lib/index.js",
+      "types": "./lib/types/index.d.ts"
+    },
+    "./global": {
+      "types": "./global/index.d.ts"
+    }
+  },
   "bin": {
     "vl_build": "./lib/bin/run-build.js",
     "vl_build-watch": "./lib/bin/run-watch.js"

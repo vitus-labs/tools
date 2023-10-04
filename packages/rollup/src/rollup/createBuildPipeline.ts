@@ -1,9 +1,11 @@
-import { PKG, CONFIG } from '../config/index.js'
+import { PKG } from '../config/index.js'
 
-const isESMModule = PKG.type === 'module'
-const { esModulesOnly } = CONFIG
-const shouldBuildNative = PKG['react-native'] !== PKG.module
-const shouldGenerateTypes = !!(PKG.types || PKG.typings)
+const isESModuleOnly = PKG.type === 'module'
+const typesFilePath = PKG?.exports?.types || PKG.types || PKG.typings
+
+const hasDifferentNativeBuild = () => {
+  return PKG['react-native'] !== PKG.module
+}
 
 const hasDifferentBrowserBuild = (type) => {
   if (!PKG.browser) return false
@@ -16,9 +18,9 @@ const hasDifferentBrowserBuild = (type) => {
   })
 }
 
-const BASE_VARIANTS = {
+const BUILD_VARIANTS = {
   main: {
-    format: esModulesOnly ? 'es' : 'cjs',
+    format: isESModuleOnly ? 'es' : 'cjs',
     env: 'development',
     platform: 'universal',
   },
@@ -45,7 +47,7 @@ const getExportsOptions = () => {
     return [
       {
         file: PKG.exports,
-        ...BASE_VARIANTS.module,
+        ...BUILD_VARIANTS.module,
       },
     ]
   }
@@ -56,21 +58,21 @@ const getExportsOptions = () => {
     if (exportsOptions.import) {
       result.push({
         file: exportsOptions.import,
-        ...BASE_VARIANTS.module,
+        ...BUILD_VARIANTS.module,
       })
     }
 
     if (exportsOptions.require) {
       result.push({
         file: exportsOptions.require,
-        ...BASE_VARIANTS.main,
+        ...BUILD_VARIANTS.main,
       })
     }
 
     if (exportsOptions.node) {
       result.push({
         file: exportsOptions.node,
-        ...BASE_VARIANTS.module,
+        ...BUILD_VARIANTS.module,
         platform: 'node',
       })
     }
@@ -78,7 +80,7 @@ const getExportsOptions = () => {
     if (exportsOptions.default) {
       result.push({
         file: exportsOptions.default,
-        ...BASE_VARIANTS.module,
+        ...BUILD_VARIANTS.module,
       })
     }
 
@@ -91,22 +93,23 @@ const getExportsOptions = () => {
 const createBasicBuildVariants = () => {
   let result: Record<string, any>[] = []
 
-  if (isESMModule) result = [...getExportsOptions()]
+  if (isESModuleOnly) result = [...getExportsOptions()]
 
-  Object.keys(BASE_VARIANTS).forEach((key) => {
+  Object.keys(BUILD_VARIANTS).forEach((key) => {
     const PKGOutDir = PKG[key]
 
     if (PKGOutDir) {
       const hasBrowserBuild = hasDifferentBrowserBuild(key)
+      const hasNativeBuild = hasDifferentNativeBuild()
 
       // create a helper function for adding a build variant to an array
       const add = (props = {}) => {
-        result.push({ ...BASE_VARIANTS[key], file: PKGOutDir, ...props })
+        result.push({ ...BUILD_VARIANTS[key], file: PKGOutDir, ...props })
       }
 
       if (key === 'react-native') {
         // add a separate RN build only if output path differs from module path
-        if (shouldBuildNative) {
+        if (hasNativeBuild) {
           add()
         }
       } else if (hasBrowserBuild) {
@@ -130,10 +133,10 @@ const createBrowserBuildVariants = () => {
     const source = key.substring(2) // strip './' from the beginning of path
     const output = value.substring(2) // strip './' from the beginning of path
 
-    Object.keys(BASE_VARIANTS).forEach((item) => {
+    Object.keys(BUILD_VARIANTS).forEach((item) => {
       if (PKG[item] === source && source !== output) {
         result.push({
-          ...BASE_VARIANTS[item],
+          ...BUILD_VARIANTS[item],
           file: output,
           platform: 'browser',
         })
@@ -151,7 +154,9 @@ const createBuildPipeline = () => {
   ]
 
   // add generate typings for the first bundle only
-  result[0] = { ...result[0], types: shouldGenerateTypes }
+  if (!!typesFilePath) {
+    result[0] = { ...result[0], typesFilePath }
+  }
 
   return result
 }
