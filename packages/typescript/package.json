@@ -6,8 +6,11 @@
   "maintainers": [
     "Vit Bokisch <vit@bokisch.com>"
   ],
-  "main": "./index.js",
-  "module": "./index.js",
+  "type": "module",
+  "exports": {
+    "./lib": "./lib.json",
+    "./nextjs": "./nextjs.json"
+  },
   "files": [
     "index.json",
     "lib.json",

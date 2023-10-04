@@ -3,6 +3,8 @@
 .next
 stats.html
 
+.yarn/install-state.gz
+
 node_modules/**/*
 .expo/*
 npm-debug.*

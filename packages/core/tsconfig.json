@@ -1,26 +1,16 @@
 {
   "extends": "@vitus-labs/tools-typescript/lib",
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
+    "incremental": false,
+    "noEmit": false,
     "outDir": "lib",
     "rootDir": "src",
     "baseUrl": ".",
     "declarationDir": "./lib/types",
     "paths": {
-      "~/*": [
-        "src/*"
-      ]
-    },
+      "~/*": ["src/*"]
+    }
   },
-  "include": [
-    "typings",
-    "src",
-  ],
-  "exclude": [
-    "node_modules",
-    "__stories__",
-    "lib"
-  ]
+  "include": ["typings", "src"],
+  "exclude": ["node_modules", "__stories__", "lib"]
 }

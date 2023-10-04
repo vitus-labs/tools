@@ -66,6 +66,5 @@
     "@vitus-labs/unistyle": "1.0.0-alpha.5",
     "styled-components": "^6.0.8",
     "typescript": "^5.2.2"
-  },
-  "gitHead": "83ccbf166b1123776610623a0f1a0869c586af8f"
+  }
 }

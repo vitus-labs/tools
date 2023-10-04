@@ -14,7 +14,7 @@
     "noUncheckedIndexedAccess": true,
     "strictNullChecks": true,
     "moduleResolution": "Bundler",
-    "module": "ESNext",
+    "module": "ES2022",
     "noEmit": true,
     "sourceMap": true,
     "incremental": true,

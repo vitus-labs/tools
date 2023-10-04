@@ -37,6 +37,8 @@ const loadPlugins = ({ env, platform, file, typesFilePath }) => {
       tsconfigDefaults: {
         exclude: CONFIG.exclude,
         include: CONFIG.include,
+        declarationMap: false,
+        declaration: false,
         compilerOptions: {
           types: ['@vitus-labs/tools-rollup'],
           plugins: [
@@ -48,12 +50,6 @@ const loadPlugins = ({ env, platform, file, typesFilePath }) => {
           ],
         },
       },
-    }
-
-    if (!typesFilePath) {
-      tsConfig.tsconfigDefaults.compilerOptions.declarationMap = false
-      tsConfig.tsconfigDefaults.compilerOptions.declaration = false
-      tsConfig.tsconfigDefaults.compilerOptions.declarationDir = undefined
     }
 
     if (typesFilePath) {
