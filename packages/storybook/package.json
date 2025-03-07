@@ -17,7 +17,7 @@
     "vl_stories-build": "./lib/bin/run-stories-build.js"
   },
   "engines": {
-    "node": ">= 16"
+    "node": ">= 22"
   },
   "publishConfig": {
     "access": "public"
@@ -34,27 +34,27 @@
   "peerDependencies": {
     "@vitus-labs/core": "*",
     "@vitus-labs/unistyle": "*",
-    "react": ">=17",
-    "react-dom": ">=17"
+    "react": ">=19",
+    "react-dom": ">=19"
   },
   "dependencies": {
-    "@storybook/addon-a11y": "^7.6.20",
-    "@storybook/addon-actions": "^7.6.20",
-    "@storybook/addon-backgrounds": "^7.6.20",
-    "@storybook/addon-controls": "^7.6.20",
-    "@storybook/addon-docs": "^7.6.20",
-    "@storybook/addon-measure": "^7.6.20",
-    "@storybook/addon-outline": "^7.6.20",
-    "@storybook/addon-storyshots": "^7.6.20",
-    "@storybook/addon-toolbars": "^7.6.20",
-    "@storybook/addon-viewport": "^7.6.20",
-    "@storybook/addons": "^7.6.20",
-    "@storybook/core-server": "^7.6.20",
-    "@storybook/nextjs": "^7.6.20",
-    "@storybook/react": "^7.6.20",
-    "@storybook/react-vite": "^7.6.20",
-    "@storybook/theming": "^7.6.20",
+    "@storybook/addon-a11y": "^8.6.4",
+    "@storybook/addon-actions": "^8.6.4",
+    "@storybook/addon-backgrounds": "^8.6.4",
+    "@storybook/addon-controls": "^8.6.4",
+    "@storybook/addon-docs": "^8.6.4",
+    "@storybook/addon-measure": "^8.6.4",
+    "@storybook/addon-outline": "^8.6.4",
+    "@storybook/addon-toolbars": "^8.6.4",
+    "@storybook/addon-viewport": "^8.6.4",
+    "@storybook/core-server": "^8.6.4",
+    "@storybook/manager-api": "^8.6.4",
+    "@storybook/nextjs": "^8.6.4",
+    "@storybook/react": "^8.6.4",
+    "@storybook/react-vite": "^8.6.4",
+    "@storybook/theming": "^8.6.4",
     "@vitus-labs/tools-core": "1.4.0",
+    "storybook": "^8.6.4",
     "storybook-dark-mode": "^3.0.3",
     "vite": "^6.2.1",
     "vite-tsconfig-paths": "^5.1.4"

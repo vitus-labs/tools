@@ -21,7 +21,7 @@
     "vl_build-watch": "./lib/bin/run-watch.js"
   },
   "engines": {
-    "node": ">= 16"
+    "node": ">= 22"
   },
   "scripts": {
     "prepublish": "yarn build",

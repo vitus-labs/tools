@@ -10,7 +10,7 @@
   "exports": "./lib/index.js",
   "types": "./lib/types/index.d.ts",
   "engines": {
-    "node": ">= 16"
+    "node": ">= 22"
   },
   "publishConfig": {
     "access": "public"
