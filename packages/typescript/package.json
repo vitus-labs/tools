@@ -26,6 +26,6 @@
     "typescript": ">=5"
   },
   "dependencies": {
-    "@styled/typescript-styled-plugin": "^1.0.0"
+    "@styled/typescript-styled-plugin": "^1.0.1"
   }
 }
