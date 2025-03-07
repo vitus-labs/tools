@@ -60,10 +60,10 @@
     "vite-tsconfig-paths": "^5.1.4"
   },
   "devDependencies": {
-    "@vitus-labs/core": "1.0.0-alpha.5",
+    "@vitus-labs/core": "1.1.2",
     "@vitus-labs/tools-babel": "1.4.0",
     "@vitus-labs/tools-typescript": "1.4.0",
-    "@vitus-labs/unistyle": "1.0.0-alpha.5",
+    "@vitus-labs/unistyle": "1.1.2",
     "styled-components": "^6.1.15",
     "typescript": "^5.8.2"
   }
