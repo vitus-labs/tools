@@ -8,9 +8,9 @@ const CONFIG: Record<string, any> = {
     theme: 'dark',
   },
   storiesDir: [
-    `/src/**/__stories__/**/*.stories.@(js|jsx|ts|tsx|mdx)`,
-    `/src/**/*.stories.@(js|jsx|ts|tsx|mdx)`,
-    `/src/**/stories.@(js|jsx|ts|tsx|mdx)`,
+    `/src/**/__stories__/**/*.stories.@(js|jsx|ts|tsx)`,
+    `/src/**/*.stories.@(js|jsx|ts|tsx)`,
+    `/src/**/stories.@(js|jsx|ts|tsx)`,
   ],
   globals: {
     // theme: {
