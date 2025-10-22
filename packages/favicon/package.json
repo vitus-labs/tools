@@ -20,7 +20,7 @@
   },
   "scripts": {
     "prepublish": "yarn build",
-    "build": "tsc"
+    "build": "rm -rf lib && tsc"
   },
   "dependencies": {
     "@vitus-labs/tools-core": "1.5.0-alpha.0",
