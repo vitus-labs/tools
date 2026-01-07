@@ -6456,7 +6456,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vitus-labs/tools-babel@1.5.0, @vitus-labs/tools-babel@workspace:packages/babel":
+"@vitus-labs/tools-babel@1.5.1, @vitus-labs/tools-babel@workspace:packages/babel":
   version: 0.0.0-use.local
   resolution: "@vitus-labs/tools-babel@workspace:packages/babel"
   dependencies:
@@ -6464,18 +6464,18 @@ __metadata:
     "@babel/preset-env": ^7.28.5
     "@babel/preset-react": ^7.28.5
     "@babel/preset-typescript": ^7.28.5
-    "@vitus-labs/tools-core": 1.5.0
-    "@vitus-labs/tools-rollup": 1.5.0
-    "@vitus-labs/tools-typescript": 1.5.0
+    "@vitus-labs/tools-core": 1.5.1
+    "@vitus-labs/tools-rollup": 1.5.1
+    "@vitus-labs/tools-typescript": 1.5.1
   languageName: unknown
   linkType: soft
 
-"@vitus-labs/tools-core@1.5.0, @vitus-labs/tools-core@workspace:packages/core":
+"@vitus-labs/tools-core@1.5.1, @vitus-labs/tools-core@workspace:packages/core":
   version: 0.0.0-use.local
   resolution: "@vitus-labs/tools-core@workspace:packages/core"
   dependencies:
     "@types/lodash-es": ^4.17.12
-    "@vitus-labs/tools-typescript": 1.5.0
+    "@vitus-labs/tools-typescript": 1.5.1
     find-up: ^7.0.0
     lodash-es: ^4.17.22
     typescript: ^5.9.3
@@ -6486,8 +6486,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@vitus-labs/tools-favicon@workspace:packages/favicon"
   dependencies:
-    "@vitus-labs/tools-core": 1.5.0
-    "@vitus-labs/tools-typescript": 1.5.0
+    "@vitus-labs/tools-core": 1.5.1
+    "@vitus-labs/tools-typescript": 1.5.1
     favicons: ^7.2.0
     typescript: ^5.9.3
   bin:
@@ -6502,9 +6502,9 @@ __metadata:
     "@types/lodash": ^4.17.21
     "@typescript-eslint/eslint-plugin": ^8.52.0
     "@typescript-eslint/parser": ^8.52.0
-    "@vitus-labs/tools-babel": 1.5.0
-    "@vitus-labs/tools-rollup": 1.5.0
-    "@vitus-labs/tools-typescript": 1.5.0
+    "@vitus-labs/tools-babel": 1.5.1
+    "@vitus-labs/tools-rollup": 1.5.1
+    "@vitus-labs/tools-typescript": 1.5.1
     eslint: ^9.39.2
     eslint-config-airbnb: ^19.0.4
     eslint-config-prettier: ^10.1.8
@@ -6537,7 +6537,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@vitus-labs/tools-rollup@1.5.0, @vitus-labs/tools-rollup@workspace:packages/rollup":
+"@vitus-labs/tools-rollup@1.5.1, @vitus-labs/tools-rollup@workspace:packages/rollup":
   version: 0.0.0-use.local
   resolution: "@vitus-labs/tools-rollup@workspace:packages/rollup"
   dependencies:
@@ -6548,8 +6548,8 @@ __metadata:
     "@rollup/plugin-typescript": ^12.3.0
     "@types/lodash-es": ^4.17.12
     "@types/node": ^25.0.3
-    "@vitus-labs/tools-core": 1.5.0
-    "@vitus-labs/tools-typescript": 1.5.0
+    "@vitus-labs/tools-core": 1.5.1
+    "@vitus-labs/tools-typescript": 1.5.1
     chalk: ^5.6.2
     find-up: ^7.0.0
     lodash-es: ^4.17.22
@@ -6605,9 +6605,9 @@ __metadata:
     "@storybook/react-vite": ^8.6.15
     "@storybook/theming": ^8.6.15
     "@vitus-labs/core": 1.2.1
-    "@vitus-labs/tools-babel": 1.5.0
-    "@vitus-labs/tools-core": 1.5.0
-    "@vitus-labs/tools-typescript": 1.5.0
+    "@vitus-labs/tools-babel": 1.5.1
+    "@vitus-labs/tools-core": 1.5.1
+    "@vitus-labs/tools-typescript": 1.5.1
     "@vitus-labs/unistyle": 1.2.1
     storybook: ^8.6.15
     storybook-dark-mode: ^4.0.2
@@ -6630,15 +6630,15 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@vitus-labs/tools-types@workspace:packages/types"
   dependencies:
-    "@vitus-labs/tools-babel": 1.5.0
-    "@vitus-labs/tools-rollup": 1.5.0
-    "@vitus-labs/tools-typescript": 1.5.0
+    "@vitus-labs/tools-babel": 1.5.1
+    "@vitus-labs/tools-rollup": 1.5.1
+    "@vitus-labs/tools-typescript": 1.5.1
   peerDependencies:
     react: "*"
   languageName: unknown
   linkType: soft
 
-"@vitus-labs/tools-typescript@1.5.0, @vitus-labs/tools-typescript@workspace:packages/typescript":
+"@vitus-labs/tools-typescript@1.5.1, @vitus-labs/tools-typescript@workspace:packages/typescript":
   version: 0.0.0-use.local
   resolution: "@vitus-labs/tools-typescript@workspace:packages/typescript"
   dependencies:

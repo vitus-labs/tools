@@ -1,6 +1,6 @@
 {
   "name": "@vitus-labs/tools-storybook",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "license": "MIT",
   "type": "module",
   "exports": {
@@ -53,7 +53,7 @@
     "@storybook/react": "^8.6.15",
     "@storybook/react-vite": "^8.6.15",
     "@storybook/theming": "^8.6.15",
-    "@vitus-labs/tools-core": "1.5.0",
+    "@vitus-labs/tools-core": "1.5.1",
     "storybook": "^8.6.15",
     "storybook-dark-mode": "^4.0.2",
     "vite": "^6.4.1",
@@ -61,8 +61,8 @@
   },
   "devDependencies": {
     "@vitus-labs/core": "1.2.1",
-    "@vitus-labs/tools-babel": "1.5.0",
-    "@vitus-labs/tools-typescript": "1.5.0",
+    "@vitus-labs/tools-babel": "1.5.1",
+    "@vitus-labs/tools-typescript": "1.5.1",
     "@vitus-labs/unistyle": "1.2.1",
     "styled-components": "^6.2.0",
     "typescript": "^5.9.3"
