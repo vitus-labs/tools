@@ -78,14 +78,14 @@ const getDependenciesList = (types: any) => {
 // example: napespace-package-name => namespacePackageName
 const camelspaceBundleName = (name: string) => {
   const parsedName = name.replace('@', '').replace('/', '-')
-  const arrayStringsCamel = (arr: any) =>
-    arr.map((item: any, i: any) =>
+  const toCamelCase = (items: any) =>
+    items.map((item: any, i: any) =>
       i === 0
         ? item
         : item.charAt(0).toUpperCase() + item.slice(1).toLowerCase(),
     )
-  const arr = parsedName.split('-')
-  const result = arrayStringsCamel(arr).join('')
+  const parts = parsedName.split('-')
+  const result = toCamelCase(parts).join('')
 
   return result
 }

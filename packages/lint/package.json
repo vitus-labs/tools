@@ -7,6 +7,9 @@
     "Vit Bokisch <vit@bokisch.com>"
   ],
   "type": "module",
+  "exports": {
+    "./biome": "./biome.shared.json"
+  },
   "files": [
     "biome.shared.json"
   ],
