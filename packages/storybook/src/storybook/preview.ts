@@ -20,7 +20,7 @@ declare global {
 // define configuration globally in window so it can be accessible from anywhere in the browser
 window.__VITUS_LABS_STORIES__ = __VITUS_LABS_STORIES__
 
-const globalTypes = __VITUS_LABS_STORIES__.globals
+const initialGlobals = __VITUS_LABS_STORIES__.globals
 
 const decorators = Object.entries(__VITUS_LABS_STORIES__.decorators).reduce(
   (acc, [key, value]) => {
@@ -43,9 +43,10 @@ const parameters = Object.entries(__VITUS_LABS_STORIES__.addons).reduce(
 )
 
 const preview: Preview = {
+  tags: ['autodocs'],
   decorators,
   parameters,
-  globalTypes,
+  initialGlobals,
 }
 
 export default preview
