@@ -16,7 +16,7 @@
   ],
   "scripts": {
     "release": "lerna publish --force-publish",
-    "pkgs:clean": "rm -rf node_modules/ yarn.lock && yarn",
+    "pkgs:clean": "rm -rf node_modules/ bun.lock && bun install",
     "pkgs:build": "lerna run build --stream",
     "prettier": "prettier \"./*.+(js|json|md)\" \"./src/**/*.*\" --write"
   },
@@ -29,5 +29,5 @@
     "react": "^19.2.3",
     "typescript": "5.9.3"
   },
-  "packageManager": "yarn@3.6.0"
+  "packageManager": "bun@1.3.3"
 }

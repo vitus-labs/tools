@@ -19,7 +19,7 @@
     "vl_favicon": "./lib/bin/run-favicon.js"
   },
   "scripts": {
-    "prepublish": "yarn build",
+    "prepublish": "bun run build",
     "build": "rm -rf lib && tsc"
   },
   "dependencies": {

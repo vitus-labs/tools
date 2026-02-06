@@ -24,7 +24,7 @@
     "node": ">= 22"
   },
   "scripts": {
-    "prepublish": "yarn build",
+    "prepublish": "bun run build",
     "build": "tsc"
   },
   "publishConfig": {

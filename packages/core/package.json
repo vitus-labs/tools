@@ -16,7 +16,7 @@
     "access": "public"
   },
   "scripts": {
-    "prepublish": "yarn build",
+    "prepublish": "bun run build",
     "build": "tsc"
   },
   "dependencies": {

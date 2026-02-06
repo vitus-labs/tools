@@ -1,5 +1,5 @@
 {
-  "npmClient": "yarn",
+  "npmClient": "bun",
   "packages": ["packages/*"],
   "version": "1.5.1",
   "command": {

@@ -26,10 +26,10 @@
     "lib/"
   ],
   "scripts": {
-    "prepublish": "yarn build",
+    "prepublish": "bun run build",
     "build": "rm -rf lib && tsc",
     "lint:ts": "eslint src/*",
-    "lint": "yarn lint:ts"
+    "lint": "bun run lint:ts"
   },
   "peerDependencies": {
     "@vitus-labs/core": "*",
