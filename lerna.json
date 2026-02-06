@@ -1,13 +1,22 @@
 {
   "npmClient": "npm",
-  "packages": ["packages/*"],
-  "version": "1.5.1",
+  "packages": [
+    "packages/*"
+  ],
+  "version": "1.5.2-alpha.0",
   "command": {
     "publish": {
-      "ignoreChanges": ["ignored-file", "*.md"]
+      "ignoreChanges": [
+        "ignored-file",
+        "*.md"
+      ]
     },
     "version": {
-      "allowBranch": ["main", "feature/*", "release/*"],
+      "allowBranch": [
+        "main",
+        "feature/*",
+        "release/*"
+      ],
       "exact": true,
       "conventionalCommits": true,
       "preid": "alpha"
