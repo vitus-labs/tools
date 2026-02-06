@@ -16,6 +16,9 @@ npm-debug.*
 web-build/
 web-report/
 
+# Nx
+.nx/
+
 # macOS
 .DS_Store
 
