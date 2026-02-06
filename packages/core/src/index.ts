@@ -135,7 +135,7 @@ const loadVLToolsConfig = () => {
     get: (param: string, defaultValue?: any) =>
       _get(object, param, defaultValue || {}),
     merge: (param: Record<string, any>) =>
-      cloneAndEnhance(merge({}, param, object)),
+      cloneAndEnhance(merge(object, param)),
   })
 
   const getOutput = (key: string) => {
