@@ -1,7 +1,7 @@
 import chalk from 'chalk'
 import { rimraf } from 'rimraf'
 import { rolldown } from 'rolldown'
-import { CONFIG } from '../config/index.js'
+import { CONFIG, PKG } from '../config/index.js'
 import {
   createBuildPipeline,
   config as rolldownConfig,
@@ -11,15 +11,16 @@ const { log } = console
 const allBuilds = createBuildPipeline()
 const allBuildsCount = allBuilds.length
 
-const MODULE_TYPES: Record<string, string> = {
-  cjs: 'CommonJS',
-  es: 'ES Module',
-  umd: 'UMD module',
+const FORMAT_LABEL: Record<string, string> = {
+  cjs: 'CJS',
+  es: 'ESM',
+  umd: 'UMD',
 }
 
-// --------------------------------------------------------
-// BUILD rolldown
-// --------------------------------------------------------
+const label = (text: string) => chalk.bold.bgCyan.black(` ${text} `)
+const dim = chalk.dim
+const bold = chalk.bold
+
 async function build({
   inputOptions,
   outputOptions,
@@ -28,71 +29,53 @@ async function build({
   outputOptions: any
 }) {
   const bundle = await rolldown(inputOptions)
-
   await bundle.write(outputOptions)
   await bundle.close()
 }
 
-// --------------------------------------------------------
-// SERIALIZE ALL BUILDS
-// --------------------------------------------------------
 const createBuilds = async () => {
   let p = Promise.resolve()
 
-  // serialize builds
-  allBuilds.forEach((item, i) => {
+  allBuilds.forEach((item) => {
     const { output, ...input } = rolldownConfig(item)
-    const type = output.format
-
+    const format = FORMAT_LABEL[output.format] || output.format
     p = p.then(() => {
-      log(
-        chalk.green(`Building ${i + 1}/${allBuildsCount}`),
-        chalk.gray(`(format: ${MODULE_TYPES[type]})`),
-      )
+      const start = performance.now()
 
-      return build({ inputOptions: input, outputOptions: output })
+      return build({ inputOptions: input, outputOptions: output }).then(() => {
+        const duration = Math.round(performance.now() - start)
+        log(
+          `  ${chalk.green('+')} ${bold(format)} ${dim('->')} ${dim(output.file)} ${dim(`(${duration}ms)`)}`,
+        )
+      })
     })
   })
 
   return p.catch((e) => {
-    log(
-      `${chalk.bold.bgRed.white('ERROR')} ${chalk.red('Something went wrong')}`,
-    )
+    log(`\n${chalk.bold.red('Build failed')}\n`)
     log(e)
     throw e
   })
 }
 
 const runBuild = async () => {
-  // --------------------------------------------------------
-  // (1) delete build folder first
-  // --------------------------------------------------------
+  const start = performance.now()
+
   log(
-    `${chalk.bold.bgBlue.black('[1/4]')} ${chalk.blue(
-      'Cleaning up old build folder...',
-    )}`,
+    `\n${label('rolldown')} ${bold(PKG.name || '')} ${dim(`v${PKG.version || '0.0.0'}`)}\n`,
   )
 
+  log(`${dim('Cleaning')} ${CONFIG.outputDir}/`)
   rimraf.sync(`${process.cwd()}/${CONFIG.outputDir}`)
 
-  log(`${chalk.bold.bgBlue.black('[2/4]')} ${chalk.blue('Old build removed')}`)
-
-  // --------------------------------------------------------
-  // (2) build
-  // --------------------------------------------------------
   log(
-    `${chalk.bold.bgBlue.black('[3/4]')} ${chalk.blue(
-      `Generating ${allBuildsCount} builds in total...`,
-    )}`,
+    `${dim('Building')} ${bold(String(allBuildsCount))} bundle${allBuildsCount > 1 ? 's' : ''}...\n`,
   )
 
-  log('\n')
+  await createBuilds()
 
-  await Promise.resolve()
-    .then(() => createBuilds())
-    .then(() => {
-      log(`${chalk.bold.bgBlue.black('[4/4]')} ${chalk.blue('Done!')}`)
-    })
+  const total = Math.round(performance.now() - start)
+  log(`\n${chalk.green('Done')} ${dim(`in ${total}ms`)}\n`)
 }
 
 export { runBuild }
