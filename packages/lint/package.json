@@ -6,11 +6,9 @@
   "maintainers": [
     "Vit Bokisch <vit@bokisch.com>"
   ],
-  "main": "./lib/vitus-tools-lint.js",
-  "module": "./lib/vitus-tools-lint.module.js",
-  "types": "./lib/index.d.ts",
+  "type": "module",
   "files": [
-    "lib/"
+    "biome.shared.json"
   ],
   "engines": {
     "node": ">= 22"
@@ -18,49 +16,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "scripts": {
-    "dev": "bun run vl_stories",
-    "prepublish": "bun run build",
-    "build": "bun run vl_build",
-    "build:watch": "bun run vl_build-watch",
-    "lint:ts": "eslint src/*",
-    "lint": "bun run lint:ts"
-  },
-  "optionalDependencies": {
-    "graphql": "^16.12.0",
-    "prettier": "^3.7.4"
-  },
-  "peerDependencies": {
-    "typescript": ">=5"
-  },
   "dependencies": {
-    "@typescript-eslint/eslint-plugin": "^8.52.0",
-    "@typescript-eslint/parser": "^8.52.0",
-    "eslint": "^9.39.2",
-    "eslint-config-airbnb": "^19.0.4",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-import-resolver-typescript": "^3.10.1",
-    "eslint-plugin-graphql": "^4.0.0",
-    "eslint-plugin-import": "^2.32.0",
-    "eslint-plugin-jest": "^28.14.0",
-    "eslint-plugin-jsx-a11y": "^6.10.2",
-    "eslint-plugin-markdown": "^5.1.0",
-    "eslint-plugin-prettier": "^5.5.4",
-    "eslint-plugin-react": "^7.37.5",
-    "eslint-plugin-react-hooks": "^5.2.0",
-    "eslint-plugin-storybook": "^0.11.6",
-    "lodash": "^4.17.21",
-    "lodash-es": "^4.17.22",
-    "stylelint": "^16.26.1",
-    "stylelint-config-prettier": "^9.0.5",
-    "stylelint-config-recommended": "^15.0.0",
-    "stylelint-config-styled-components": "^0.1.1",
-    "stylelint-processor-styled-components": "^1.10.0"
-  },
-  "devDependencies": {
-    "@types/lodash": "^4.17.21",
-    "@vitus-labs/tools-babel": "1.5.1",
-    "@vitus-labs/tools-rollup": "1.5.1",
-    "@vitus-labs/tools-typescript": "1.5.1"
+    "@biomejs/biome": "^2.3.14"
   }
 }

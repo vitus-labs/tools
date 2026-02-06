@@ -19,10 +19,7 @@
     "sourceMap": true,
     "incremental": true,
     "allowSyntheticDefaultImports": true,
-    "lib": [
-      "ES2022",
-      "dom"
-    ],
+    "lib": ["ES2022", "dom"],
     "preserveSymlinks": true,
     "isolatedModules": true,
     "plugins": [
@@ -32,12 +29,6 @@
     ],
     "declaration": true
   },
-  "include": [
-    "src"
-  ],
-  "exclude": [
-    "node_modules",
-    "__stories__",
-    "lib/*"
-  ]
+  "include": ["src"],
+  "exclude": ["node_modules", "__stories__", "lib/*"]
 }

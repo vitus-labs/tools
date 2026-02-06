@@ -1,12 +1,12 @@
 import { createRequire } from 'node:module'
-import typescript from 'rollup-plugin-typescript2'
-import { apiExtractor } from 'rollup-plugin-api-extractor'
 import { nodeResolve } from '@rollup/plugin-node-resolve'
-import filesize from 'rollup-plugin-filesize'
-import { visualizer } from 'rollup-plugin-visualizer'
 import replace from '@rollup/plugin-replace'
 import terser from '@rollup/plugin-terser'
 import { swapGlobals } from '@vitus-labs/tools-core'
+import { apiExtractor } from 'rollup-plugin-api-extractor'
+import filesize from 'rollup-plugin-filesize'
+import typescript from 'rollup-plugin-typescript2'
+import { visualizer } from 'rollup-plugin-visualizer'
 import { CONFIG, PKG, PLATFORMS } from '../config/index.js'
 
 const require = createRequire(import.meta.url)

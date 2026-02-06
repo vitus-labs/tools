@@ -28,8 +28,7 @@
   "scripts": {
     "prepublish": "bun run build",
     "build": "rm -rf lib && tsc",
-    "lint:ts": "eslint src/*",
-    "lint": "bun run lint:ts"
+    "lint": "biome check src/"
   },
   "peerDependencies": {
     "@vitus-labs/core": "*",

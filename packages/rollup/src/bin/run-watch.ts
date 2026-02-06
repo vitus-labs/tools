@@ -4,7 +4,7 @@ const rollup = require('rollup')
 const watchOptions = {}
 const watcher = rollup.watch(watchOptions)
 
-watcher.on('event', (event) => {
+watcher.on('event', (_event) => {
   // event.code can be one of:
   //   START        — the watcher is (re)starting
   //   BUNDLE_START — building an individual bundle

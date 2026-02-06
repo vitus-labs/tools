@@ -1,6 +1,6 @@
 import fs from 'node:fs'
-import favicons from 'favicons'
 import { VL_CONFIG } from '@vitus-labs/tools-core'
+import favicons from 'favicons'
 import { configuration } from './baseConfig.js'
 
 const { icons, path, ...restConfig } =

@@ -1,5 +1,5 @@
 import fs from 'node:fs'
-import { createRequire } from 'module'
+import { createRequire } from 'node:module'
 import { findUpSync } from 'find-up'
 import { get as _get, merge } from 'lodash-es'
 
@@ -19,7 +19,7 @@ const loadFileToJSON = (filename: string) => {
 
   if (!file) return {}
 
-  let data
+  let data: Record<string, any> = {}
 
   // try to read an exported module first
   try {
@@ -28,7 +28,7 @@ const loadFileToJSON = (filename: string) => {
     if (importedFile) {
       data = importedFile
     }
-  } catch (e) {
+  } catch (_e) {
     // ignore error
   }
 
@@ -36,7 +36,7 @@ const loadFileToJSON = (filename: string) => {
   if (!data) {
     try {
       data = JSON.parse(fs.readFileSync(file, 'utf-8'))
-    } catch (e) {
+    } catch (_e) {
       // ignore error
     }
   }

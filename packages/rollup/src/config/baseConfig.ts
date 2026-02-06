@@ -13,7 +13,7 @@ export default {
   filesize: true,
   extensions: ['.json', '.js', '.jsx', '.ts', '.tsx', '.es6', '.es', '.mjs'],
   include: ['src'],
-  external: [],
+  external: ['react/jsx-runtime'],
   exclude: [
     'lib',
     'node_modules/**',

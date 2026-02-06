@@ -1,4 +1,4 @@
-import { VL_CONFIG, PKG, TS_CONFIG } from '@vitus-labs/tools-core'
+import { PKG, TS_CONFIG, VL_CONFIG } from '@vitus-labs/tools-core'
 import baseConfig from './baseConfig.js'
 
 const CONFIG_KEY = 'build'

@@ -154,7 +154,7 @@ const createBuildPipeline = () => {
   ]
 
   // add generate typings for the first bundle only
-  if (!!typesFilePath) {
+  if (typesFilePath) {
     result[0] = { ...result[0], typesFilePath }
   }
 

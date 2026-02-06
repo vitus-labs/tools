@@ -15,8 +15,8 @@ export type StrictOmit<T, K extends keyof T> = Omit<T, K>
  */
 export type ExtractProps<TComponentOrTProps> =
   TComponentOrTProps extends ComponentType<infer TProps>
-  ? TProps
-  : TComponentOrTProps
+    ? TProps
+    : TComponentOrTProps
 
 // --------------------------------------------------------
 // MERGE TYPES
@@ -31,11 +31,11 @@ type Id<T> = T extends infer U ? { [K in keyof U]: U[K] } : never
  * Only filters out properties that are exactly never, null, or undefined
  */
 type ExtractNullableKeys<T> = {
-  [P in keyof T as[T[P]] extends [never]
-  ? never
-  : [T[P]] extends [null | undefined]
-  ? never
-  : P]: T[P]
+  [P in keyof T as [T[P]] extends [never]
+    ? never
+    : [T[P]] extends [null | undefined]
+      ? never
+      : P]: T[P]
 }
 
 /**
