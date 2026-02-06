@@ -14,21 +14,6 @@
         "typescript": "5.9.3",
       },
     },
-    "packages/babel": {
-      "name": "@vitus-labs/tools-babel",
-      "version": "1.5.1",
-      "dependencies": {
-        "@babel/core": "^7.28.5",
-        "@babel/preset-env": "^7.28.5",
-        "@babel/preset-react": "^7.28.5",
-        "@babel/preset-typescript": "^7.28.5",
-      },
-      "devDependencies": {
-        "@vitus-labs/tools-core": "1.5.1",
-        "@vitus-labs/tools-rollup": "1.5.1",
-        "@vitus-labs/tools-typescript": "1.5.1",
-      },
-    },
     "packages/core": {
       "name": "@vitus-labs/tools-core",
       "version": "1.5.1",
@@ -126,7 +111,6 @@
       },
       "devDependencies": {
         "@vitus-labs/core": "1.2.1",
-        "@vitus-labs/tools-babel": "1.5.1",
         "@vitus-labs/tools-typescript": "1.5.1",
         "@vitus-labs/unistyle": "1.2.1",
         "styled-components": "^6.3.8",
@@ -143,7 +127,6 @@
       "name": "@vitus-labs/tools-types",
       "version": "1.5.1",
       "devDependencies": {
-        "@vitus-labs/tools-babel": "1.5.1",
         "@vitus-labs/tools-rollup": "1.5.1",
         "@vitus-labs/tools-typescript": "1.5.1",
       },
@@ -884,8 +867,6 @@
 
     "@vitus-labs/core": ["@vitus-labs/core@1.2.1", "", { "dependencies": { "lodash-es": "^4.17.21", "moize": "^6.1.6", "react-is": "^19.1.0" }, "peerDependencies": { "react": ">= 18", "styled-components": ">= 6" } }, "sha512-8j6ae28KPyJ3cTUbfqM4Fo87fK+9UIqZmUpb4WWdad9OokuwqwtIpdQxXCliw0ZxxLOih4ucJum+98hft7s40A=="],
 
-    "@vitus-labs/tools-babel": ["@vitus-labs/tools-babel@workspace:packages/babel"],
-
     "@vitus-labs/tools-core": ["@vitus-labs/tools-core@workspace:packages/core"],
 
     "@vitus-labs/tools-favicon": ["@vitus-labs/tools-favicon@workspace:packages/favicon"],
@@ -1022,7 +1003,7 @@
 
     "babel-plugin-polyfill-corejs2": ["babel-plugin-polyfill-corejs2@0.4.15", "", { "dependencies": { "@babel/compat-data": "^7.28.6", "@babel/helper-define-polyfill-provider": "^0.6.6", "semver": "^6.3.1" }, "peerDependencies": { "@babel/core": "^7.4.0 || ^8.0.0-0 <8.0.0" } }, "sha512-hR3GwrRwHUfYwGfrisXPIDP3JcYfBrW7wKE7+Au6wDYl7fm/ka1NEII6kORzxNU556JjfidZeBsO10kYvtV1aw=="],
 
-    "babel-plugin-polyfill-corejs3": ["babel-plugin-polyfill-corejs3@0.14.0", "", { "dependencies": { "@babel/helper-define-polyfill-provider": "^0.6.6", "core-js-compat": "^3.48.0" }, "peerDependencies": { "@babel/core": "^7.4.0 || ^8.0.0-0 <8.0.0" } }, "sha512-AvDcMxJ34W4Wgy4KBIIePQTAOP1Ie2WFwkQp3dB7FQ/f0lI5+nM96zUnYEOE1P9sEg0es5VCP0HxiWu5fUHZAQ=="],
+    "babel-plugin-polyfill-corejs3": ["babel-plugin-polyfill-corejs3@0.13.0", "", { "dependencies": { "@babel/helper-define-polyfill-provider": "^0.6.5", "core-js-compat": "^3.43.0" }, "peerDependencies": { "@babel/core": "^7.4.0 || ^8.0.0-0 <8.0.0" } }, "sha512-U+GNwMdSFgzVmfhNm8GJUX88AadB3uo9KpJqS3FaqNIPKgySuvMb+bHPsOmmuWyIcuqZj/pzt1RUIUZns4y2+A=="],
 
     "babel-plugin-polyfill-regenerator": ["babel-plugin-polyfill-regenerator@0.6.6", "", { "dependencies": { "@babel/helper-define-polyfill-provider": "^0.6.6" }, "peerDependencies": { "@babel/core": "^7.4.0 || ^8.0.0-0 <8.0.0" } }, "sha512-hYm+XLYRMvupxiQzrvXUj7YyvFFVfv5gI0R71AJzudg1g2AI2vyCPPIFEBjk162/wFzti3inBHo7isWFuEVS/A=="],
 
@@ -2376,9 +2357,9 @@
 
     "@babel/helper-create-regexp-features-plugin/semver": ["semver@6.3.1", "", { "bin": { "semver": "bin/semver.js" } }, "sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA=="],
 
-    "@babel/plugin-transform-runtime/babel-plugin-polyfill-corejs3": ["babel-plugin-polyfill-corejs3@0.13.0", "", { "dependencies": { "@babel/helper-define-polyfill-provider": "^0.6.5", "core-js-compat": "^3.43.0" }, "peerDependencies": { "@babel/core": "^7.4.0 || ^8.0.0-0 <8.0.0" } }, "sha512-U+GNwMdSFgzVmfhNm8GJUX88AadB3uo9KpJqS3FaqNIPKgySuvMb+bHPsOmmuWyIcuqZj/pzt1RUIUZns4y2+A=="],
-
     "@babel/plugin-transform-runtime/semver": ["semver@6.3.1", "", { "bin": { "semver": "bin/semver.js" } }, "sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA=="],
+
+    "@babel/preset-env/babel-plugin-polyfill-corejs3": ["babel-plugin-polyfill-corejs3@0.14.0", "", { "dependencies": { "@babel/helper-define-polyfill-provider": "^0.6.6", "core-js-compat": "^3.48.0" }, "peerDependencies": { "@babel/core": "^7.4.0 || ^8.0.0-0 <8.0.0" } }, "sha512-AvDcMxJ34W4Wgy4KBIIePQTAOP1Ie2WFwkQp3dB7FQ/f0lI5+nM96zUnYEOE1P9sEg0es5VCP0HxiWu5fUHZAQ=="],
 
     "@babel/preset-env/semver": ["semver@6.3.1", "", { "bin": { "semver": "bin/semver.js" } }, "sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA=="],
 

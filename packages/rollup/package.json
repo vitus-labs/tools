@@ -9,8 +9,8 @@
   "type": "module",
   "exports": {
     ".": {
-      "import": "./lib/index.js",
-      "types": "./lib/types/index.d.ts"
+      "types": "./lib/types/index.d.ts",
+      "import": "./lib/index.js"
     },
     "./global": {
       "types": "./global/index.d.ts"

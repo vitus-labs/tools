@@ -28,7 +28,6 @@
     "react": "*"
   },
   "devDependencies": {
-    "@vitus-labs/tools-babel": "1.5.1",
     "@vitus-labs/tools-rollup": "1.5.1",
     "@vitus-labs/tools-typescript": "1.5.1"
   }

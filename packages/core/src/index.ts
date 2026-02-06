@@ -14,7 +14,7 @@ const require = createRequire(import.meta.url)
 // --------------------------------------------------------
 const findFile = (filename: string) => findUpSync(filename, { type: 'file' })
 
-const loadFileToJSON = (filename: string) => {
+const loadFileToJSON = (filename: string): Record<string, any> => {
   const file = findFile(filename)
 
   if (!file) return {}
@@ -93,7 +93,7 @@ const camelspaceBundleName = (name: string) => {
 // --------------------------------------------------------
 // PACKAGE JSON DATA
 // --------------------------------------------------------
-const getPkgData = () => {
+const getPkgData = (): Record<string, any> => {
   const pkg = getPackageJSON()
   const { name } = pkg
   // const namespace = parseNamespace(name)

@@ -7,8 +7,12 @@
     "Vit Bokisch <vit@bokisch.com>"
   ],
   "type": "module",
-  "exports": "./lib/index.js",
-  "types": "./lib/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/types/index.d.ts",
+      "import": "./lib/index.js"
+    }
+  },
   "engines": {
     "node": ">= 22"
   },
