@@ -128,7 +128,7 @@ const loadConfigParam =
 const loadVLToolsConfig = () => {
   const externalConfig = getExternalConfig()
 
-  const cloneAndEnhance = (object) => ({
+  const cloneAndEnhance = (object: Record<string, any>) => ({
     get config() {
       return object
     },
@@ -148,11 +148,13 @@ const loadVLToolsConfig = () => {
 }
 
 const swapGlobals = (globals: Record<string, string>) =>
-  Object.entries(globals).reduce((acc, [key, value]) => {
-    // eslint-disable-next-line no-param-reassign
-    acc[value] = key
-    return acc
-  }, {})
+  Object.entries(globals).reduce<Record<string, string>>(
+    (acc, [key, value]) => {
+      acc[value] = key
+      return acc
+    },
+    {},
+  )
 
 const PKG = getPkgData()
 const VL_CONFIG = loadVLToolsConfig()

@@ -12,7 +12,6 @@
     "./nextjs": "./nextjs.json"
   },
   "files": [
-    "index.json",
     "lib.json",
     "nextjs.json"
   ],
@@ -24,8 +23,5 @@
   },
   "peerDependencies": {
     "typescript": ">=5"
-  },
-  "dependencies": {
-    "@styled/typescript-styled-plugin": "^1.0.1"
   }
 }

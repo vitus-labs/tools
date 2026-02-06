@@ -6,25 +6,25 @@ import { configuration } from './baseConfig.js'
 const { icons, path, ...restConfig } =
   VL_CONFIG('favicon').merge(configuration).config
 
-const handleSuccess = (outputPath, response) => {
+const handleSuccess = (outputPath: string, response: any) => {
   console.log('Creating images...')
-  response.images.forEach((item) => {
+  response.images.forEach((item: any) => {
     fs.writeFileSync(`${outputPath}${item.name}`, item.contents)
   })
 
   console.log('Creating manifests...')
-  response.files.forEach((item) => {
+  response.files.forEach((item: any) => {
     fs.writeFileSync(`${outputPath}${item.name}`, item.contents)
   })
 }
 
-const handleError = (error) => {
+const handleError = (error: any) => {
   console.log(error.message) // Error description e.g. "An unknown error has occurred"
 }
 
 const generateFavicons = () =>
   Promise.all(
-    icons.map((item) => {
+    icons.map((item: any) => {
       const inputPath = `${process.cwd()}/${item.input}`
       const outputPath = `${process.cwd()}/${item.output}/`
 

@@ -8,7 +8,7 @@ const { log } = console
 const allBuilds = createBuildPipeline()
 const allBuildsCount = allBuilds.length
 
-const MODULE_TYPES = {
+const MODULE_TYPES: Record<string, string> = {
   cjs: 'CommonJS',
   es: 'ES Module',
   umd: 'UMD module',
@@ -17,7 +17,13 @@ const MODULE_TYPES = {
 // --------------------------------------------------------
 // BUILD rollup
 // --------------------------------------------------------
-async function build({ inputOptions, outputOptions }) {
+async function build({
+  inputOptions,
+  outputOptions,
+}: {
+  inputOptions: any
+  outputOptions: any
+}) {
   const bundle = await rollup(inputOptions)
 
   await bundle.write(outputOptions)

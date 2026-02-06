@@ -25,7 +25,7 @@ const globalTypes = __VITUS_LABS_STORIES__.globals
 const decorators = Object.entries(__VITUS_LABS_STORIES__.decorators).reduce(
   (acc, [key, value]) => {
     if (value) {
-      acc.push(d[key](value))
+      acc.push((d as Record<string, any>)[key](value))
     }
     return acc
   },

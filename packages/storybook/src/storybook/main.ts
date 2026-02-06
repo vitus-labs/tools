@@ -5,7 +5,7 @@ import { CONFIG } from '../config/index.js'
 // --------------------------------------------------------
 // STORYBOOK ADDONS LIST
 // --------------------------------------------------------
-const ADDONS_MAP = {
+const ADDONS_MAP: Record<string, string> = {
   a11y: '@storybook/addon-a11y',
   actions: '@storybook/addon-actions',
   backgrounds: '@storybook/addon-backgrounds',

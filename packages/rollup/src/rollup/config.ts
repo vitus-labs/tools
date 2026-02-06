@@ -12,11 +12,11 @@ import { CONFIG, PKG, PLATFORMS } from '../config/index.js'
 const require = createRequire(import.meta.url)
 const tspCompiler = require('ts-patch/compiler')
 
-const defineExtensions = (platform) => {
+const defineExtensions = (platform: string) => {
   const platformExtensions: string[] = []
 
-  if (PLATFORMS.includes(platform)) {
-    CONFIG.extensions.forEach((item) => {
+  if ((PLATFORMS as readonly string[]).includes(platform)) {
+    CONFIG.extensions.forEach((item: string) => {
       platformExtensions.push(`.${platform}${item}`)
     })
   }
@@ -24,7 +24,17 @@ const defineExtensions = (platform) => {
   return platformExtensions.concat(CONFIG.extensions)
 }
 
-const loadPlugins = ({ env, platform, file, typesFilePath }) => {
+const loadPlugins = ({
+  env,
+  platform,
+  file,
+  typesFilePath,
+}: {
+  env: string
+  platform: string
+  file: string
+  typesFilePath?: string
+}) => {
   const extensions = defineExtensions(platform)
   const plugins = [nodeResolve({ extensions, browser: platform === 'browser' })]
 
@@ -82,7 +92,7 @@ const loadPlugins = ({ env, platform, file, typesFilePath }) => {
   }
 
   if (CONFIG.replaceGlobals) {
-    const replaceOptions = {
+    const replaceOptions: Record<string, string> = {
       __VERSION__: JSON.stringify(PKG.version),
       __NODE__: JSON.stringify(platform === 'node'),
       __WEB__: JSON.stringify(

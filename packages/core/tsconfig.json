@@ -1,7 +1,6 @@
 {
   "extends": "@vitus-labs/tools-typescript/lib",
   "compilerOptions": {
-    "incremental": false,
     "noEmit": false,
     "outDir": "lib",
     "rootDir": "src",
