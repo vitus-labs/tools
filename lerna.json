@@ -7,8 +7,10 @@
       "ignoreChanges": ["ignored-file", "*.md"]
     },
     "version": {
-      "allowBranch": "main",
-      "exact": true
+      "allowBranch": ["main", "feature/*", "release/*"],
+      "exact": true,
+      "conventionalCommits": true,
+      "preid": "alpha"
     }
   },
   "$schema": "node_modules/lerna/schemas/lerna-schema.json"
