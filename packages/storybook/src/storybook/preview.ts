@@ -34,7 +34,7 @@ const decorators = Object.entries(__VITUS_LABS_STORIES__.decorators).reduce(
 
 const parameters = Object.entries(__VITUS_LABS_STORIES__.addons).reduce(
   (acc, [key, value]) => {
-    if (typeof value === 'object') {
+    if (typeof value === 'object' && value !== null) {
       return { ...acc, [key]: value }
     }
     return acc

@@ -1,7 +1,7 @@
 import type { Options } from './types'
 
 const loadTsProjects = (projects: string[]) =>
-  projects.map((item) => `${item}/**/*/tsconfig.json`)
+  projects.map((item) => `${item}/**/tsconfig.json`)
 
 const loadPlugins = (options: Options) => {
   const RESULT = ['@typescript-eslint']

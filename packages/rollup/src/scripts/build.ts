@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 import chalk from 'chalk'
 import { rimraf } from 'rimraf'
 import { rollup } from 'rollup'
@@ -45,16 +44,15 @@ const createBuilds = async () => {
     })
   })
 
-  p.catch((e) => {
+  return p.catch((e) => {
     log(
       `${chalk.bold.bgRed.white('⚠️ ERROR')} ${chalk.red(
         'Something went wrong'
       )}`
     )
     log(e)
+    throw e
   })
-
-  return p
 }
 
 const runBuild = async () => {

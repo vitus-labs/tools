@@ -23,15 +23,19 @@ const handleError = (error) => {
 }
 
 const generateFavicons = () =>
-  icons.forEach((item) => {
-    const inputPath = `${process.cwd()}/${item.input}`
-    const outputPath = `${process.cwd()}/${item.output}/`
+  Promise.all(
+    icons.map((item) => {
+      const inputPath = `${process.cwd()}/${item.input}`
+      const outputPath = `${process.cwd()}/${item.output}/`
 
-    // favicons(source, configuration, callback)
-    favicons(inputPath, { ...restConfig, path: `${path}/${item.path}` }).then(
-      (res) => handleSuccess(outputPath, res),
-      (err) => handleError(err)
-    )
-  })
+      return favicons(inputPath, {
+        ...restConfig,
+        path: `${path}/${item.path}`,
+      }).then(
+        (res) => handleSuccess(outputPath, res),
+        (err) => handleError(err),
+      )
+    }),
+  )
 
 export { generateFavicons }

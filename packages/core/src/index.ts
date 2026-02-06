@@ -29,7 +29,7 @@ const loadFileToJSON = (filename: string) => {
       data = importedFile
     }
   } catch (e) {
-    // ignore eror
+    // ignore error
   }
 
   // try to read a plain json file like tsconfig.json
@@ -82,7 +82,7 @@ const camelspaceBundleName = (name: string) => {
     arr.map((item: any, i: any) =>
       i === 0
         ? item
-        : item.charAt(0).toUpperCase() + item.substr(1).toLowerCase(),
+        : item.charAt(0).toUpperCase() + item.slice(1).toLowerCase(),
     )
   const arr = parsedName.split('-')
   const result = arrayStringsCamel(arr).join('')
@@ -135,7 +135,7 @@ const loadVLToolsConfig = () => {
     get: (param: string, defaultValue?: any) =>
       _get(object, param, defaultValue || {}),
     merge: (param: Record<string, any>) =>
-      cloneAndEnhance(merge(param, object)),
+      cloneAndEnhance(merge({}, param, object)),
   })
 
   const getOutput = (key: string) => {

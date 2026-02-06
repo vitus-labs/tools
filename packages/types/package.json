@@ -4,7 +4,7 @@
   "license": "MIT",
   "author": "Vit Bokisch <vit@bokisch.com>",
   "maintainers": [
-    "\"Vit Bokisch <vit@bokisch.com>\""
+    "Vit Bokisch <vit@bokisch.com>"
   ],
   "type": "module",
   "types": "./src/index.d.ts",
@@ -19,10 +19,10 @@
   "keywords": [],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/airaflex/frontend.git"
+    "url": "git+https://github.com/vitus-labs/tools.git"
   },
   "bugs": {
-    "url": "https://github.com/airaflex/frontend/issues"
+    "url": "https://github.com/vitus-labs/tools/issues"
   },
   "peerDependencies": {
     "react": "*"

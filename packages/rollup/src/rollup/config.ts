@@ -156,7 +156,7 @@ const rollupConfig = ({
       interop: 'compat',
       systemNullSetters: false,
     },
-    external: [...PKG.externalDependencies, CONFIG.external],
+    external: [...PKG.externalDependencies, ...CONFIG.external],
     plugins,
   }
 
