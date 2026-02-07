@@ -1,22 +1,22 @@
 import { createRequire } from 'node:module'
-import typescript from 'rollup-plugin-typescript2'
-import { apiExtractor } from 'rollup-plugin-api-extractor'
 import { nodeResolve } from '@rollup/plugin-node-resolve'
-import filesize from 'rollup-plugin-filesize'
-import { visualizer } from 'rollup-plugin-visualizer'
 import replace from '@rollup/plugin-replace'
 import terser from '@rollup/plugin-terser'
 import { swapGlobals } from '@vitus-labs/tools-core'
+import { apiExtractor } from 'rollup-plugin-api-extractor'
+import filesize from 'rollup-plugin-filesize'
+import typescript from 'rollup-plugin-typescript2'
+import { visualizer } from 'rollup-plugin-visualizer'
 import { CONFIG, PKG, PLATFORMS } from '../config/index.js'
 
 const require = createRequire(import.meta.url)
 const tspCompiler = require('ts-patch/compiler')
 
-const defineExtensions = (platform) => {
+const defineExtensions = (platform: string) => {
   const platformExtensions: string[] = []
 
-  if (PLATFORMS.includes(platform)) {
-    CONFIG.extensions.forEach((item) => {
+  if ((PLATFORMS as readonly string[]).includes(platform)) {
+    CONFIG.extensions.forEach((item: string) => {
       platformExtensions.push(`.${platform}${item}`)
     })
   }
@@ -24,7 +24,17 @@ const defineExtensions = (platform) => {
   return platformExtensions.concat(CONFIG.extensions)
 }
 
-const loadPlugins = ({ env, platform, file, typesFilePath }) => {
+const loadPlugins = ({
+  env,
+  platform,
+  file,
+  typesFilePath,
+}: {
+  env: string
+  platform: string
+  file: string
+  typesFilePath?: string
+}) => {
   const extensions = defineExtensions(platform)
   const plugins = [nodeResolve({ extensions, browser: platform === 'browser' })]
 
@@ -82,7 +92,7 @@ const loadPlugins = ({ env, platform, file, typesFilePath }) => {
   }
 
   if (CONFIG.replaceGlobals) {
-    const replaceOptions = {
+    const replaceOptions: Record<string, string> = {
       __VERSION__: JSON.stringify(PKG.version),
       __NODE__: JSON.stringify(platform === 'node'),
       __WEB__: JSON.stringify(
@@ -156,7 +166,7 @@ const rollupConfig = ({
       interop: 'compat',
       systemNullSetters: false,
     },
-    external: [...PKG.externalDependencies, CONFIG.external],
+    external: [...PKG.externalDependencies, ...CONFIG.external],
     plugins,
   }
 

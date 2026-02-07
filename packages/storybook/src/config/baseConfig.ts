@@ -1,5 +1,5 @@
-import { themes } from '@storybook/theming'
-import { MINIMAL_VIEWPORTS, INITIAL_VIEWPORTS } from '@storybook/addon-viewport'
+import { themes } from 'storybook/theming'
+import { INITIAL_VIEWPORTS, MINIMAL_VIEWPORTS } from 'storybook/viewport'
 
 const CONFIG: Record<string, any> = {
   outDir: '/docs',
@@ -12,40 +12,34 @@ const CONFIG: Record<string, any> = {
     `/src/**/*.stories.@(js|jsx|ts|tsx)`,
     `/src/**/stories.@(js|jsx|ts|tsx)`,
   ],
-  globals: {
-    // theme: {
-    //   name: 'Theme',
-    //   description: 'Global theme for components',
-    //   defaultValue: 'light',
-    //   toolbar: {
-    //     icon: 'circlehollow',
-    //     // array of plain string values or MenuItem shape (see below)
-    //     items: ['light', 'dark'],
-    //   },
-    // },
-  },
+  globals: {},
   addons: {
     controls: { expanded: true },
     actions: true,
     a11y: true,
     toolbars: true,
-    mode: true,
     docs: true,
     viewport: {
-      viewports: { ...MINIMAL_VIEWPORTS, ...INITIAL_VIEWPORTS },
+      options: { ...MINIMAL_VIEWPORTS, ...INITIAL_VIEWPORTS },
     },
+    chromatic: true,
+    designs: true,
+    mode: true,
+    pseudoStates: true,
+    themes: true,
+    vitest: true,
     measure: true,
     outline: true,
     darkMode: {
       dark: themes.dark,
-      light: themes.normal,
+      light: themes.light,
     },
     backgrounds: {
       default: 'light',
-      values: [
-        { name: 'light', value: '#fff' },
-        { name: 'dark', value: '#000' },
-      ],
+      options: {
+        light: { name: 'Light', value: '#fff' },
+        dark: { name: 'Dark', value: '#000' },
+      },
       grid: {
         disable: false,
         cellSize: 8,

@@ -1,4 +1,4 @@
-import { VL_CONFIG, TS_CONFIG } from '@vitus-labs/tools-core'
+import { TS_CONFIG, VL_CONFIG } from '@vitus-labs/tools-core'
 
 const CONFIG_KEY = 'stories'
 

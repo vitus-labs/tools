@@ -1,4 +1,4 @@
-import { type Preview } from '@storybook/react'
+import type { Preview } from '@storybook/react'
 import * as d from '../decorators/index.js'
 
 type VLStories = {
@@ -20,12 +20,12 @@ declare global {
 // define configuration globally in window so it can be accessible from anywhere in the browser
 window.__VITUS_LABS_STORIES__ = __VITUS_LABS_STORIES__
 
-const globalTypes = __VITUS_LABS_STORIES__.globals
+const initialGlobals = __VITUS_LABS_STORIES__.globals
 
 const decorators = Object.entries(__VITUS_LABS_STORIES__.decorators).reduce(
   (acc, [key, value]) => {
     if (value) {
-      acc.push(d[key](value))
+      acc.push((d as Record<string, any>)[key](value))
     }
     return acc
   },
@@ -34,7 +34,7 @@ const decorators = Object.entries(__VITUS_LABS_STORIES__.decorators).reduce(
 
 const parameters = Object.entries(__VITUS_LABS_STORIES__.addons).reduce(
   (acc, [key, value]) => {
-    if (typeof value === 'object') {
+    if (typeof value === 'object' && value !== null) {
       return { ...acc, [key]: value }
     }
     return acc
@@ -43,9 +43,10 @@ const parameters = Object.entries(__VITUS_LABS_STORIES__.addons).reduce(
 )
 
 const preview: Preview = {
+  tags: ['autodocs'],
   decorators,
   parameters,
-  globalTypes,
+  initialGlobals,
 }
 
 export default preview

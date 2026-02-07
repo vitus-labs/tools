@@ -4,18 +4,19 @@ import { CONFIG } from '../config/index.js'
 
 // --------------------------------------------------------
 // STORYBOOK ADDONS LIST
+// Only external addons — essentials (actions, backgrounds,
+// controls, measure, outline, toolbars, viewport) are
+// built into Storybook 10 core.
 // --------------------------------------------------------
-const ADDONS_MAP = {
+const ADDONS_MAP: Record<string, string> = {
   a11y: '@storybook/addon-a11y',
-  actions: '@storybook/addon-actions',
-  backgrounds: '@storybook/addon-backgrounds',
-  controls: '@storybook/addon-controls',
+  chromatic: '@chromatic-com/storybook',
+  designs: '@storybook/addon-designs',
   docs: '@storybook/addon-docs',
-  mode: 'storybook-dark-mode',
-  toolbars: '@storybook/addon-toolbars',
-  viewport: '@storybook/addon-viewport',
-  measure: '@storybook/addon-measure',
-  outline: '@storybook/addon-outline',
+  mode: '@vueless/storybook-dark-mode',
+  pseudoStates: 'storybook-addon-pseudo-states',
+  themes: '@storybook/addon-themes',
+  vitest: '@storybook/addon-vitest',
 }
 
 // --------------------------------------------------------
@@ -25,9 +26,6 @@ const STORYBOOK_CONFIG: StorybookConfig = {
   framework: {
     name: '@storybook/react-vite',
     options: {},
-  },
-  docs: {
-    autodocs: true,
   },
   stories: CONFIG.storiesDir,
   addons: Object.entries(CONFIG.addons).reduce((acc, [key, value]) => {

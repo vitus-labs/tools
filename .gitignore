@@ -3,7 +3,6 @@
 .next
 stats.html
 
-.yarn/install-state.gz
 
 node_modules/**/*
 .expo/*
@@ -17,6 +16,9 @@ npm-debug.*
 web-build/
 web-report/
 
+# Nx
+.nx/
+
 # macOS
 .DS_Store
 
@@ -24,8 +26,6 @@ web-report/
 logs
 *.log
 npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
 .cache/
 
 # Editors & OS
@@ -88,8 +88,6 @@ build/Release
 # Output of 'npm pack'
 *.tgz
 
-# Yarn Integrity file
-.yarn-integrity
 
 # dotenv environment variables file
 .env

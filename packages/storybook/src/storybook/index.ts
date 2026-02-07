@@ -14,7 +14,7 @@ const storybookStandalone = {
 
 const storybookBuild = {
   mode: 'static',
-  outputDir: CONFIG.outputDir,
+  outputDir: CONFIG.outDir,
   configDir: storybookConfigDir,
 }
 

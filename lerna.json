@@ -1,14 +1,24 @@
 {
-  "npmClient": "yarn",
-  "packages": ["packages/*"],
-  "version": "1.5.1",
+  "npmClient": "npm",
+  "packages": [
+    "packages/*"
+  ],
+  "version": "1.5.2-alpha.1",
   "command": {
     "publish": {
-      "ignoreChanges": ["ignored-file", "*.md"]
+      "ignoreChanges": [
+        "ignored-file",
+        "*.md"
+      ]
     },
     "version": {
-      "allowBranch": "main",
-      "exact": true
+      "allowBranch": [
+        "main",
+        "feature/*",
+        "release/*"
+      ],
+      "exact": true,
+      "preid": "alpha"
     }
   },
   "$schema": "node_modules/lerna/schemas/lerna-schema.json"

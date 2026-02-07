@@ -1,6 +1,6 @@
 const INTERNAL_CONFIG = { CONFIG: {} }
 
-export const setConfig = (value) => {
+export const setConfig = (value: Record<string, any>) => {
   INTERNAL_CONFIG.CONFIG = value
 }
 

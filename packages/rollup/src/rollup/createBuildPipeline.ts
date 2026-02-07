@@ -7,18 +7,23 @@ const hasDifferentNativeBuild = () => {
   return PKG['react-native'] !== PKG.module
 }
 
-const hasDifferentBrowserBuild = (type) => {
+const hasDifferentBrowserBuild = (type: string) => {
   if (!PKG.browser) return false
 
-  return Object.entries(PKG.browser).some(([key, value]: [string, string]) => {
-    const source = key.substring(2)
-    const output = value.substring(2)
+  return Object.entries(PKG.browser as Record<string, string>).some(
+    ([key, value]) => {
+      const source = key.substring(2)
+      const output = value.substring(2)
 
-    return source !== PKG[type] && source !== output
-  })
+      return source !== PKG[type] && source !== output
+    },
+  )
 }
 
-const BUILD_VARIANTS = {
+const BUILD_VARIANTS: Record<
+  string,
+  { format: string; env: string; platform?: string }
+> = {
   main: {
     format: isESModuleOnly ? 'es' : 'cjs',
     env: 'development',
@@ -129,20 +134,22 @@ const createBrowserBuildVariants = () => {
   const result: Record<string, any>[] = []
   if (!PKG.browser) return result
 
-  Object.entries(PKG.browser).forEach(([key, value]: [string, string]) => {
-    const source = key.substring(2) // strip './' from the beginning of path
-    const output = value.substring(2) // strip './' from the beginning of path
+  Object.entries(PKG.browser as Record<string, string>).forEach(
+    ([key, value]) => {
+      const source = key.substring(2) // strip './' from the beginning of path
+      const output = value.substring(2) // strip './' from the beginning of path
 
-    Object.keys(BUILD_VARIANTS).forEach((item) => {
-      if (PKG[item] === source && source !== output) {
-        result.push({
-          ...BUILD_VARIANTS[item],
-          file: output,
-          platform: 'browser',
-        })
-      }
-    })
-  })
+      Object.keys(BUILD_VARIANTS).forEach((item) => {
+        if (PKG[item] === source && source !== output) {
+          result.push({
+            ...BUILD_VARIANTS[item],
+            file: output,
+            platform: 'browser',
+          })
+        }
+      })
+    },
+  )
 
   return result
 }
@@ -154,7 +161,7 @@ const createBuildPipeline = () => {
   ]
 
   // add generate typings for the first bundle only
-  if (!!typesFilePath) {
+  if (typesFilePath) {
     result[0] = { ...result[0], typesFilePath }
   }
 

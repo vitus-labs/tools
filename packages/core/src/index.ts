@@ -1,5 +1,5 @@
 import fs from 'node:fs'
-import { createRequire } from 'module'
+import { createRequire } from 'node:module'
 import { findUpSync } from 'find-up'
 import { get as _get, merge } from 'lodash-es'
 
@@ -14,12 +14,12 @@ const require = createRequire(import.meta.url)
 // --------------------------------------------------------
 const findFile = (filename: string) => findUpSync(filename, { type: 'file' })
 
-const loadFileToJSON = (filename: string) => {
+const loadFileToJSON = (filename: string): Record<string, any> => {
   const file = findFile(filename)
 
   if (!file) return {}
 
-  let data
+  let data: Record<string, any> = {}
 
   // try to read an exported module first
   try {
@@ -28,15 +28,15 @@ const loadFileToJSON = (filename: string) => {
     if (importedFile) {
       data = importedFile
     }
-  } catch (e) {
-    // ignore eror
+  } catch (_e) {
+    // ignore error
   }
 
   // try to read a plain json file like tsconfig.json
   if (!data) {
     try {
       data = JSON.parse(fs.readFileSync(file, 'utf-8'))
-    } catch (e) {
+    } catch (_e) {
       // ignore error
     }
   }
@@ -78,14 +78,14 @@ const getDependenciesList = (types: any) => {
 // example: napespace-package-name => namespacePackageName
 const camelspaceBundleName = (name: string) => {
   const parsedName = name.replace('@', '').replace('/', '-')
-  const arrayStringsCamel = (arr: any) =>
-    arr.map((item: any, i: any) =>
+  const toCamelCase = (items: any) =>
+    items.map((item: any, i: any) =>
       i === 0
         ? item
-        : item.charAt(0).toUpperCase() + item.substr(1).toLowerCase(),
+        : item.charAt(0).toUpperCase() + item.slice(1).toLowerCase(),
     )
-  const arr = parsedName.split('-')
-  const result = arrayStringsCamel(arr).join('')
+  const parts = parsedName.split('-')
+  const result = toCamelCase(parts).join('')
 
   return result
 }
@@ -93,7 +93,7 @@ const camelspaceBundleName = (name: string) => {
 // --------------------------------------------------------
 // PACKAGE JSON DATA
 // --------------------------------------------------------
-const getPkgData = () => {
+const getPkgData = (): Record<string, any> => {
   const pkg = getPackageJSON()
   const { name } = pkg
   // const namespace = parseNamespace(name)
@@ -128,14 +128,14 @@ const loadConfigParam =
 const loadVLToolsConfig = () => {
   const externalConfig = getExternalConfig()
 
-  const cloneAndEnhance = (object) => ({
+  const cloneAndEnhance = (object: Record<string, any>) => ({
     get config() {
       return object
     },
     get: (param: string, defaultValue?: any) =>
       _get(object, param, defaultValue || {}),
     merge: (param: Record<string, any>) =>
-      cloneAndEnhance(merge(param, object)),
+      cloneAndEnhance(merge(object, param)),
   })
 
   const getOutput = (key: string) => {
@@ -148,11 +148,13 @@ const loadVLToolsConfig = () => {
 }
 
 const swapGlobals = (globals: Record<string, string>) =>
-  Object.entries(globals).reduce((acc, [key, value]) => {
-    // eslint-disable-next-line no-param-reassign
-    acc[value] = key
-    return acc
-  }, {})
+  Object.entries(globals).reduce<Record<string, string>>(
+    (acc, [key, value]) => {
+      acc[value] = key
+      return acc
+    },
+    {},
+  )
 
 const PKG = getPkgData()
 const VL_CONFIG = loadVLToolsConfig()

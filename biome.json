@@ -1,0 +1,19 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.3.14/schema.json",
+  "extends": ["./packages/lint/biome.shared.json"],
+  "linter": {
+    "rules": {
+      "suspicious": {
+        "noConsole": "off"
+      }
+    }
+  },
+  "files": {
+    "includes": [
+      "packages/*/src/**",
+      "packages/typescript/*.json",
+      "biome.json",
+      "package.json"
+    ]
+  }
+}
