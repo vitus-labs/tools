@@ -54,7 +54,7 @@
     "vite-tsconfig-paths": "^6.0.5"
   },
   "devDependencies": {
-    "@vitus-labs/core": "1.2.1",
+    "@vitus-labs/core": "1.2.2",
     "@vitus-labs/tools-typescript": "1.5.2-alpha.1",
     "@vitus-labs/unistyle": "1.2.1",
     "styled-components": "^6.3.8",
