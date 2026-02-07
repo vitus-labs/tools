@@ -18,7 +18,6 @@
         "release/*"
       ],
       "exact": true,
-      "conventionalCommits": true,
       "preid": "alpha"
     }
   },
