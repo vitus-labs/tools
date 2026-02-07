@@ -1,6 +1,6 @@
 {
   "name": "@vitus-labs/tools-favicon",
-  "version": "1.5.2-alpha.1",
+  "version": "1.5.1",
   "license": "MIT",
   "author": "Vit Bokisch <vit@bokisch.com>",
   "maintainers": [
@@ -27,11 +27,11 @@
     "build": "rm -rf lib && tsc"
   },
   "dependencies": {
-    "@vitus-labs/tools-core": "1.5.2-alpha.1",
+    "@vitus-labs/tools-core": "1.5.1",
     "favicons": "^7.2.0"
   },
   "devDependencies": {
-    "@vitus-labs/tools-typescript": "1.5.2-alpha.1",
+    "@vitus-labs/tools-typescript": "1.5.1",
     "typescript": "^5.9.3"
   }
 }

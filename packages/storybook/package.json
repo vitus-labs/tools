@@ -1,6 +1,6 @@
 {
   "name": "@vitus-labs/tools-storybook",
-  "version": "1.5.2-alpha.1",
+  "version": "1.5.1",
   "license": "MIT",
   "type": "module",
   "exports": {
@@ -46,7 +46,7 @@
     "@storybook/nextjs": "^10.2.7",
     "@storybook/react": "^10.2.7",
     "@storybook/react-vite": "^10.2.7",
-    "@vitus-labs/tools-core": "1.5.2-alpha.1",
+    "@vitus-labs/tools-core": "1.5.1",
     "@vueless/storybook-dark-mode": "^10.0.7",
     "storybook": "^10.2.7",
     "storybook-addon-pseudo-states": "^10.2.7",
@@ -55,7 +55,7 @@
   },
   "devDependencies": {
     "@vitus-labs/core": "1.2.1",
-    "@vitus-labs/tools-typescript": "1.5.2-alpha.1",
+    "@vitus-labs/tools-typescript": "1.5.1",
     "@vitus-labs/unistyle": "1.2.1",
     "styled-components": "^6.3.8",
     "typescript": "^5.9.3"
