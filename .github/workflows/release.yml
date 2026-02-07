@@ -59,7 +59,9 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Publish
-        run: bunx lerna publish ${{ inputs.type }} --provenance --yes
+        run: bunx lerna publish ${{ inputs.type }} --yes
+        env:
+          NPM_CONFIG_PROVENANCE: true
 
   # ── Prerelease (feature/release branches, automatic) ────────────
   prerelease:
@@ -90,4 +92,6 @@ jobs:
         run: bunx lerna run build --stream
 
       - name: Publish canary
-        run: bunx lerna publish --canary --preid alpha --dist-tag next --force-publish --provenance --yes
+        run: bunx lerna publish --canary --preid alpha --dist-tag next --force-publish --yes
+        env:
+          NPM_CONFIG_PROVENANCE: true
