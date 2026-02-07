@@ -115,6 +115,7 @@ const rolldownConfig = ({
       name: ['umd', 'iife'].includes(format) ? PKG.bundleName : undefined,
       esModule: true,
       minify: env === 'production',
+      codeSplitting: false,
     },
     external: [...PKG.externalDependencies, ...CONFIG.external],
     plugins,
