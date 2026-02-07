@@ -29,8 +29,8 @@
     "build": "tsc"
   },
   "dependencies": {
-    "find-up": "^7.0.0",
-    "lodash-es": "^4.17.22"
+    "find-up": "^8.0.0",
+    "lodash-es": "^4.17.23"
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.12",
