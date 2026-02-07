@@ -31,11 +31,17 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      id-token: write
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: 'https://registry.npmjs.org'
 
       - uses: oven-sh/setup-bun@v2
 
@@ -52,23 +58,26 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Configure npm auth
-        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-
       - name: Publish
-        run: bunx lerna publish ${{ inputs.type }} --yes
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: bunx lerna publish ${{ inputs.type }} --provenance --yes
 
   # ── Prerelease (feature/release branches, automatic) ────────────
   prerelease:
     if: github.event_name == 'push'
     name: Publish Prerelease
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: 'https://registry.npmjs.org'
 
       - uses: oven-sh/setup-bun@v2
 
@@ -80,10 +89,5 @@ jobs:
       - name: Build all packages
         run: bunx lerna run build --stream
 
-      - name: Configure npm auth
-        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-
       - name: Publish canary
-        run: bunx lerna publish --canary --preid alpha --dist-tag next --force-publish --yes
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: bunx lerna publish --canary --preid alpha --dist-tag next --force-publish --provenance --yes
