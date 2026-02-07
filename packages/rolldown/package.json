@@ -1,6 +1,6 @@
 {
   "name": "@vitus-labs/tools-rolldown",
-  "version": "1.5.2-alpha.0",
+  "version": "1.5.2-alpha.1",
   "license": "MIT",
   "author": "Vit Bokisch <vit@bokisch.com>",
   "maintainers": [
@@ -31,7 +31,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@vitus-labs/tools-core": "1.5.2-alpha.0",
+    "@vitus-labs/tools-core": "1.5.2-alpha.1",
     "chalk": "^5.6.2",
     "rimraf": "^6.1.2",
     "rolldown": "^1.0.0-rc.3",
@@ -40,7 +40,7 @@
     "rollup-plugin-visualizer": "^5.14.0"
   },
   "devDependencies": {
-    "@vitus-labs/tools-typescript": "1.5.2-alpha.0",
+    "@vitus-labs/tools-typescript": "1.5.2-alpha.1",
     "typescript": "^5.9.3"
   }
 }
