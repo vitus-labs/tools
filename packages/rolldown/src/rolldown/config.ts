@@ -114,8 +114,7 @@ const rolldownConfig = ({
 }
 
 const buildDts = () => {
-  const typesFilePath =
-    PKG?.exports?.types || PKG.types || PKG.typings
+  const typesFilePath = PKG?.exports?.types || PKG.types || PKG.typings
 
   if (!CONFIG.typescript || !typesFilePath) return null
 
@@ -132,9 +131,7 @@ const buildDts = () => {
       extensions: CONFIG.extensions,
     },
     external: [...PKG.externalDependencies, ...CONFIG.external],
-    plugins: [
-      ...(dts({ tsconfig: 'tsconfig.json' }) as RolldownPlugin[]),
-    ],
+    plugins: [...(dts({ tsconfig: 'tsconfig.json' }) as RolldownPlugin[])],
     output: {
       dir,
       entryFileNames: entryFileName,

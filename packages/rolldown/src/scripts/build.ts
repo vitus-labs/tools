@@ -1,18 +1,13 @@
-import {
-  readdirSync,
-  renameSync,
-  statSync,
-  unlinkSync,
-} from 'node:fs'
+import { readdirSync, renameSync, statSync, unlinkSync } from 'node:fs'
 import { join } from 'node:path'
 import chalk from 'chalk'
 import { rimraf } from 'rimraf'
 import { rolldown } from 'rolldown'
 import { CONFIG, PKG } from '../config/index.js'
 import {
+  buildDts,
   createBuildPipeline,
   config as rolldownConfig,
-  buildDts,
 } from '../rolldown/index.js'
 
 const { log } = console
@@ -114,12 +109,16 @@ const runBuild = async () => {
         try {
           unlinkSync(entryMap)
           renameSync(chunkMap, entryMap)
-        } catch {}
+        } catch {
+          // sourcemap may not exist
+        }
       }
     }
 
     const tscDuration = Math.round(performance.now() - tscStart)
-    log(`  ${chalk.green('+')} ${bold('DTS')} ${dim('->')} ${dim(file)} ${dim(`(${tscDuration}ms)`)}`)
+    log(
+      `  ${chalk.green('+')} ${bold('DTS')} ${dim('->')} ${dim(file)} ${dim(`(${tscDuration}ms)`)}`,
+    )
   }
 
   const total = Math.round(performance.now() - start)
