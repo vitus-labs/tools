@@ -2,6 +2,11 @@
   "name": "@vitus-labs/tools-typescript",
   "version": "1.5.2-alpha.1",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vitus-labs/tools",
+    "directory": "packages/typescript"
+  },
   "author": "Vit Bokisch <vit@bokisch.com>",
   "maintainers": [
     "Vit Bokisch <vit@bokisch.com>"
