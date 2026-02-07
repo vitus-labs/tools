@@ -10,7 +10,7 @@ const mockFavicons = vi.fn()
 vi.mock('favicons', () => ({ default: mockFavicons }))
 
 vi.mock('@vitus-labs/tools-core', () => ({
-  VL_CONFIG: (key: string) => ({
+  VL_CONFIG: (_key: string) => ({
     config: {},
     get: vi.fn(),
     merge: (config: any) => ({
@@ -47,7 +47,9 @@ describe('generateFavicons', () => {
   })
 
   it('should handle favicon generation errors', async () => {
-    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
+    const consoleSpy = vi
+      .spyOn(console, 'log')
+      .mockImplementation(() => undefined)
 
     mockFavicons.mockRejectedValue(new Error('Generation failed'))
 

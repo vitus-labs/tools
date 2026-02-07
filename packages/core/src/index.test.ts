@@ -122,7 +122,9 @@ describe('tools-core', () => {
   })
 
   describe('loadConfigParam', () => {
-    let loadConfigParam: (filename: string) => (key: string, defaultValue?: any) => any
+    let loadConfigParam: (
+      filename: string,
+    ) => (key: string, defaultValue?: any) => any
 
     beforeEach(async () => {
       vi.resetModules()
@@ -197,7 +199,11 @@ describe('tools-core', () => {
       })
       mockRequireFn.mockImplementation((path: string) => {
         if (path === '/path/to/package.json') {
-          return { name: '@test/pkg', version: '1.0.0', dependencies: { react: '^19' } }
+          return {
+            name: '@test/pkg',
+            version: '1.0.0',
+            dependencies: { react: '^19' },
+          }
         }
         return null
       })

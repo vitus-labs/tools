@@ -59,7 +59,10 @@ describe('storybook main config', () => {
   it('should have viteFinal that defines globals', async () => {
     const viteConfig: any = { define: undefined, plugins: [] }
 
-    const result = await STORYBOOK_CONFIG.viteFinal!(viteConfig, {} as any)
+    const result = (await STORYBOOK_CONFIG.viteFinal?.(
+      viteConfig,
+      {} as any,
+    )) as any
 
     expect(result.define.__BROWSER__).toBe('true')
     expect(result.define.__NATIVE__).toBe('false')
@@ -72,7 +75,7 @@ describe('storybook main config', () => {
   it('should add tsconfigPaths plugin in viteFinal', async () => {
     const viteConfig: any = { define: {}, plugins: [] }
 
-    await STORYBOOK_CONFIG.viteFinal!(viteConfig, {} as any)
+    await STORYBOOK_CONFIG.viteFinal?.(viteConfig, {} as any)
 
     expect(viteConfig.plugins).toHaveLength(1)
     expect(viteConfig.plugins[0]).toHaveProperty('name', 'mock-tsconfig-paths')
@@ -81,7 +84,10 @@ describe('storybook main config', () => {
   it('should handle viteFinal when define already exists', async () => {
     const viteConfig: any = { define: { existing: true }, plugins: [] }
 
-    const result = await STORYBOOK_CONFIG.viteFinal!(viteConfig, {} as any)
+    const result = (await STORYBOOK_CONFIG.viteFinal?.(
+      viteConfig,
+      {} as any,
+    )) as any
 
     expect(result.define.existing).toBe(true)
     expect(result.define.__BROWSER__).toBe('true')

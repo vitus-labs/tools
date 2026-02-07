@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 vi.mock('@vitus-labs/tools-core', () => ({
   VL_CONFIG: (key: string) => ({
     config: { key },
-    get: (param: string, defaultValue?: any) => defaultValue || {},
+    get: (_param: string, defaultValue?: any) => defaultValue || {},
     merge: (param: Record<string, any>) => ({
       config: { key, ...param },
     }),
@@ -11,7 +11,7 @@ vi.mock('@vitus-labs/tools-core', () => ({
   TS_CONFIG: { compilerOptions: { strict: true } },
 }))
 
-import { VL_CONFIG, TS_CONFIG } from './initialConfig.js'
+import { TS_CONFIG, VL_CONFIG } from './initialConfig.js'
 
 describe('initialConfig', () => {
   it('should export VL_CONFIG derived from tools-core', () => {

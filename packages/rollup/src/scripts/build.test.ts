@@ -1,12 +1,16 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-const { mockRollup, mockBundleWrite, mockCreateBuildPipeline, mockRollupConfig } =
-  vi.hoisted(() => ({
-    mockRollup: vi.fn(),
-    mockBundleWrite: vi.fn(),
-    mockCreateBuildPipeline: vi.fn(),
-    mockRollupConfig: vi.fn(),
-  }))
+const {
+  mockRollup,
+  mockBundleWrite,
+  mockCreateBuildPipeline,
+  mockRollupConfig,
+} = vi.hoisted(() => ({
+  mockRollup: vi.fn(),
+  mockBundleWrite: vi.fn(),
+  mockCreateBuildPipeline: vi.fn(),
+  mockRollupConfig: vi.fn(),
+}))
 
 vi.mock('rollup', () => ({ rollup: mockRollup }))
 vi.mock('rimraf', () => ({ rimraf: { sync: vi.fn() } }))

@@ -159,7 +159,9 @@ describe('rolldownConfig', () => {
       platform: 'universal',
     })
 
-    expect(config.transform?.define?.['process.env.NODE_ENV']).toBe('"production"')
+    expect(config.transform?.define?.['process.env.NODE_ENV']).toBe(
+      '"production"',
+    )
     expect(config.output.minify).toBe(true)
   })
 
