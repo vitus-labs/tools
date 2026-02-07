@@ -37,7 +37,7 @@
     "rolldown": "^1.0.0-rc.3",
     "rolldown-plugin-dts": "^0.13.4",
     "rollup-plugin-filesize": "^10.0.0",
-    "rollup-plugin-visualizer": "^5.14.0"
+    "rollup-plugin-visualizer": "^6.0.5"
   },
   "devDependencies": {
     "@vitus-labs/tools-typescript": "1.5.2-alpha.1",
