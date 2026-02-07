@@ -25,22 +25,8 @@ const mapPlatform = (
   return 'neutral'
 }
 
-const loadPlugins = ({
-  file,
-  typesFilePath,
-}: {
-  file: string
-  typesFilePath?: string
-}) => {
+const loadPlugins = ({ file }: { file: string }) => {
   const plugins: RolldownPlugin[] = []
-
-  if (CONFIG.typescript && typesFilePath) {
-    plugins.push(
-      ...(dts({
-        tsconfig: 'tsconfig.json',
-      }) as RolldownPlugin[]),
-    )
-  }
 
   // generate visualised graphs in dist folder
   if (CONFIG.visualise) {
@@ -91,12 +77,15 @@ const rolldownConfig = ({
   file,
   format,
   env,
-  typesFilePath,
   platform,
 }: Record<string, any>) => {
   const extensions = defineExtensions(platform)
-  const plugins = loadPlugins({ file, typesFilePath })
+  const plugins = loadPlugins({ file })
   const define = buildDefineOptions(env, platform)
+
+  const lastSlash = file.lastIndexOf('/')
+  const dir = lastSlash >= 0 ? file.substring(0, lastSlash) : '.'
+  const entryFileName = lastSlash >= 0 ? file.substring(lastSlash + 1) : file
 
   const buildOutput = {
     input: CONFIG.sourceDir,
@@ -107,7 +96,8 @@ const rolldownConfig = ({
     },
     transform: define ? { define } : undefined,
     output: {
-      file,
+      dir,
+      entryFileNames: entryFileName,
       format,
       globals: swapGlobals(CONFIG.globals),
       sourcemap: true,
@@ -115,7 +105,6 @@ const rolldownConfig = ({
       name: ['umd', 'iife'].includes(format) ? PKG.bundleName : undefined,
       esModule: true,
       minify: env === 'production',
-      codeSplitting: false,
     },
     external: [...PKG.externalDependencies, ...CONFIG.external],
     plugins,
@@ -124,4 +113,38 @@ const rolldownConfig = ({
   return buildOutput
 }
 
+const buildDts = () => {
+  const typesFilePath =
+    PKG?.exports?.types || PKG.types || PKG.typings
+
+  if (!CONFIG.typescript || !typesFilePath) return null
+
+  const lastSlash = typesFilePath.lastIndexOf('/')
+  const dir = lastSlash >= 0 ? typesFilePath.substring(0, lastSlash) : '.'
+  const entryFileName =
+    lastSlash >= 0 ? typesFilePath.substring(lastSlash + 1) : typesFilePath
+
+  return {
+    file: typesFilePath,
+    input: `${CONFIG.sourceDir}/index.ts`,
+    tsconfig: 'tsconfig.json',
+    resolve: {
+      extensions: CONFIG.extensions,
+    },
+    external: [...PKG.externalDependencies, ...CONFIG.external],
+    plugins: [
+      ...(dts({ tsconfig: 'tsconfig.json' }) as RolldownPlugin[]),
+    ],
+    output: {
+      dir,
+      entryFileNames: entryFileName,
+      chunkFileNames: '[name].d.ts',
+      format: 'es' as const,
+      sourcemap: false,
+      esModule: true,
+    },
+  }
+}
+
 export default rolldownConfig
+export { buildDts }

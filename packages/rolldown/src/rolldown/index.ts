@@ -1,4 +1,4 @@
-import config from './config.js'
+import config, { buildDts } from './config.js'
 import createBuildPipeline from './createBuildPipeline.js'
 
-export { createBuildPipeline, config }
+export { createBuildPipeline, config, buildDts }

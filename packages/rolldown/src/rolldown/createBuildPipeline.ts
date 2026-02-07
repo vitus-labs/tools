@@ -1,7 +1,6 @@
 import { PKG } from '../config/index.js'
 
 const isESModuleOnly = PKG.type === 'module'
-const typesFilePath = PKG?.exports?.types || PKG.types || PKG.typings
 
 const hasDifferentNativeBuild = () => {
   return PKG['react-native'] !== PKG.module
@@ -155,17 +154,7 @@ const createBrowserBuildVariants = () => {
 }
 
 const createBuildPipeline = () => {
-  const result = [
-    ...createBasicBuildVariants(),
-    ...createBrowserBuildVariants(),
-  ]
-
-  // add generate typings for the first bundle only
-  if (typesFilePath) {
-    result[0] = { ...result[0], typesFilePath }
-  }
-
-  return result
+  return [...createBasicBuildVariants(), ...createBrowserBuildVariants()]
 }
 
 export default createBuildPipeline
