@@ -27,6 +27,8 @@ jobs:
       - uses: actions/checkout@v6
       - uses: oven-sh/setup-bun@v2
       - run: bun install --frozen-lockfile
+      - name: Build core (needed for workspace resolution)
+        run: cd packages/core && bun run build
       - run: bunx vitest run --coverage
 
   build:

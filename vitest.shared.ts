@@ -1,4 +1,4 @@
-import { defineConfig } from 'vitest/config'
+import { configDefaults, defineConfig } from 'vitest/config'
 
 export const createVitestConfig = (extraCoverageExclude: string[] = []) =>
   defineConfig({
@@ -7,6 +7,7 @@ export const createVitestConfig = (extraCoverageExclude: string[] = []) =>
       environment: 'node',
       mockReset: true,
       include: ['src/**/*.test.ts'],
+      exclude: [...configDefaults.exclude, 'lib/**'],
       coverage: {
         provider: 'v8',
         include: ['src/**/*.ts'],
