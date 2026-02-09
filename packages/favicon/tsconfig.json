@@ -8,5 +8,5 @@
     "declarationDir": "./lib/types"
   },
   "include": ["src"],
-  "exclude": ["node_modules", "__stories__", "lib"]
+  "exclude": ["node_modules", "__stories__", "lib", "**/*.test.ts"]
 }
