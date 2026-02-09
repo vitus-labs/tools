@@ -33,6 +33,7 @@
   "scripts": {
     "prepublish": "bun run build",
     "build": "rm -rf lib && tsc",
+    "typecheck": "tsc --noEmit",
     "lint": "biome check src/"
   },
   "peerDependencies": {

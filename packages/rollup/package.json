@@ -30,7 +30,8 @@
   },
   "scripts": {
     "prepublish": "bun run build",
-    "build": "tsc"
+    "build": "tsc",
+    "typecheck": "tsc --noEmit"
   },
   "publishConfig": {
     "access": "public"
