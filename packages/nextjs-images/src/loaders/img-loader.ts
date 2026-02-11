@@ -13,13 +13,23 @@ import { getWebpResourceQuery } from './webp-loader.js'
 
 const require = createRequire(import.meta.url)
 
+// Dynamic import wrapper invisible to webpack's static analysis,
+// avoiding PackFileCacheStrategy build dependency warnings.
+const dynamicImport = new Function(
+  'moduleName',
+  'return import(moduleName)',
+) as (moduleName: string) => Promise<Record<string, unknown>>
+
 /**
- * Requires an imagemin plugin and configures it.
+ * Dynamically imports an imagemin plugin and configures it.
+ *
+ * Uses dynamic import() because imagemin plugins
+ * (e.g. imagemin-mozjpeg) are ESM-only packages.
  */
-const requireImageminPlugin = (
+const importImageminPlugin = async (
   plugin: string,
   nextConfig: NextConfig,
-): unknown => {
+): Promise<unknown> => {
   let moduleName = plugin
 
   if (nextConfig.overwriteImageLoaderPaths) {
@@ -28,7 +38,8 @@ const requireImageminPlugin = (
     })
   }
 
-  const pluginFn = require(moduleName)
+  const mod = await dynamicImport(moduleName)
+  const pluginFn = (mod.default ?? mod) as (opts: unknown) => unknown
 
   return pluginFn(
     (nextConfig as Record<string, unknown>)[plugin.replace('imagemin-', '')] ||
@@ -43,27 +54,27 @@ const getImgLoaderOptions = (
   nextConfig: NextConfig,
   detectedLoaders: DetectedLoaders,
   optimize: boolean,
-): { plugins: unknown[] } => {
+): { plugins: unknown[] } | Promise<{ plugins: unknown[] }> => {
   if (!optimize) {
     return { plugins: [] }
   }
 
-  const plugins = [
+  return Promise.all([
     detectedLoaders.jpeg
-      ? requireImageminPlugin(detectedLoaders.jpeg, nextConfig)
+      ? importImageminPlugin(detectedLoaders.jpeg, nextConfig)
       : undefined,
     detectedLoaders.png
-      ? requireImageminPlugin(detectedLoaders.png, nextConfig)
+      ? importImageminPlugin(detectedLoaders.png, nextConfig)
       : undefined,
     detectedLoaders.svg
-      ? requireImageminPlugin(detectedLoaders.svg, nextConfig)
+      ? importImageminPlugin(detectedLoaders.svg, nextConfig)
       : undefined,
     detectedLoaders.gif
-      ? requireImageminPlugin(detectedLoaders.gif, nextConfig)
+      ? importImageminPlugin(detectedLoaders.gif, nextConfig)
       : undefined,
-  ].filter(Boolean)
-
-  return { plugins }
+  ]).then((plugins) => ({
+    plugins: plugins.filter(Boolean),
+  }))
 }
 
 /**
@@ -96,7 +107,7 @@ const applyImgLoader = (
     nextConfig,
     detectedLoaders,
     optimize,
-  )
+  ) as unknown as Record<string, unknown>
 
   webpackConfig.module?.rules?.push({
     test: getHandledFilesRegex(handledImageTypes),
@@ -147,7 +158,7 @@ const applyImgLoader = (
 }
 
 export {
-  requireImageminPlugin,
+  importImageminPlugin,
   getImgLoaderOptions,
   getHandledFilesRegex,
   applyImgLoader,
