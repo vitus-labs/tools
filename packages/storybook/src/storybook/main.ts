@@ -1,6 +1,11 @@
 import type { StorybookConfig } from '@storybook/react-vite'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import { CONFIG } from '../config/index.js'
+import {
+  createAutoDiscoveryIndexer,
+  manualStoryIndexer,
+} from '../indexer/index.js'
+import { rocketstoriesVitePlugin } from '../vite-plugin/index.js'
 
 // --------------------------------------------------------
 // STORYBOOK ADDONS LIST
@@ -19,6 +24,8 @@ const ADDONS_MAP: Record<string, string> = {
   vitest: '@storybook/addon-vitest',
 }
 
+const autoDiscoveryIndexer = createAutoDiscoveryIndexer()
+
 // --------------------------------------------------------
 // STORYBOOK CONFIGURATION
 // --------------------------------------------------------
@@ -36,6 +43,15 @@ const STORYBOOK_CONFIG: StorybookConfig = {
 
     return acc
   }, [] as any),
+
+  // Custom indexers: rocketstories first, then auto-discovery,
+  // then default CSF indexer as fallback
+  experimental_indexers: (existingIndexers) => [
+    manualStoryIndexer,
+    autoDiscoveryIndexer,
+    ...(existingIndexers ?? []),
+  ],
+
   viteFinal: async (config) => {
     // DEFINE GLOBALS
     if (!config.define) {
@@ -49,8 +65,11 @@ const STORYBOOK_CONFIG: StorybookConfig = {
     config.define.__CLIENT__ = JSON.stringify(true)
     config.define.__VITUS_LABS_STORIES__ = JSON.stringify(CONFIG)
 
-    // DEFINE TYPESCRIPT PATHS
-    config.plugins?.push(tsconfigPaths({ root: process.cwd() }))
+    // VITE PLUGINS
+    config.plugins?.push(
+      tsconfigPaths({ root: process.cwd() }),
+      rocketstoriesVitePlugin(),
+    )
 
     return config
   },
