@@ -81,6 +81,13 @@ const deriveStoryTitle = (
   normalized: string,
   prefix: string | null,
 ): string | null => {
+  // Story at package root: src/__stories__/Element.stories.tsx
+  // Must be checked before the generic pattern to avoid matching parentDir = "src"
+  const rootMatch = normalized.match(
+    /src\/__stories__\/([^/]+)\.stories\.[jt]sx?$/,
+  )
+  if (rootMatch?.[1]) return withPrefix(prefix, rootMatch[1])
+
   // Story in __stories__ folder
   const storyMatch = normalized.match(
     /\/([^/]+)\/__stories__\/([^/]+)\.stories\.[jt]sx?$/,
@@ -94,12 +101,6 @@ const deriveStoryTitle = (
       storyName === parentDir ? parentDir : `${parentDir}/${storyName}`
     return withPrefix(prefix, segment)
   }
-
-  // Story at package root: src/__stories__/Element.stories.tsx
-  const rootMatch = normalized.match(
-    /src\/__stories__\/([^/]+)\.stories\.[jt]sx?$/,
-  )
-  if (rootMatch?.[1]) return withPrefix(prefix, rootMatch[1])
 
   return null
 }

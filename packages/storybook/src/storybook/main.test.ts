@@ -72,13 +72,17 @@ describe('storybook main config', () => {
     expect(result.define.__VITUS_LABS_STORIES__).toBeDefined()
   })
 
-  it('should add tsconfigPaths plugin in viteFinal', async () => {
+  it('should add tsconfigPaths and rocketstories plugins in viteFinal', async () => {
     const viteConfig: any = { define: {}, plugins: [] }
 
     await STORYBOOK_CONFIG.viteFinal?.(viteConfig, {} as any)
 
-    expect(viteConfig.plugins).toHaveLength(1)
+    expect(viteConfig.plugins).toHaveLength(2)
     expect(viteConfig.plugins[0]).toHaveProperty('name', 'mock-tsconfig-paths')
+    expect(viteConfig.plugins[1]).toHaveProperty(
+      'name',
+      'vite-plugin-rocketstories',
+    )
   })
 
   it('should handle viteFinal when define already exists', async () => {
