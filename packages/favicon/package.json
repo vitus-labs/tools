@@ -1,6 +1,6 @@
 {
   "name": "@vitus-labs/tools-favicon",
-  "version": "1.7.0",
+  "version": "1.9.0",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -33,11 +33,11 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@vitus-labs/tools-core": "1.7.0",
+    "@vitus-labs/tools-core": "1.9.0",
     "favicons": "^7.2.0"
   },
   "devDependencies": {
-    "@vitus-labs/tools-typescript": "1.7.0",
+    "@vitus-labs/tools-typescript": "1.9.0",
     "typescript": "^5.9.3"
   }
 }
