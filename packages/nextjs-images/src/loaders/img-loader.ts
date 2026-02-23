@@ -1,4 +1,5 @@
-import { createRequire } from 'node:module'
+import path from 'node:path'
+import { pathToFileURL } from 'node:url'
 import type {
   DetectedLoaders,
   HandledImageTypes,
@@ -10,8 +11,6 @@ import { getResourceQueries } from './resource-queries.js'
 import { getSvgSpriteLoaderResourceQuery } from './svg-sprite-loader/index.js'
 import { getUrlLoaderOptions } from './url-loader.js'
 import { getWebpResourceQuery } from './webp-loader.js'
-
-const require = createRequire(import.meta.url)
 
 // Dynamic import wrapper invisible to webpack's static analysis,
 // avoiding PackFileCacheStrategy build dependency warnings.
@@ -33,9 +32,10 @@ const importImageminPlugin = async (
   let moduleName = plugin
 
   if (nextConfig.overwriteImageLoaderPaths) {
-    moduleName = require.resolve(plugin, {
-      paths: [nextConfig.overwriteImageLoaderPaths],
-    })
+    moduleName = import.meta.resolve(
+      plugin,
+      pathToFileURL(path.join(nextConfig.overwriteImageLoaderPaths, '_')).href,
+    )
   }
 
   const mod = await dynamicImport(moduleName)

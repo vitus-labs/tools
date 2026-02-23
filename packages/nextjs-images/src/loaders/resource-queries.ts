@@ -1,4 +1,4 @@
-import { createRequire } from 'node:module'
+import { fileURLToPath } from 'node:url'
 import type {
   DetectedLoaders,
   NextConfig,
@@ -11,7 +11,9 @@ import { getLqipLoaderOptions } from './lqip-loader/index.js'
 import { getResponsiveLoaderOptions } from './responsive-loader.js'
 import { getUrlLoaderOptions } from './url-loader.js'
 
-const require = createRequire(import.meta.url)
+const LQIP_EXPORT_LOADER = fileURLToPath(
+  import.meta.resolve('./lqip-export-loader.js'),
+)
 
 /**
  * Configure the common resource queries.
@@ -52,29 +54,16 @@ const queries: ResourceQueryConfig[] = [
   // ?lqip: low quality image placeholder
   {
     test: 'lqip(&|$)',
-    loaders: [
-      require.resolve('./lqip-loader/picture-export-loader.cjs'),
-      'lqip-loader',
-      'url-loader',
-    ],
+    loaders: [LQIP_EXPORT_LOADER, 'lqip-loader', 'url-loader'],
+    options: [{ exportProperty: 'preSrc' }],
     optimize: false,
   },
 
   // ?lqip-colors: low quality image placeholder colors
   {
     test: 'lqip-colors',
-    loaders: [
-      require.resolve('./lqip-loader/colors-export-loader.cjs'),
-      'lqip-loader',
-      'url-loader',
-    ],
-    options: [
-      {},
-      {
-        base64: false,
-        palette: true,
-      },
-    ],
+    loaders: [LQIP_EXPORT_LOADER, 'lqip-loader', 'url-loader'],
+    options: [{ exportProperty: 'palette' }, { base64: false, palette: true }],
     optimize: false,
   },
 
