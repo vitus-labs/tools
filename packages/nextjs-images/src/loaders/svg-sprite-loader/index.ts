@@ -1,10 +1,9 @@
-import { createRequire } from 'node:module'
-import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import type { DetectedLoaders, OptimizedImagesConfig } from '../../types.js'
 
-const require = createRequire(import.meta.url)
-const currentDir = path.dirname(fileURLToPath(import.meta.url))
+const RUNTIME_GENERATOR = fileURLToPath(
+  import.meta.resolve('./svg-runtime-generator.js'),
+)
 
 /**
  * Returns the resource query definition for an svg sprite image.
@@ -20,9 +19,7 @@ const getSvgSpriteLoaderResourceQuery = (
     {
       loader: 'svg-sprite-loader',
       options: {
-        runtimeGenerator: require.resolve(
-          path.resolve(currentDir, 'svg-runtime-generator.cjs'),
-        ),
+        runtimeGenerator: RUNTIME_GENERATOR,
         ...(optimizedConfig.svgSpriteLoader || {}),
       },
     },

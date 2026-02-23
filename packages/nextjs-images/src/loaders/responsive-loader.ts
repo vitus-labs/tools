@@ -8,6 +8,7 @@ import type {
 } from '../types.js'
 import { getFileLoaderOptions } from './file-loader.js'
 
+// createRequire needed here for synchronous module loading (sharp adapter)
 const require = createRequire(import.meta.url)
 
 /**

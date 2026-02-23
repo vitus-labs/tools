@@ -1,4 +1,4 @@
-import fs from 'node:fs'
+import { existsSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import type {
@@ -7,8 +7,6 @@ import type {
   OptimizedImagesConfig,
   WebpackConfig,
 } from '../types.js'
-
-const currentFilePath = fileURLToPath(import.meta.url)
 
 /**
  * Build options for the webpack file loader.
@@ -45,24 +43,19 @@ const getFileLoaderOptions = (
 }
 
 /**
- * Get the file-loader path.
+ * Get the file-loader path. Resolves to an absolute path so webpack can find
+ * it even when file-loader is a transitive dependency of this package.
  */
 const getFileLoaderPath = (): string => {
-  const absolutePath = path.resolve(
-    path.dirname(currentFilePath),
-    '..',
-    '..',
-    'node_modules',
-    'file-loader',
-    'dist',
-    'cjs.js',
-  )
-
-  if (fs.existsSync(absolutePath)) {
-    return absolutePath
+  try {
+    const resolved = fileURLToPath(import.meta.resolve('file-loader'))
+    // Prefer the CJS entry point for webpack compatibility
+    const cjsPath = path.join(path.dirname(resolved), 'cjs.js')
+    if (existsSync(cjsPath)) return cjsPath
+    return resolved
+  } catch {
+    return 'file-loader'
   }
-
-  return 'file-loader'
 }
 
 /**

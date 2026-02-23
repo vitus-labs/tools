@@ -1,4 +1,5 @@
-import { createRequire } from 'node:module'
+import path from 'node:path'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 import type {
   DetectedLoaders,
   HandledImageTypes,
@@ -11,14 +12,23 @@ import { applyImgLoader } from './img-loader.js'
 import { applyResponsiveLoader } from './responsive-loader.js'
 import { applyWebpLoader } from './webp-loader.js'
 
-const require = createRequire(import.meta.url)
+/**
+ * Resolve a module specifier, optionally from a custom directory.
+ */
+const resolveModule = (name: string, resolvePath?: string): string =>
+  fileURLToPath(
+    import.meta.resolve(
+      name,
+      resolvePath ? pathToFileURL(path.join(resolvePath, '_')).href : undefined,
+    ),
+  )
 
 /**
  * Checks if a node module is installed in the current context.
  */
 const isModuleInstalled = (name: string, resolvePath?: string): boolean => {
   try {
-    require.resolve(name, resolvePath ? { paths: [resolvePath] } : undefined)
+    resolveModule(name, resolvePath)
     return true
   } catch {
     return false
@@ -59,12 +69,10 @@ const detectLoaders = (resolvePath?: string): DetectedLoaders => {
   }
 
   if (isModuleInstalled('responsive-loader', resolvePath)) {
-    responsive = require
-      .resolve(
-        'responsive-loader',
-        resolvePath ? { paths: [resolvePath] } : undefined,
-      )
-      .replace(/(\/|\\)lib(\/|\\)index.js$/g, '')
+    responsive = resolveModule('responsive-loader', resolvePath).replace(
+      /(\/|\\)lib(\/|\\)index.js$/g,
+      '',
+    )
 
     if (isModuleInstalled('sharp', resolvePath)) {
       responsiveAdapter = 'sharp'
