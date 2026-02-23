@@ -18,6 +18,7 @@
         "release/*"
       ],
       "exact": true,
+      "forcePublish": true,
       "preid": "alpha"
     }
   },

@@ -45,28 +45,28 @@
     "react-dom": ">=19"
   },
   "dependencies": {
-    "@chromatic-com/storybook": "^5.0.0",
-    "@storybook/addon-a11y": "^10.2.7",
+    "@chromatic-com/storybook": "^5.0.1",
+    "@storybook/addon-a11y": "^10.2.10",
     "@storybook/addon-designs": "^11.1.2",
-    "@storybook/addon-docs": "^10.2.7",
-    "@storybook/addon-themes": "^10.2.7",
-    "@storybook/addon-vitest": "^10.2.7",
-    "@storybook/nextjs": "^10.2.7",
-    "@storybook/react": "^10.2.7",
-    "@storybook/react-vite": "^10.2.7",
+    "@storybook/addon-docs": "^10.2.10",
+    "@storybook/addon-themes": "^10.2.10",
+    "@storybook/addon-vitest": "^10.2.10",
+    "@storybook/nextjs": "^10.2.10",
+    "@storybook/react": "^10.2.10",
+    "@storybook/react-vite": "^10.2.10",
     "@vitus-labs/tools-core": "1.7.0",
     "@vueless/storybook-dark-mode": "^10.0.7",
-    "storybook": "^10.2.7",
-    "storybook-addon-pseudo-states": "^10.2.7",
+    "storybook": "^10.2.10",
+    "storybook-addon-pseudo-states": "^10.2.10",
     "tinyglobby": "^0.2.15",
     "vite": "^7.3.1",
-    "vite-tsconfig-paths": "^6.1.0"
+    "vite-tsconfig-paths": "^6.1.1"
   },
   "devDependencies": {
-    "@vitus-labs/core": "1.2.2",
+    "@vitus-labs/core": "1.4.2",
     "@vitus-labs/tools-typescript": "1.7.0",
-    "@vitus-labs/unistyle": "1.2.2",
-    "styled-components": "^6.3.8",
+    "@vitus-labs/unistyle": "1.4.2",
+    "styled-components": "^6.3.11",
     "typescript": "^5.9.3"
   }
 }
