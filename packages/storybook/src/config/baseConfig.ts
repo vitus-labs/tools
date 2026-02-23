@@ -7,11 +7,8 @@ const CONFIG: Record<string, any> = {
   ui: {
     theme: 'dark',
   },
-  storiesDir: [
-    `/src/**/__stories__/**/*.stories.@(js|jsx|ts|tsx)`,
-    `/src/**/*.stories.@(js|jsx|ts|tsx)`,
-    `/src/**/stories.@(js|jsx|ts|tsx)`,
-  ],
+  storiesDir: [`/src/**/*.stories.@(js|jsx|ts|tsx|md|mdx)`],
+  monorepoStoriesDir: [`/packages/*/src/**/*.stories.@(js|jsx|ts|tsx|md|mdx)`],
   globals: {},
   addons: {
     controls: { expanded: true },

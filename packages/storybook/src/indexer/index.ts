@@ -48,7 +48,7 @@ const indexManualStoryFile = async (
  * Indexes .stories.tsx files that use the rocketstories init() pattern.
  */
 export const manualStoryIndexer: Indexer = {
-  test: /\.stories\.[jt]sx?$/,
+  test: /\.stories\.([jt]sx?|mdx?)$/,
   createIndex: async (fileName, { makeTitle }) =>
     indexManualStoryFile(fileName, makeTitle),
 }

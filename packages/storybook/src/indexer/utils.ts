@@ -148,7 +148,7 @@ export const findManualStories = async (
 
   if (!existsSync(storiesDir)) return []
 
-  return glob(['*.stories.{ts,tsx,js,jsx}'], {
+  return glob(['*.stories.{ts,tsx,js,jsx,md,mdx}'], {
     cwd: storiesDir,
     absolute: true,
   })

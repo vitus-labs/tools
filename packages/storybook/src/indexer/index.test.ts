@@ -37,6 +37,11 @@ describe('manualStoryIndexer', () => {
     expect(manualStoryIndexer.test.test('Button.stories.jsx')).toBe(true)
   })
 
+  it('should match .stories.md and .stories.mdx files', () => {
+    expect(manualStoryIndexer.test.test('Badge.stories.mdx')).toBe(true)
+    expect(manualStoryIndexer.test.test('Docs.stories.md')).toBe(true)
+  })
+
   it('should not match non-story files', () => {
     expect(manualStoryIndexer.test.test('Badge.tsx')).toBe(false)
     expect(manualStoryIndexer.test.test('index.ts')).toBe(false)

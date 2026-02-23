@@ -20,9 +20,17 @@ describe('storybook baseConfig', () => {
     expect(CONFIG.ui.theme).toBe('dark')
   })
 
-  it('should have stories directory patterns', () => {
-    expect(CONFIG.storiesDir).toHaveLength(3)
-    expect(CONFIG.storiesDir[0]).toContain('__stories__')
+  it('should have stories directory patterns with md/mdx support', () => {
+    expect(CONFIG.storiesDir).toHaveLength(1)
+    expect(CONFIG.storiesDir[0]).toContain('*.stories')
+    expect(CONFIG.storiesDir[0]).toContain('md|mdx')
+  })
+
+  it('should have monorepo stories directory patterns', () => {
+    expect(CONFIG.monorepoStoriesDir).toHaveLength(1)
+    expect(CONFIG.monorepoStoriesDir[0]).toContain('packages/*')
+    expect(CONFIG.monorepoStoriesDir[0]).toContain('*.stories')
+    expect(CONFIG.monorepoStoriesDir[0]).toContain('md|mdx')
   })
 
   it('should have addon configurations', () => {

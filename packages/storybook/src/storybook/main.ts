@@ -1,10 +1,13 @@
+import { readFile } from 'node:fs/promises'
 import type { StorybookConfig } from '@storybook/react-vite'
+import type { Indexer } from 'storybook/internal/types'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import { CONFIG } from '../config/index.js'
 import {
   createAutoDiscoveryIndexer,
   manualStoryIndexer,
 } from '../indexer/index.js'
+import { isRocketstoriesPattern } from '../indexer/utils.js'
 import { rocketstoriesVitePlugin } from '../vite-plugin/index.js'
 
 // --------------------------------------------------------
@@ -45,12 +48,24 @@ const STORYBOOK_CONFIG: StorybookConfig = {
   }, [] as any),
 
   // Custom indexers: rocketstories first, then auto-discovery,
-  // then default CSF indexer as fallback
-  experimental_indexers: (existingIndexers) => [
-    manualStoryIndexer,
-    autoDiscoveryIndexer,
-    ...(existingIndexers ?? []),
-  ],
+  // then default CSF indexer (wrapped to skip rocketstories files)
+  experimental_indexers: (existingIndexers) => {
+    // Wrap existing indexers so they skip rocketstories files —
+    // without this, the CSF indexer tries to statically parse
+    // `export default stories.init()` and fails.
+    const wrapped: Indexer[] = (existingIndexers ?? []).map((indexer) => ({
+      ...indexer,
+      createIndex: async (fileName: string, opts: any) => {
+        if (/\.stories\.([jt]sx?|mdx?)$/.test(fileName)) {
+          const code = await readFile(fileName, 'utf-8')
+          if (isRocketstoriesPattern(code)) return []
+        }
+        return indexer.createIndex(fileName, opts)
+      },
+    }))
+
+    return [manualStoryIndexer, autoDiscoveryIndexer, ...wrapped]
+  },
 
   viteFinal: async (config) => {
     // DEFINE GLOBALS

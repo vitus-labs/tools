@@ -4,12 +4,15 @@ import { setConfig } from './root.js'
 
 const { config } = VL_CONFIG.merge(baseConfig)
 
+const isMonorepo = process.env.VL_MONOREPO === '1'
+const storiesPatterns = isMonorepo
+  ? config.monorepoStoriesDir
+  : config.storiesDir
+
 const updatedConfig = {
   ...config,
   outDir: `${process.cwd()}${config.outDir}`,
-  storiesDir: config.storiesDir.map(
-    (item: string) => `${process.cwd()}${item}`,
-  ),
+  storiesDir: storiesPatterns.map((item: string) => `${process.cwd()}${item}`),
 }
 
 setConfig(updatedConfig)
