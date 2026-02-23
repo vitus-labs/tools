@@ -19,7 +19,9 @@
   "types": "./lib/types/index.d.ts",
   "bin": {
     "vl_stories": "./lib/bin/run-stories.js",
-    "vl_stories-build": "./lib/bin/run-stories-build.js"
+    "vl_stories-build": "./lib/bin/run-stories-build.js",
+    "vl_stories-monorepo": "./lib/bin/run-stories-monorepo.js",
+    "vl_stories-monorepo-build": "./lib/bin/run-stories-monorepo-build.js"
   },
   "engines": {
     "node": ">= 22"

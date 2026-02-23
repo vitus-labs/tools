@@ -1,5 +1,9 @@
 import { describe, expect, it, vi } from 'vitest'
 
+vi.mock('node:fs/promises', () => ({
+  readFile: vi.fn(),
+}))
+
 vi.mock('vite-tsconfig-paths', () => ({
   default: vi.fn(() => ({ name: 'mock-tsconfig-paths' })),
 }))
@@ -95,5 +99,61 @@ describe('storybook main config', () => {
 
     expect(result.define.existing).toBe(true)
     expect(result.define.__BROWSER__).toBe('true')
+  })
+
+  it('should wrap existing indexers to skip rocketstories files', async () => {
+    const mockCsfIndexer = {
+      test: /\.stories\.[jt]sx?$/,
+      createIndex: vi.fn().mockResolvedValue([{ type: 'story' }]),
+    }
+
+    const indexersFn = STORYBOOK_CONFIG.experimental_indexers as (
+      existing: any[],
+    ) => any[]
+    const indexers = indexersFn([mockCsfIndexer])
+
+    // Should have: manualStoryIndexer, autoDiscoveryIndexer, wrapped CSF
+    expect(indexers).toHaveLength(3)
+
+    // The wrapped CSF indexer should skip rocketstories files
+    const wrappedCsf = indexers[2]
+    const rocketstoriesFile = '/src/Button/__stories__/Button.stories.tsx'
+
+    // Mock readFile to return rocketstories content
+    const { readFile } = await import('node:fs/promises')
+    vi.mocked(readFile).mockResolvedValueOnce(
+      'export default stories.init()' as any,
+    )
+
+    const result = await wrappedCsf.createIndex(rocketstoriesFile, {})
+    expect(result).toEqual([])
+    expect(mockCsfIndexer.createIndex).not.toHaveBeenCalled()
+  })
+
+  it('should let wrapped indexers handle standard CSF files', async () => {
+    const mockCsfIndexer = {
+      test: /\.stories\.[jt]sx?$/,
+      createIndex: vi.fn().mockResolvedValue([{ type: 'story' }]),
+    }
+
+    const indexersFn = STORYBOOK_CONFIG.experimental_indexers as (
+      existing: any[],
+    ) => any[]
+    const indexers = indexersFn([mockCsfIndexer])
+    const wrappedCsf = indexers[2]
+
+    const csfFile = '/src/Button/__stories__/Button.stories.tsx'
+    const { readFile } = await import('node:fs/promises')
+    vi.mocked(readFile).mockResolvedValueOnce(
+      'export default { component: Button }' as any,
+    )
+
+    const result = await wrappedCsf.createIndex(csfFile, {
+      makeTitle: (t: string) => t,
+    })
+    expect(result).toEqual([{ type: 'story' }])
+    expect(mockCsfIndexer.createIndex).toHaveBeenCalledWith(csfFile, {
+      makeTitle: expect.any(Function),
+    })
   })
 })
