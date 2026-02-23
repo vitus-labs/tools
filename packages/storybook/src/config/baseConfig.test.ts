@@ -61,8 +61,11 @@ describe('storybook baseConfig', () => {
     expect(CONFIG.addons.backgrounds.grid.cellSize).toBe(8)
   })
 
-  it('should have decorators config', () => {
-    expect(CONFIG.decorators).toHaveProperty('theme')
+  it('should have rocketstories config with defaults', () => {
+    expect(CONFIG.rocketstories).toEqual({
+      module: '@vitus-labs/rocketstories',
+      export: 'rocketstories',
+    })
   })
 
   it('should have empty globals by default', () => {

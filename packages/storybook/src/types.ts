@@ -37,7 +37,10 @@ export interface StoriesConfig {
       }
     }
   }>
-  decorators?: Record<string, any>
+  rocketstories?: {
+    module: string
+    export?: string
+  }
 }
 
 export interface VLToolsConfig {

@@ -126,7 +126,7 @@ const STORYBOOK_CONFIG: StorybookConfig = {
     // VITE PLUGINS
     config.plugins?.push(
       tsconfigPaths({ root: process.cwd() }),
-      rocketstoriesVitePlugin(),
+      rocketstoriesVitePlugin(CONFIG.rocketstories),
     )
 
     return config

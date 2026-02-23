@@ -7,6 +7,11 @@ import { detectComponentKind, extractDimensionNames } from '../indexer/utils.js'
 const RESOLVE_PREFIX = VIRTUAL_STORY_PREFIX
 const VIRTUAL_PREFIX = `\0${VIRTUAL_STORY_PREFIX}`
 
+interface RocketstoriesConfig {
+  module: string
+  export: string
+}
+
 /**
  * Generate a story module for a rocketstyle component.
  */
@@ -14,6 +19,7 @@ const generateRocketstyleStory = (
   componentPath: string,
   dimensions: string[],
   componentName: string,
+  rs: RocketstoriesConfig,
 ): string => {
   const dimExports = dimensions.map((dim) => {
     const exportName = `${dim.charAt(0).toUpperCase() + dim.slice(1)}s`
@@ -21,13 +27,13 @@ const generateRocketstyleStory = (
   })
 
   return `
-import { rocketstories } from '@vitus-labs/rocketstories'
+import { ${rs.export} } from '${rs.module}'
 import Component from '${componentPath}'
 
-const stories = rocketstories(Component)
+const stories = ${rs.export}(Component)
   .attrs({ label: '${componentName}' })
 
-export default stories.init()
+export default stories.init
 export const Default = stories.main()
 ${dimExports.join('\n')}
 export const PseudoStates = stories.render((props) => {
@@ -82,7 +88,7 @@ export const Default = {
  * Vite plugin that resolves virtual story modules for auto-discovered
  * components. Works with the auto-discovery indexer.
  */
-export const rocketstoriesVitePlugin = (): Plugin => ({
+export const rocketstoriesVitePlugin = (rs: RocketstoriesConfig): Plugin => ({
   name: 'vite-plugin-rocketstories',
 
   resolveId(id) {
@@ -103,7 +109,12 @@ export const rocketstoriesVitePlugin = (): Plugin => ({
 
     if (kind === 'rocketstyle') {
       const dimensions = extractDimensionNames(code)
-      return generateRocketstyleStory(componentPath, dimensions, componentName)
+      return generateRocketstyleStory(
+        componentPath,
+        dimensions,
+        componentName,
+        rs,
+      )
     }
 
     return generatePlainStory(componentPath, componentName)

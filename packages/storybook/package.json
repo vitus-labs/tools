@@ -13,8 +13,7 @@
     "./storybook": "./lib/storybook/index.js",
     "./storybook/preview": "./lib/storybook/preview.js",
     "./storybook/main": "./lib/storybook/main.js",
-    "./storybook/manager": "./lib/storybook/manager.js",
-    "./decorators": "./lib/decorators/index.js"
+    "./storybook/manager": "./lib/storybook/manager.js"
   },
   "types": "./lib/types/index.d.ts",
   "bin": {
@@ -39,8 +38,6 @@
     "lint": "biome check src/"
   },
   "peerDependencies": {
-    "@vitus-labs/core": "*",
-    "@vitus-labs/unistyle": "*",
     "react": ">=19",
     "react-dom": ">=19"
   },
@@ -63,10 +60,7 @@
     "vite-tsconfig-paths": "^6.1.1"
   },
   "devDependencies": {
-    "@vitus-labs/core": "1.4.2",
     "@vitus-labs/tools-typescript": "1.9.0",
-    "@vitus-labs/unistyle": "1.4.2",
-    "styled-components": "^6.3.11",
     "typescript": "^5.9.3"
   }
 }

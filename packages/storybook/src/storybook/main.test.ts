@@ -25,6 +25,10 @@ vi.mock('../config/index.js', () => ({
       themes: true,
       vitest: true,
     },
+    rocketstories: {
+      module: '@vitus-labs/rocketstories',
+      export: 'rocketstories',
+    },
     port: 6006,
   },
 }))
