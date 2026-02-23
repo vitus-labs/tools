@@ -10,11 +10,11 @@
   "type": "module",
   "exports": {
     ".": "./lib/config/index.js",
-    "./lib/storybook.js": "./lib/storybook/index.js",
-    "./lib/storybook/preview.js": "./lib/storybook/preview.js",
-    "./lib/storybook/main.js": "./lib/storybook/main.js",
-    "./lib/storybook/manager.js": "./lib/storybook/manager.js",
-    "./decorators.js": "./lib/decorators/index.js"
+    "./storybook": "./lib/storybook/index.js",
+    "./storybook/preview": "./lib/storybook/preview.js",
+    "./storybook/main": "./lib/storybook/main.js",
+    "./storybook/manager": "./lib/storybook/manager.js",
+    "./decorators": "./lib/decorators/index.js"
   },
   "types": "./lib/types/index.d.ts",
   "bin": {
