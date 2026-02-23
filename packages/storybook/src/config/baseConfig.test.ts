@@ -16,6 +16,10 @@ describe('storybook baseConfig', () => {
     expect(CONFIG.port).toBe(6006)
   })
 
+  it('should have vite as default framework', () => {
+    expect(CONFIG.framework).toBe('vite')
+  })
+
   it('should have dark UI theme', () => {
     expect(CONFIG.ui.theme).toBe('dark')
   })

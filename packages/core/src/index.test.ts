@@ -1,212 +1,282 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { mkdirSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import path from 'node:path'
+import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
-const mockFindUpSync = vi.fn()
-vi.mock('find-up', () => ({
-  findUpSync: mockFindUpSync,
-}))
+const BASE_TMP = path.join(tmpdir(), `vl-core-test-${Date.now()}`)
+let testId = 0
 
-const mockReadFileSync = vi.fn()
-vi.mock('node:fs', () => ({
-  default: { readFileSync: mockReadFileSync },
-  readFileSync: mockReadFileSync,
-}))
+const createTestDir = (opts: {
+  packageJson?: Record<string, any>
+  tsConfig?: Record<string, any>
+  vlConfig?: Record<string, any>
+  parent?: { vlConfig?: Record<string, any> }
+}) => {
+  testId++
+  const root = path.join(BASE_TMP, `t${testId}`)
+  const projectDir = opts.parent ? path.join(root, 'packages', 'child') : root
 
-const mockRequireFn = vi.fn()
-vi.mock('node:module', () => ({
-  createRequire: vi.fn(() => mockRequireFn),
-}))
+  mkdirSync(projectDir, { recursive: true })
 
-// Default mock setup that satisfies module-level getPkgData() —
-// package.json must always be found with a valid `name` field,
-// otherwise camelspaceBundleName(undefined) crashes at import time.
-const setupDefaultMocks = () => {
-  mockFindUpSync.mockImplementation((filename: string) => {
-    if (filename === 'package.json') return '/mock/package.json'
-    return undefined
-  })
-  mockRequireFn.mockImplementation((path: string) => {
-    if (path === '/mock/package.json') return { name: 'mock-pkg' }
-    return null
-  })
+  writeFileSync(
+    path.join(projectDir, 'package.json'),
+    JSON.stringify(opts.packageJson ?? { name: 'test-pkg' }),
+  )
+
+  if (opts.tsConfig) {
+    writeFileSync(
+      path.join(projectDir, 'tsconfig.json'),
+      JSON.stringify(opts.tsConfig),
+    )
+  }
+
+  if (opts.vlConfig) {
+    writeFileSync(
+      path.join(projectDir, 'vl-tools.config.mjs'),
+      `export default ${JSON.stringify(opts.vlConfig)}`,
+    )
+  }
+
+  if (opts.parent?.vlConfig) {
+    writeFileSync(
+      path.join(root, 'vl-tools.config.mjs'),
+      `export default ${JSON.stringify(opts.parent.vlConfig)}`,
+    )
+  }
+
+  return projectDir
 }
+
+afterAll(() => {
+  rmSync(BASE_TMP, { recursive: true, force: true })
+})
 
 describe('tools-core', () => {
   beforeEach(() => {
-    mockFindUpSync.mockReset()
-    mockReadFileSync.mockReset()
-    mockRequireFn.mockReset()
+    vi.restoreAllMocks()
   })
 
   describe('swapGlobals', () => {
-    let swapGlobals: (globals: Record<string, string>) => Record<string, string>
-
-    beforeEach(async () => {
+    it('should invert key/value pairs', async () => {
       vi.resetModules()
-      setupDefaultMocks()
+      const dir = createTestDir({})
+      vi.spyOn(process, 'cwd').mockReturnValue(dir)
+
       const mod = await import('./index.js')
-      swapGlobals = mod.swapGlobals
-    })
-
-    it('should invert key/value pairs', () => {
       const input = { react: 'React', 'react-dom': 'ReactDOM' }
-      const result = swapGlobals(input)
-      expect(result).toEqual({ React: 'react', ReactDOM: 'react-dom' })
+      expect(mod.swapGlobals(input)).toEqual({
+        React: 'react',
+        ReactDOM: 'react-dom',
+      })
     })
 
-    it('should return empty object for empty input', () => {
-      expect(swapGlobals({})).toEqual({})
+    it('should return empty object for empty input', async () => {
+      vi.resetModules()
+      const dir = createTestDir({})
+      vi.spyOn(process, 'cwd').mockReturnValue(dir)
+
+      const mod = await import('./index.js')
+      expect(mod.swapGlobals({})).toEqual({})
+    })
+  })
+
+  describe('defineConfig', () => {
+    it('should return the same config object', async () => {
+      vi.resetModules()
+      const dir = createTestDir({})
+      vi.spyOn(process, 'cwd').mockReturnValue(dir)
+
+      const mod = await import('./index.js')
+      const config = { stories: { framework: 'next' } }
+      expect(mod.defineConfig(config)).toBe(config)
     })
   })
 
   describe('findFile', () => {
-    let findFile: (filename: string) => string | undefined
-
-    beforeEach(async () => {
+    it('should return the path when file is found in cwd', async () => {
       vi.resetModules()
-      setupDefaultMocks()
+      const dir = createTestDir({ tsConfig: { strict: true } })
+      vi.spyOn(process, 'cwd').mockReturnValue(dir)
+
       const mod = await import('./index.js')
-      findFile = mod.findFile
+      expect(mod.findFile('tsconfig.json')).toBe(
+        path.join(dir, 'tsconfig.json'),
+      )
     })
 
-    it('should call findUpSync with the filename', () => {
-      mockFindUpSync.mockReturnValue('/path/to/file.json')
-      findFile('file.json')
-      expect(mockFindUpSync).toHaveBeenCalledWith('file.json', { type: 'file' })
+    it('should walk up directories to find the file', async () => {
+      vi.resetModules()
+      testId++
+      const root = path.join(BASE_TMP, `t${testId}`)
+      const child = path.join(root, 'sub', 'deep')
+      mkdirSync(child, { recursive: true })
+      writeFileSync(
+        path.join(child, 'package.json'),
+        JSON.stringify({ name: 'deep' }),
+      )
+      writeFileSync(path.join(root, 'target.json'), '{}')
+      vi.spyOn(process, 'cwd').mockReturnValue(child)
+
+      const mod = await import('./index.js')
+      expect(mod.findFile('target.json')).toBe(path.join(root, 'target.json'))
     })
 
-    it('should return the path when file is found', () => {
-      mockFindUpSync.mockReturnValue('/path/to/file.json')
-      expect(findFile('file.json')).toBe('/path/to/file.json')
-    })
+    it('should return undefined when file is not found', async () => {
+      vi.resetModules()
+      const dir = createTestDir({})
+      vi.spyOn(process, 'cwd').mockReturnValue(dir)
 
-    it('should return undefined when file is not found', () => {
-      mockFindUpSync.mockReturnValue(undefined)
-      expect(findFile('missing.json')).toBeUndefined()
+      const mod = await import('./index.js')
+      expect(mod.findFile('nonexistent.xyz')).toBeUndefined()
     })
   })
 
   describe('loadFileToJSON', () => {
-    let loadFileToJSON: (filename: string) => Record<string, any>
-
-    beforeEach(async () => {
+    it('should return empty object when file is not found', async () => {
       vi.resetModules()
-      setupDefaultMocks()
+      const dir = createTestDir({})
+      vi.spyOn(process, 'cwd').mockReturnValue(dir)
+
       const mod = await import('./index.js')
-      loadFileToJSON = mod.loadFileToJSON
+      expect(mod.loadFileToJSON('missing.json')).toEqual({})
     })
 
-    it('should return empty object when file is not found', () => {
-      mockFindUpSync.mockReturnValue(undefined)
-      expect(loadFileToJSON('missing.json')).toEqual({})
-    })
-
-    it('should load file using require when available', () => {
-      mockFindUpSync.mockReturnValue('/path/to/config.js')
-      mockRequireFn.mockReturnValue({ key: 'value' })
-      expect(loadFileToJSON('config.js')).toEqual({ key: 'value' })
-    })
-
-    it('should return empty object when require returns falsy', () => {
-      mockFindUpSync.mockReturnValue('/path/to/config.json')
-      mockRequireFn.mockReturnValue(null)
-      expect(loadFileToJSON('config.json')).toEqual({})
-    })
-
-    it('should return empty object when require throws', () => {
-      mockFindUpSync.mockReturnValue('/path/to/bad.json')
-      mockRequireFn.mockImplementation(() => {
-        throw new Error('require failed')
+    it('should parse JSON files', async () => {
+      vi.resetModules()
+      const dir = createTestDir({
+        tsConfig: { compilerOptions: { strict: true } },
       })
-      expect(loadFileToJSON('bad.json')).toEqual({})
+      vi.spyOn(process, 'cwd').mockReturnValue(dir)
+
+      const mod = await import('./index.js')
+      expect(mod.loadFileToJSON('tsconfig.json')).toEqual({
+        compilerOptions: { strict: true },
+      })
+    })
+
+    it('should return empty object for invalid JSON', async () => {
+      vi.resetModules()
+      const dir = createTestDir({})
+      writeFileSync(path.join(dir, 'bad.json'), 'not json{{{')
+      vi.spyOn(process, 'cwd').mockReturnValue(dir)
+
+      const mod = await import('./index.js')
+      expect(mod.loadFileToJSON('bad.json')).toEqual({})
     })
   })
 
   describe('loadConfigParam', () => {
-    let loadConfigParam: (
-      filename: string,
-    ) => (key: string, defaultValue?: any) => any
-
-    beforeEach(async () => {
+    it('should return a function that gets a nested config value', async () => {
       vi.resetModules()
-      setupDefaultMocks()
-      const mod = await import('./index.js')
-      loadConfigParam = mod.loadConfigParam
-    })
+      const dir = createTestDir({})
+      writeFileSync(
+        path.join(dir, 'config.json'),
+        JSON.stringify({ build: { sourceDir: 'src' } }),
+      )
+      vi.spyOn(process, 'cwd').mockReturnValue(dir)
 
-    it('should return a function that gets a nested config value', () => {
-      mockFindUpSync.mockReturnValue('/path/to/config.js')
-      mockRequireFn.mockReturnValue({ build: { sourceDir: 'src' } })
-      const getParam = loadConfigParam('config.js')
+      const mod = await import('./index.js')
+      const getParam = mod.loadConfigParam('config.json')
       expect(getParam('build.sourceDir')).toBe('src')
     })
 
-    it('should return defaultValue when key is not found', () => {
-      mockFindUpSync.mockReturnValue('/path/to/config.js')
-      mockRequireFn.mockReturnValue({})
-      const getParam = loadConfigParam('config.js')
+    it('should return defaultValue when key is not found', async () => {
+      vi.resetModules()
+      const dir = createTestDir({})
+      writeFileSync(path.join(dir, 'config.json'), JSON.stringify({}))
+      vi.spyOn(process, 'cwd').mockReturnValue(dir)
+
+      const mod = await import('./index.js')
+      const getParam = mod.loadConfigParam('config.json')
       expect(getParam('missing.key', 'default')).toBe('default')
     })
   })
 
   describe('loadVLToolsConfig', () => {
-    let loadVLToolsConfig: () => (key: string) => any
-
-    beforeEach(async () => {
+    it('should load .mjs config and provide .config, .get(), .merge()', async () => {
       vi.resetModules()
-      setupDefaultMocks()
-      const mod = await import('./index.js')
-      loadVLToolsConfig = mod.loadVLToolsConfig
-    })
+      const dir = createTestDir({
+        vlConfig: { build: { sourceDir: 'src' } },
+      })
+      vi.spyOn(process, 'cwd').mockReturnValue(dir)
 
-    it('should return a function that provides .config, .get(), .merge()', () => {
-      mockFindUpSync.mockReturnValue('/path/to/vl-tools.config.js')
-      mockRequireFn.mockReturnValue({ build: { sourceDir: 'src' } })
-      const vlConfig = loadVLToolsConfig()
+      const mod = await import('./index.js')
+      const vlConfig = await mod.loadVLToolsConfig()
       const buildConfig = vlConfig('build')
       expect(buildConfig.config).toEqual({ sourceDir: 'src' })
       expect(buildConfig.get('sourceDir')).toBe('src')
     })
 
-    it('should support chained merge calls', () => {
-      mockFindUpSync.mockReturnValue('/path/to/vl-tools.config.js')
-      mockRequireFn.mockReturnValue({ build: { sourceDir: 'src' } })
-      const vlConfig = loadVLToolsConfig()
+    it('should support chained merge calls', async () => {
+      vi.resetModules()
+      const dir = createTestDir({
+        vlConfig: { build: { sourceDir: 'src' } },
+      })
+      vi.spyOn(process, 'cwd').mockReturnValue(dir)
+
+      const mod = await import('./index.js')
+      const vlConfig = await mod.loadVLToolsConfig()
       const merged = vlConfig('build').merge({ outputDir: 'lib' })
       expect(merged.config).toEqual({ sourceDir: 'src', outputDir: 'lib' })
     })
 
-    it('should return empty config when file is not found', () => {
-      mockFindUpSync.mockReturnValue(undefined)
-      const vlConfig = loadVLToolsConfig()
-      const result = vlConfig('build')
-      expect(result.config).toEqual({})
+    it('should return empty config when no config file exists', async () => {
+      vi.resetModules()
+      const dir = createTestDir({})
+      vi.spyOn(process, 'cwd').mockReturnValue(dir)
+
+      const mod = await import('./index.js')
+      const vlConfig = await mod.loadVLToolsConfig()
+      expect(vlConfig('build').config).toEqual({})
     })
 
-    it('should return default value with get when key is missing', () => {
-      mockFindUpSync.mockReturnValue(undefined)
-      const vlConfig = loadVLToolsConfig()
-      const result = vlConfig('build')
-      expect(result.get('missing')).toEqual({})
+    it('should return default value with get when key is missing', async () => {
+      vi.resetModules()
+      const dir = createTestDir({})
+      vi.spyOn(process, 'cwd').mockReturnValue(dir)
+
+      const mod = await import('./index.js')
+      const vlConfig = await mod.loadVLToolsConfig()
+      expect(vlConfig('build').get('missing')).toEqual({})
+    })
+
+    it('should cascade configs from root to package (deep merge)', async () => {
+      vi.resetModules()
+      const dir = createTestDir({
+        vlConfig: { stories: { framework: 'next' } },
+        parent: {
+          vlConfig: {
+            stories: { framework: 'vite', port: 6006 },
+            build: { sourceDir: 'src' },
+          },
+        },
+      })
+      vi.spyOn(process, 'cwd').mockReturnValue(dir)
+
+      const mod = await import('./index.js')
+      const vlConfig = await mod.loadVLToolsConfig()
+      const stories = vlConfig('stories')
+
+      // framework overridden by package config
+      expect(stories.get('framework')).toBe('next')
+      // port inherited from root config
+      expect(stories.get('port')).toBe(6006)
+      // build inherited from root config
+      expect(vlConfig('build').config).toEqual({ sourceDir: 'src' })
     })
   })
 
   describe('module-level constants', () => {
     it('should export PKG with bundleName from scoped package name', async () => {
       vi.resetModules()
-      mockFindUpSync.mockImplementation((filename: string) => {
-        if (filename === 'package.json') return '/path/to/package.json'
-        return undefined
+      const dir = createTestDir({
+        packageJson: {
+          name: '@test/pkg',
+          version: '1.0.0',
+          dependencies: { react: '^19' },
+        },
       })
-      mockRequireFn.mockImplementation((path: string) => {
-        if (path === '/path/to/package.json') {
-          return {
-            name: '@test/pkg',
-            version: '1.0.0',
-            dependencies: { react: '^19' },
-          }
-        }
-        return null
-      })
+      vi.spyOn(process, 'cwd').mockReturnValue(dir)
 
       const mod = await import('./index.js')
       expect(mod.PKG.name).toBe('@test/pkg')
@@ -216,16 +286,10 @@ describe('tools-core', () => {
 
     it('should handle simple hyphenated package names in bundleName', async () => {
       vi.resetModules()
-      mockFindUpSync.mockImplementation((filename: string) => {
-        if (filename === 'package.json') return '/path/to/package.json'
-        return undefined
+      const dir = createTestDir({
+        packageJson: { name: 'my-cool-library' },
       })
-      mockRequireFn.mockImplementation((path: string) => {
-        if (path === '/path/to/package.json') {
-          return { name: 'my-cool-library' }
-        }
-        return null
-      })
+      vi.spyOn(process, 'cwd').mockReturnValue(dir)
 
       const mod = await import('./index.js')
       expect(mod.PKG.bundleName).toBe('myCoolLibrary')
@@ -233,19 +297,13 @@ describe('tools-core', () => {
 
     it('should include peerDependencies in externalDependencies', async () => {
       vi.resetModules()
-      mockFindUpSync.mockImplementation((filename: string) => {
-        if (filename === 'package.json') return '/path/to/package.json'
-        return undefined
+      const dir = createTestDir({
+        packageJson: {
+          name: 'my-lib',
+          peerDependencies: { 'styled-components': '^6' },
+        },
       })
-      mockRequireFn.mockImplementation((path: string) => {
-        if (path === '/path/to/package.json') {
-          return {
-            name: 'my-lib',
-            peerDependencies: { 'styled-components': '^6' },
-          }
-        }
-        return null
-      })
+      vi.spyOn(process, 'cwd').mockReturnValue(dir)
 
       const mod = await import('./index.js')
       expect(mod.PKG.externalDependencies).toContain('styled-components')
@@ -253,28 +311,35 @@ describe('tools-core', () => {
 
     it('should export VL_CONFIG as a function', async () => {
       vi.resetModules()
-      setupDefaultMocks()
+      const dir = createTestDir({})
+      vi.spyOn(process, 'cwd').mockReturnValue(dir)
+
       const mod = await import('./index.js')
       expect(typeof mod.VL_CONFIG).toBe('function')
     })
 
     it('should export TS_CONFIG from tsconfig.json', async () => {
       vi.resetModules()
-      mockFindUpSync.mockImplementation((filename: string) => {
-        if (filename === 'package.json') return '/mock/package.json'
-        if (filename === 'tsconfig.json') return '/path/to/tsconfig.json'
-        return undefined
+      const dir = createTestDir({
+        tsConfig: { compilerOptions: { strict: true } },
       })
-      mockRequireFn.mockImplementation((path: string) => {
-        if (path === '/mock/package.json') return { name: 'mock-pkg' }
-        if (path === '/path/to/tsconfig.json') {
-          return { compilerOptions: { strict: true } }
-        }
-        return null
-      })
+      vi.spyOn(process, 'cwd').mockReturnValue(dir)
 
       const mod = await import('./index.js')
       expect(mod.TS_CONFIG).toEqual({ compilerOptions: { strict: true } })
+    })
+
+    it('should resolve VL_CONFIG from .mjs config at module level', async () => {
+      vi.resetModules()
+      const dir = createTestDir({
+        vlConfig: { stories: { framework: 'next', port: 3000 } },
+      })
+      vi.spyOn(process, 'cwd').mockReturnValue(dir)
+
+      const mod = await import('./index.js')
+      const stories = mod.VL_CONFIG('stories')
+      expect(stories.get('framework')).toBe('next')
+      expect(stories.get('port')).toBe(3000)
     })
   })
 })

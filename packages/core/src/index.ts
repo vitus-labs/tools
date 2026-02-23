@@ -1,57 +1,110 @@
 import fs from 'node:fs'
-import { createRequire } from 'node:module'
-import { findUpSync } from 'find-up'
-import { get as _get, merge } from 'lodash-es'
+import path from 'node:path'
+import { pathToFileURL } from 'node:url'
 
-const VITUS_LABS_FILE_NAME = 'vl-tools.config.js'
+const VL_CONFIG_FILES = ['vl-tools.config.mjs']
 const PACKAGE_FILE_NAME = 'package.json'
 const TYPESCRIPT_FILE_NAME = 'tsconfig.json'
 
-const require = createRequire(import.meta.url)
+// --------------------------------------------------------
+// Utility helpers (replaces lodash-es and find-up)
+// --------------------------------------------------------
+const get = (obj: any, dotPath: string, defaultValue: any = {}): any => {
+  const keys = dotPath.split('.')
+  let result = obj
+
+  for (const key of keys) {
+    if (result == null) return defaultValue
+    result = result[key]
+  }
+
+  return result === undefined ? defaultValue : result
+}
+
+const deepMerge = (
+  target: Record<string, any>,
+  source: Record<string, any>,
+): Record<string, any> => {
+  const result = { ...target }
+
+  for (const key of Object.keys(source)) {
+    const srcVal = source[key]
+    const tgtVal = result[key]
+
+    if (
+      typeof srcVal === 'object' &&
+      srcVal !== null &&
+      !Array.isArray(srcVal) &&
+      typeof tgtVal === 'object' &&
+      tgtVal !== null &&
+      !Array.isArray(tgtVal)
+    ) {
+      result[key] = deepMerge(tgtVal, srcVal)
+    } else {
+      result[key] = srcVal
+    }
+  }
+
+  return result
+}
+
+const findFileUp = (
+  names: string | string[],
+  cwd = process.cwd(),
+): string | undefined => {
+  const fileNames = Array.isArray(names) ? names : [names]
+  let dir = path.resolve(cwd)
+
+  while (true) {
+    for (const name of fileNames) {
+      const filePath = path.join(dir, name)
+      try {
+        if (fs.statSync(filePath).isFile()) return filePath
+      } catch (_e) {
+        // file doesn't exist, continue
+      }
+    }
+
+    const parent = path.dirname(dir)
+    if (parent === dir) return undefined
+    dir = parent
+  }
+}
 
 // --------------------------------------------------------
 // FIND & READ file helpers
 // --------------------------------------------------------
-const findFile = (filename: string) => findUpSync(filename, { type: 'file' })
+const findFile = (filename: string) => findFileUp(filename)
 
 const loadFileToJSON = (filename: string): Record<string, any> => {
   const file = findFile(filename)
-
   if (!file) return {}
 
-  let data: Record<string, any> = {}
-
-  // try to read an exported module first
   try {
-    const importedFile = require(file)
-
-    if (importedFile) {
-      data = importedFile
-    }
+    return JSON.parse(fs.readFileSync(file, 'utf-8'))
   } catch (_e) {
-    // ignore error
+    return {}
   }
+}
 
-  // try to read a plain json file like tsconfig.json
-  if (!data) {
-    try {
-      data = JSON.parse(fs.readFileSync(file, 'utf-8'))
-    } catch (_e) {
-      // ignore error
-    }
+const loadModuleAsync = async (
+  filePath: string,
+): Promise<Record<string, any>> => {
+  try {
+    const mod = await import(pathToFileURL(filePath).href)
+    return mod?.default ?? mod ?? {}
+  } catch (e: any) {
+    console.warn(
+      `[tools-core] Failed to load config: ${filePath}\n  ${e.message}`,
+    )
+    return {}
   }
-
-  return data
 }
 
 // --------------------------------------------------------
 // GET PACKAGE.JSON info
 // --------------------------------------------------------
-const getPackageJSON = () => {
-  const data = loadFileToJSON(PACKAGE_FILE_NAME)
-
-  return data
-}
+const getPackageJSON = () => loadFileToJSON(PACKAGE_FILE_NAME)
 
 // --------------------------------------------------------
 // PACKAGE.json parsing functions
@@ -69,10 +122,6 @@ const getDependenciesList = (types: any) => {
 
   return result
 }
-
-// parse namespace name
-// const parseNamespace = (name) =>
-//   name.startsWith('@') ? name.split('/')[0] : ''
 
 // converts package name to umd or iife valid format
 // example: napespace-package-name => namespacePackageName
@@ -96,14 +145,9 @@ const camelspaceBundleName = (name: string) => {
 const getPkgData = (): Record<string, any> => {
   const pkg = getPackageJSON()
   const { name } = pkg
-  // const namespace = parseNamespace(name)
 
   return {
     ...pkg,
-    // nameWithoutPrefix: name.replace(namespace, '').replace('/', ''),
-    // namespace,
-    // namespaceName: namespace.replace('@', ''),
-    // rootPath: findFilePath('package.json'),
     bundleName: camelspaceBundleName(name),
     externalDependencies: getDependenciesList([
       'dependencies',
@@ -114,38 +158,70 @@ const getPkgData = (): Record<string, any> => {
 
 // --------------------------------------------------------
 // LOAD EXTERNAL CONFIGURATION
+// Cascading: finds all vl-tools.config.mjs files from
+// cwd upward, then deep-merges them (root first, closest
+// package config wins).
 // --------------------------------------------------------
-const getExternalConfig = () => loadFileToJSON(VITUS_LABS_FILE_NAME)
+const findAllConfigFiles = (): string[] => {
+  const files: string[] = []
+  let cwd = process.cwd()
+
+  while (true) {
+    const file = findFileUp(VL_CONFIG_FILES, cwd)
+    if (!file) break
+    files.push(file)
+    const parentDir = path.dirname(path.dirname(file))
+    if (parentDir === path.dirname(file)) break
+    cwd = parentDir
+  }
+
+  // Root config first, closest config last (overrides)
+  return files.reverse()
+}
+
+const getExternalConfig = async (): Promise<Record<string, any>> => {
+  const files = findAllConfigFiles()
+  let config: Record<string, any> = {}
+
+  for (const file of files) {
+    const loaded = await loadModuleAsync(file)
+    config = deepMerge(config, loaded)
+  }
+
+  return config
+}
 
 const loadConfigParam =
   (filename: string) =>
   (key: string, defaultValue = {}) => {
     const externalConfig = loadFileToJSON(filename)
 
-    return _get(externalConfig, key, defaultValue)
+    return get(externalConfig, key, defaultValue)
   }
 
-const loadVLToolsConfig = () => {
-  const externalConfig = getExternalConfig()
+const loadVLToolsConfig = async () => {
+  const externalConfig = await getExternalConfig()
 
   const cloneAndEnhance = (object: Record<string, any>) => ({
     get config() {
       return object
     },
     get: (param: string, defaultValue?: any) =>
-      _get(object, param, defaultValue || {}),
+      get(object, param, defaultValue || {}),
     merge: (param: Record<string, any>) =>
-      cloneAndEnhance(merge(object, param)),
+      cloneAndEnhance(deepMerge(param, object)),
   })
 
   const getOutput = (key: string) => {
-    const result = _get(externalConfig, key, {})
+    const result = get(externalConfig, key, {})
 
     return cloneAndEnhance(result)
   }
 
   return getOutput
 }
+
+const defineConfig = <T extends Record<string, any>>(config: T): T => config
 
 const swapGlobals = (globals: Record<string, string>) =>
   Object.entries(globals).reduce<Record<string, string>>(
@@ -157,10 +233,11 @@ const swapGlobals = (globals: Record<string, string>) =>
   )
 
 const PKG = getPkgData()
-const VL_CONFIG = loadVLToolsConfig()
+const VL_CONFIG = await loadVLToolsConfig()
 const TS_CONFIG = loadFileToJSON(TYPESCRIPT_FILE_NAME)
 
 export {
+  defineConfig,
   findFile,
   loadConfigParam,
   loadFileToJSON,

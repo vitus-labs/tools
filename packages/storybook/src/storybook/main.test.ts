@@ -11,6 +11,7 @@ vi.mock('vite-tsconfig-paths', () => ({
 vi.mock('../config/index.js', () => ({
   CONFIG: {
     storiesDir: ['/src/**/*.stories.tsx'],
+    framework: 'vite',
     addons: {
       a11y: true,
       chromatic: true,

@@ -27,16 +27,18 @@ const ADDONS_MAP: Record<string, string> = {
   vitest: '@storybook/addon-vitest',
 }
 
+const resolveFramework = (key: string): StorybookConfig['framework'] =>
+  key === 'next'
+    ? { name: '@storybook/nextjs', options: {} }
+    : { name: '@storybook/react-vite', options: {} }
+
 const autoDiscoveryIndexer = createAutoDiscoveryIndexer()
 
 // --------------------------------------------------------
 // STORYBOOK CONFIGURATION
 // --------------------------------------------------------
 const STORYBOOK_CONFIG: StorybookConfig = {
-  framework: {
-    name: '@storybook/react-vite',
-    options: {},
-  },
+  framework: resolveFramework(CONFIG.framework),
   stories: CONFIG.storiesDir,
   addons: Object.entries(CONFIG.addons).reduce((acc, [key, value]) => {
     const addon = ADDONS_MAP[key]
