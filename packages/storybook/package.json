@@ -63,7 +63,7 @@
   "devDependencies": {
     "@vitus-labs/core": "1.2.2",
     "@vitus-labs/tools-typescript": "1.7.0",
-    "@vitus-labs/unistyle": "1.2.2",
+    "@vitus-labs/unistyle": "1.4.2",
     "styled-components": "^6.3.8",
     "typescript": "^5.9.3"
   }
