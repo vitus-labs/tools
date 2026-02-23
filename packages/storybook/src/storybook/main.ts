@@ -94,9 +94,9 @@ const STORYBOOK_CONFIG: StorybookConfig = {
       config.optimizeDeps.exclude = [
         ...(config.optimizeDeps.exclude ?? []),
         'next',
-        'next/**',
+        'next/*',
         '@next/font',
-        '@next/font/**',
+        '@next/font/*',
       ]
     }
 
