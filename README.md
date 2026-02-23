@@ -13,7 +13,7 @@ A monorepo of shared configs and build tools used across [Vitus Labs](https://gi
 | [`@vitus-labs/tools-lint`](packages/lint) | Shared [Biome](https://biomejs.dev) configuration for formatting and linting |
 | [`@vitus-labs/tools-rollup`](packages/rollup) | Build tooling powered by [Rollup](https://rollupjs.org) with TypeScript, DTS bundling, and multi-platform output |
 | [`@vitus-labs/tools-rolldown`](packages/rolldown) | Build tooling powered by [Rolldown](https://rolldown.rs) — faster Rust-based alternative with built-in TS support |
-| [`@vitus-labs/tools-storybook`](packages/storybook) | Shared [Storybook 10](https://storybook.js.org) configuration with addon presets |
+| [`@vitus-labs/tools-storybook`](packages/storybook) | Preconfigured [Storybook 10](https://storybook.js.org) with auto-discovery and rocketstories integration |
 | [`@vitus-labs/tools-favicon`](packages/favicon) | CLI tool for generating favicons from a source image |
 
 ## Getting Started
@@ -34,6 +34,12 @@ bun install
 ```bash
 # Build all packages
 bun run pkgs:build
+
+# Run tests
+bun test
+
+# Typecheck all packages
+bun run typecheck
 
 # Format code
 bun run format
@@ -91,16 +97,39 @@ Or with Rolldown:
 }
 ```
 
-Both tools read configuration from `vl-tools.config.js` (key: `build`) and support the same config-merging pattern via `@vitus-labs/tools-core`.
+Both tools read configuration from `vl-tools.config.mjs` (key: `build`) and support the same config-merging pattern via `@vitus-labs/tools-core`.
 
 ### Storybook
 
-```ts
-import { createConfig } from '@vitus-labs/tools-storybook'
+Add CLI commands to your `scripts`:
 
-const config = createConfig({
-  addons: { docs: true, a11y: true },
-})
+```json
+{
+  "scripts": {
+    "stories": "vl_stories",
+    "stories:build": "vl_stories-build"
+  }
+}
+```
+
+Use the pre-built Storybook config in `.storybook/main.ts`:
+
+```ts
+export { default } from '@vitus-labs/tools-storybook/storybook/main'
+```
+
+Configure via `vl-tools.config.mjs` (key: `stories`):
+
+```js
+export default {
+  stories: {
+    framework: 'next',
+    rocketstories: {
+      module: '@my-org/rocketstories',
+      export: 'storyOf',
+    },
+  },
+}
 ```
 
 ## Versioning
