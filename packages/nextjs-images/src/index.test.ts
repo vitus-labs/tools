@@ -28,7 +28,7 @@ describe('withOptimizedImages', () => {
     const config = withOptimizedImages()({})
 
     expect(() =>
-      config.webpack!(
+      config.webpack?.(
         { module: { rules: [] } } as any,
         { dev: false, isServer: false } as any,
       ),

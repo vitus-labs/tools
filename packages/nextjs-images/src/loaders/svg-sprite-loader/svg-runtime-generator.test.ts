@@ -15,7 +15,8 @@ describe('runtimeGenerator', () => {
     const result = runtimeGenerator({
       symbol: { id: 'icon-home', viewBox: '0 0 24 24', content: '<path/>' },
       config: {
-        spriteModule: '/project/node_modules/svg-sprite-loader/runtime/sprite.js',
+        spriteModule:
+          '/project/node_modules/svg-sprite-loader/runtime/sprite.js',
         symbolModule:
           '/project/node_modules/svg-sprite-loader/runtime/symbol.js',
       },

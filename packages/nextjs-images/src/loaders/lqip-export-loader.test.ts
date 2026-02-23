@@ -1,13 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import lqipExportLoader from './lqip-export-loader.js'
 
-const createContext = (exportProperty: string) =>
-  ({
-    getOptions: () => ({ exportProperty }),
-  }) as Parameters<typeof lqipExportLoader>[0] extends Buffer
-    ? never
-    : { getOptions: () => { exportProperty: string } }
-
 describe('lqipExportLoader', () => {
   it('should re-export preSrc property', () => {
     const content = Buffer.from(

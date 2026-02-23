@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import type { DetectedLoaders, OptimizedImagesConfig } from '../types.js'
+import { getImageTraceLoaderOptions } from './image-trace-loader.js'
+import { getHandledFilesRegex } from './img-loader.js'
 import {
   getHandledImageTypes,
   getNumOptimizationLoadersInstalled,
 } from './index.js'
-import { getHandledFilesRegex } from './img-loader.js'
-import { getImageTraceLoaderOptions } from './image-trace-loader.js'
 import { getWebpLoaderOptions } from './webp-loader.js'
 
 const defaultConfig = {

@@ -37,9 +37,7 @@ describe('getFileLoaderOptions', () => {
       false,
     )
 
-    expect(opts.publicPath).toBe(
-      'https://cdn.example.com/_next/static/images/',
-    )
+    expect(opts.publicPath).toBe('https://cdn.example.com/_next/static/images/')
   })
 
   it('should handle assetPrefix with trailing slash', () => {
@@ -49,9 +47,7 @@ describe('getFileLoaderOptions', () => {
       false,
     )
 
-    expect(opts.publicPath).toBe(
-      'https://cdn.example.com/_next/static/images/',
-    )
+    expect(opts.publicPath).toBe('https://cdn.example.com/_next/static/images/')
   })
 
   it('should set server output path with ../ prefix', () => {
