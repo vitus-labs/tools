@@ -1,12 +1,10 @@
 import fs from 'node:fs'
-import { createRequire } from 'node:module'
 import path from 'node:path'
+import { pathToFileURL } from 'node:url'
 
-const VL_CONFIG_FILES = ['vl-tools.config.mjs', 'vl-tools.config.js']
+const VL_CONFIG_FILES = ['vl-tools.config.mjs']
 const PACKAGE_FILE_NAME = 'package.json'
 const TYPESCRIPT_FILE_NAME = 'tsconfig.json'
-
-const require = createRequire(import.meta.url)
 
 // --------------------------------------------------------
 // Utility helpers (replaces lodash-es and find-up)
@@ -78,43 +76,35 @@ const findFileUp = (
 // --------------------------------------------------------
 const findFile = (filename: string) => findFileUp(filename)
 
-const loadModule = (filePath: string): Record<string, any> => {
+const loadFileToJSON = (filename: string): Record<string, any> => {
+  const file = findFile(filename)
+  if (!file) return {}
+
   try {
-    const imported = require(filePath)
-    // Handle ESM default export wrapping
-    return imported?.default ?? imported ?? {}
+    return JSON.parse(fs.readFileSync(file, 'utf-8'))
   } catch (_e) {
     return {}
   }
 }
 
-const loadFileToJSON = (filename: string): Record<string, any> => {
-  const file = findFile(filename)
-
-  if (!file) return {}
-
-  // try to read an exported module first
-  const data = loadModule(file)
-  if (data && Object.keys(data).length > 0) return data
-
-  // try to read a plain json file like tsconfig.json
+const loadModuleAsync = async (
+  filePath: string,
+): Promise<Record<string, any>> => {
   try {
-    return JSON.parse(fs.readFileSync(file, 'utf-8'))
-  } catch (_e) {
-    // ignore error
+    const mod = await import(pathToFileURL(filePath).href)
+    return mod?.default ?? mod ?? {}
+  } catch (e: any) {
+    console.warn(
+      `[tools-core] Failed to load config: ${filePath}\n  ${e.message}`,
+    )
+    return {}
   }
-
-  return {}
 }
 
 // --------------------------------------------------------
 // GET PACKAGE.JSON info
 // --------------------------------------------------------
-const getPackageJSON = () => {
-  const data = loadFileToJSON(PACKAGE_FILE_NAME)
-
-  return data
-}
+const getPackageJSON = () => loadFileToJSON(PACKAGE_FILE_NAME)
 
 // --------------------------------------------------------
 // PACKAGE.json parsing functions
@@ -168,7 +158,7 @@ const getPkgData = (): Record<string, any> => {
 
 // --------------------------------------------------------
 // LOAD EXTERNAL CONFIGURATION
-// Cascading: finds all vl-tools.config.{mjs,js} files from
+// Cascading: finds all vl-tools.config.mjs files from
 // cwd upward, then deep-merges them (root first, closest
 // package config wins).
 // --------------------------------------------------------
@@ -189,12 +179,12 @@ const findAllConfigFiles = (): string[] => {
   return files.reverse()
 }
 
-const getExternalConfig = (): Record<string, any> => {
+const getExternalConfig = async (): Promise<Record<string, any>> => {
   const files = findAllConfigFiles()
   let config: Record<string, any> = {}
 
   for (const file of files) {
-    const loaded = loadModule(file)
+    const loaded = await loadModuleAsync(file)
     config = deepMerge(config, loaded)
   }
 
@@ -209,8 +199,8 @@ const loadConfigParam =
     return get(externalConfig, key, defaultValue)
   }
 
-const loadVLToolsConfig = () => {
-  const externalConfig = getExternalConfig()
+const loadVLToolsConfig = async () => {
+  const externalConfig = await getExternalConfig()
 
   const cloneAndEnhance = (object: Record<string, any>) => ({
     get config() {
@@ -243,7 +233,7 @@ const swapGlobals = (globals: Record<string, string>) =>
   )
 
 const PKG = getPkgData()
-const VL_CONFIG = loadVLToolsConfig()
+const VL_CONFIG = await loadVLToolsConfig()
 const TS_CONFIG = loadFileToJSON(TYPESCRIPT_FILE_NAME)
 
 export {
