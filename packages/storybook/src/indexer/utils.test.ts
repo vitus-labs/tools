@@ -16,8 +16,13 @@ describe('isRocketstoriesPattern', () => {
     expect(isRocketstoriesPattern('export default stories.init()')).toBe(true)
   })
 
+  it('should detect stories.init pattern (no parens)', () => {
+    expect(isRocketstoriesPattern('export default stories.init')).toBe(true)
+  })
+
   it('should detect with different variable names', () => {
     expect(isRocketstoriesPattern('export default myStories.init()')).toBe(true)
+    expect(isRocketstoriesPattern('export default myStories.init')).toBe(true)
   })
 
   it('should not match standard CSF default export', () => {
