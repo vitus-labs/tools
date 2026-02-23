@@ -219,7 +219,7 @@ const loadVLToolsConfig = () => {
     get: (param: string, defaultValue?: any) =>
       get(object, param, defaultValue || {}),
     merge: (param: Record<string, any>) =>
-      cloneAndEnhance(deepMerge(object, param)),
+      cloneAndEnhance(deepMerge(param, object)),
   })
 
   const getOutput = (key: string) => {
