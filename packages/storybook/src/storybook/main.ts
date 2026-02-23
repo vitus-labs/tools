@@ -29,7 +29,7 @@ const ADDONS_MAP: Record<string, string> = {
 
 const resolveFramework = (key: string): StorybookConfig['framework'] =>
   key === 'next'
-    ? { name: '@storybook/nextjs', options: {} }
+    ? { name: '@storybook/nextjs-vite', options: {} }
     : { name: '@storybook/react-vite', options: {} }
 
 const autoDiscoveryIndexer = createAutoDiscoveryIndexer()

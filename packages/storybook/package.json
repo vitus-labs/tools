@@ -51,7 +51,7 @@
     "@storybook/addon-docs": "^10.2.10",
     "@storybook/addon-themes": "^10.2.10",
     "@storybook/addon-vitest": "^10.2.10",
-    "@storybook/nextjs": "^10.2.10",
+    "@storybook/nextjs-vite": "^10.2.10",
     "@storybook/react": "^10.2.10",
     "@storybook/react-vite": "^10.2.10",
     "@vitus-labs/tools-core": "1.9.0",
