@@ -19,12 +19,7 @@
     "packages/core": {
       "name": "@vitus-labs/tools-core",
       "version": "1.7.0",
-      "dependencies": {
-        "find-up": "^8.0.0",
-        "lodash-es": "^4.17.23",
-      },
       "devDependencies": {
-        "@types/lodash-es": "^4.17.12",
         "@vitus-labs/tools-typescript": "1.7.0",
         "typescript": "^5.9.3",
       },
@@ -53,7 +48,7 @@
     },
     "packages/nextjs-images": {
       "name": "@vitus-labs/tools-nextjs-images",
-      "version": "1.7.0",
+      "version": "1.8.0",
       "dependencies": {
         "chalk": "^5.6.2",
         "file-loader": "^6.2.0",
@@ -130,7 +125,7 @@
     },
     "packages/storybook": {
       "name": "@vitus-labs/tools-storybook",
-      "version": "1.7.0",
+      "version": "1.8.0",
       "bin": {
         "vl_stories": "./lib/bin/run-stories.js",
         "vl_stories-build": "./lib/bin/run-stories-build.js",

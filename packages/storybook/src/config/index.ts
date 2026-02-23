@@ -18,3 +18,4 @@ const updatedConfig = {
 setConfig(updatedConfig)
 
 export { updatedConfig as CONFIG, TS_CONFIG }
+export type { StoriesConfig, VLToolsConfig } from '../types.js'

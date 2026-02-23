@@ -4,6 +4,7 @@ import { INITIAL_VIEWPORTS, MINIMAL_VIEWPORTS } from 'storybook/viewport'
 const CONFIG: Record<string, any> = {
   outDir: '/docs',
   port: 6006,
+  framework: 'vite',
   ui: {
     theme: 'dark',
   },
