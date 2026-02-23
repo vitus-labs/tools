@@ -82,21 +82,26 @@ const STORYBOOK_CONFIG: StorybookConfig = {
     config.define.__CLIENT__ = JSON.stringify(true)
     config.define.__VITUS_LABS_STORIES__ = JSON.stringify(CONFIG)
 
-    // When using Next.js framework, exclude next/* from dep optimization
-    // so @storybook/nextjs-vite's mocks (next/font, next/image, next/navigation,
-    // next/router, next/dynamic, etc.) intercept at runtime.
-    // Without this, Vite pre-bundles deps that import next/* and resolves
-    // the real modules instead of the mocks.
+    // When using Next.js framework, exclude mocked Next.js modules from
+    // dep optimization so @storybook/nextjs-vite's mocks intercept at runtime.
+    // Without this, Vite pre-bundles deps that import these modules and
+    // resolves the real Next.js code instead of the Storybook mocks.
     if (CONFIG.framework === 'next') {
       if (!config.optimizeDeps) {
         config.optimizeDeps = {}
       }
       config.optimizeDeps.exclude = [
         ...(config.optimizeDeps.exclude ?? []),
-        'next',
-        'next/*',
-        '@next/font',
-        '@next/font/*',
+        'next/font/local',
+        'next/font/google',
+        'next/image',
+        'next/navigation',
+        'next/router',
+        'next/link',
+        'next/head',
+        'next/dynamic',
+        '@next/font/local',
+        '@next/font/google',
       ]
     }
 
