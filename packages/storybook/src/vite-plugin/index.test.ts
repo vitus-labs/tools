@@ -23,9 +23,7 @@ describe('rocketstoriesVitePlugin', () => {
       const result = resolveId(
         'virtual:rocketstory:/project/src/Badge/index.tsx',
       )
-      expect(result).toBe(
-        '\0virtual:rocketstory:/project/src/Badge/index.tsx',
-      )
+      expect(result).toBe('\0virtual:rocketstory:/project/src/Badge/index.tsx')
     })
 
     it('should not resolve other ids', () => {
@@ -51,7 +49,9 @@ describe('rocketstoriesVitePlugin', () => {
         '\0virtual:rocketstory:/project/src/Badge/index.tsx',
       )
 
-      expect(result).toContain("import Component from '/project/src/Badge/index.tsx'")
+      expect(result).toContain(
+        "import Component from '/project/src/Badge/index.tsx'",
+      )
       expect(result).toContain("title: 'Badge'")
       expect(result).toContain('component: Component')
       expect(result).toContain('export const Default')
@@ -70,13 +70,19 @@ describe('rocketstoriesVitePlugin', () => {
         '\0virtual:rocketstory:/project/src/Badge/index.tsx',
       )
 
-      expect(result).toContain("import { rocketstories } from '@vitus-labs/rocketstories'")
-      expect(result).toContain("import Component from '/project/src/Badge/index.tsx'")
+      expect(result).toContain(
+        "import { rocketstories } from '@vitus-labs/rocketstories'",
+      )
+      expect(result).toContain(
+        "import Component from '/project/src/Badge/index.tsx'",
+      )
       expect(result).toContain('rocketstories(Component)')
       expect(result).toContain("label: 'Badge'")
       expect(result).toContain('export default stories.init()')
       expect(result).toContain('export const Default = stories.main()')
-      expect(result).toContain("export const States = stories.dimension('state')")
+      expect(result).toContain(
+        "export const States = stories.dimension('state')",
+      )
       expect(result).toContain("export const Sizes = stories.dimension('size')")
       expect(result).toContain('export const PseudoStates')
     })
@@ -105,7 +111,9 @@ describe('rocketstoriesVitePlugin', () => {
       expect(result).toContain('PseudoStates')
       expect(result).toContain('data-pseudo')
       expect(result).toContain('data-disabled')
-      expect(result).toContain("'normal', 'hover', 'focus', 'active', 'disabled'")
+      expect(result).toContain(
+        "'normal', 'hover', 'focus', 'active', 'disabled'",
+      )
     })
   })
 })

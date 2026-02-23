@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import {
   deriveTitle,
   detectComponentKind,
@@ -13,15 +13,11 @@ import {
 
 describe('isRocketstoriesPattern', () => {
   it('should detect stories.init() pattern', () => {
-    expect(
-      isRocketstoriesPattern('export default stories.init()'),
-    ).toBe(true)
+    expect(isRocketstoriesPattern('export default stories.init()')).toBe(true)
   })
 
   it('should detect with different variable names', () => {
-    expect(
-      isRocketstoriesPattern('export default myStories.init()'),
-    ).toBe(true)
+    expect(isRocketstoriesPattern('export default myStories.init()')).toBe(true)
   })
 
   it('should not match standard CSF default export', () => {
@@ -33,9 +29,7 @@ describe('isRocketstoriesPattern', () => {
   })
 
   it('should not match init() in non-default context', () => {
-    expect(isRocketstoriesPattern('const result = stories.init()')).toBe(
-      false,
-    )
+    expect(isRocketstoriesPattern('const result = stories.init()')).toBe(false)
   })
 })
 
@@ -122,15 +116,15 @@ describe('extractNamedExports', () => {
 
 describe('extractExplicitTitle', () => {
   it('should extract title from .config({ name: "..." })', () => {
-    expect(
-      extractExplicitTitle(`.config({ name: 'Custom/Title' })`),
-    ).toBe('Custom/Title')
+    expect(extractExplicitTitle(`.config({ name: 'Custom/Title' })`)).toBe(
+      'Custom/Title',
+    )
   })
 
   it('should extract title with double quotes', () => {
-    expect(
-      extractExplicitTitle('.config({ name: "My/Component" })'),
-    ).toBe('My/Component')
+    expect(extractExplicitTitle('.config({ name: "My/Component" })')).toBe(
+      'My/Component',
+    )
   })
 
   it('should return null when no explicit title', () => {
@@ -194,10 +188,9 @@ describe('deriveTitle', () => {
 
   it('should derive title without package prefix for story files', () => {
     expect(
-      deriveTitle(
-        '/project/src/Button/__stories__/Button.stories.tsx',
-        { isStoryFile: true },
-      ),
+      deriveTitle('/project/src/Button/__stories__/Button.stories.tsx', {
+        isStoryFile: true,
+      }),
     ).toBe('Button')
   })
 
@@ -207,9 +200,7 @@ describe('deriveTitle', () => {
 
   it('should handle Windows paths', () => {
     expect(
-      deriveTitle(
-        '\\project\\packages\\ui-base\\src\\Badge\\index.tsx',
-      ),
+      deriveTitle('\\project\\packages\\ui-base\\src\\Badge\\index.tsx'),
     ).toBe('ui-base/Badge')
   })
 })
@@ -223,9 +214,7 @@ describe('detectComponentKind', () => {
 
   it('should detect plain React components', () => {
     expect(
-      detectComponentKind(
-        'export default const Badge: FC = () => <div />',
-      ),
+      detectComponentKind('export default const Badge: FC = () => <div />'),
     ).toBe('react')
   })
 
@@ -235,18 +224,16 @@ describe('detectComponentKind', () => {
 
   it('should prefer rocketstyle over plain react', () => {
     expect(
-      detectComponentKind(
-        'export default component.config({ name: "Badge" })',
-      ),
+      detectComponentKind('export default component.config({ name: "Badge" })'),
     ).toBe('rocketstyle')
   })
 })
 
 describe('extractDimensionNames', () => {
   it('should extract states dimension', () => {
-    expect(
-      extractDimensionNames('component.states({ active: true })'),
-    ).toEqual(['state'])
+    expect(extractDimensionNames('component.states({ active: true })')).toEqual(
+      ['state'],
+    )
   })
 
   it('should extract multiple dimensions', () => {
@@ -256,11 +243,7 @@ describe('extractDimensionNames', () => {
         .sizes({ sm: {}, md: {}, lg: {} })
         .variants({ primary: {}, secondary: {} })
     `
-    expect(extractDimensionNames(code)).toEqual([
-      'state',
-      'size',
-      'variant',
-    ])
+    expect(extractDimensionNames(code)).toEqual(['state', 'size', 'variant'])
   })
 
   it('should extract multiple() dimension', () => {
@@ -284,8 +267,8 @@ describe('extractDimensionNames', () => {
   })
 
   it('should return empty for no dimensions', () => {
-    expect(extractDimensionNames('component.config({ name: "Badge" })')).toEqual(
-      [],
-    )
+    expect(
+      extractDimensionNames('component.config({ name: "Badge" })'),
+    ).toEqual([])
   })
 })
