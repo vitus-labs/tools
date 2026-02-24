@@ -3,6 +3,7 @@ import type { Preview } from '@storybook/react'
 declare const __VITUS_LABS_STORIES__: {
   globals: any
   addons: Record<string, any>
+  framework: string
 }
 
 const parameters = Object.entries(__VITUS_LABS_STORIES__.addons).reduce(
@@ -17,7 +18,12 @@ const parameters = Object.entries(__VITUS_LABS_STORIES__.addons).reduce(
 
 const preview: Preview = {
   tags: ['autodocs'],
-  parameters,
+  parameters: {
+    ...parameters,
+    ...(__VITUS_LABS_STORIES__.framework === 'next' && {
+      nextjs: { appDirectory: true },
+    }),
+  },
   initialGlobals: __VITUS_LABS_STORIES__.globals,
 }
 
