@@ -5,26 +5,26 @@ import { describe, expect, it } from 'vitest'
 
 describe('withOptimizedImages', () => {
   it('should be importable', async () => {
-    const mod = await import('./index.js')
+    const mod = await import('./index')
     expect(typeof mod.default).toBe('function')
   })
 
   it('should return a function that accepts nextConfig', async () => {
-    const { default: withOptimizedImages } = await import('./index.js')
+    const { default: withOptimizedImages } = await import('./index')
     const plugin = withOptimizedImages()
 
     expect(typeof plugin).toBe('function')
   })
 
   it('should return config with webpack function', async () => {
-    const { default: withOptimizedImages } = await import('./index.js')
+    const { default: withOptimizedImages } = await import('./index')
     const config = withOptimizedImages()({})
 
     expect(typeof config.webpack).toBe('function')
   })
 
   it('should throw when defaultLoaders is missing', async () => {
-    const { default: withOptimizedImages } = await import('./index.js')
+    const { default: withOptimizedImages } = await import('./index')
     const config = withOptimizedImages()({})
 
     expect(() =>
@@ -36,7 +36,7 @@ describe('withOptimizedImages', () => {
   })
 
   it('should preserve existing nextConfig properties', async () => {
-    const { default: withOptimizedImages } = await import('./index.js')
+    const { default: withOptimizedImages } = await import('./index')
     const config = withOptimizedImages()({
       reactStrictMode: true,
       basePath: '/app',

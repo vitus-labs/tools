@@ -8,4 +8,6 @@ export default defineWorkspace([
   'packages/storybook',
   'packages/lint',
   'packages/typescript',
+  'packages/nextjs',
+  'packages/nextjs-images',
 ])

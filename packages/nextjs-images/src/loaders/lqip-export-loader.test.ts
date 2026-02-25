@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import lqipExportLoader from './lqip-export-loader.js'
+import lqipExportLoader from './lqip-export-loader'
 
 describe('lqipExportLoader', () => {
   it('should re-export preSrc property', () => {

@@ -6,11 +6,11 @@ import type {
   NextConfig,
   OptimizedImagesConfig,
   WebpackConfig,
-} from '../types.js'
-import { getResourceQueries } from './resource-queries.js'
-import { getSvgSpriteLoaderResourceQuery } from './svg-sprite-loader/index.js'
-import { getUrlLoaderOptions } from './url-loader.js'
-import { getWebpResourceQuery } from './webp-loader.js'
+} from '../types'
+import { getResourceQueries } from './resource-queries'
+import { getSvgSpriteLoaderResourceQuery } from './svg-sprite-loader/index'
+import { getUrlLoaderOptions } from './url-loader'
+import { getWebpResourceQuery } from './webp-loader'
 
 // Dynamic import wrapper invisible to webpack's static analysis,
 // avoiding PackFileCacheStrategy build dependency warnings.

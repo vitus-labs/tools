@@ -46,6 +46,22 @@
         "@biomejs/biome": "^2.4.4",
       },
     },
+    "packages/nextjs": {
+      "name": "@vitus-labs/tools-nextjs",
+      "version": "1.9.0",
+      "dependencies": {
+        "@vitus-labs/tools-core": "1.9.0",
+      },
+      "devDependencies": {
+        "@vitus-labs/tools-typescript": "1.9.0",
+        "@vitus-labs/tools-vitest": "1.9.0",
+        "next": "^16.1.6",
+        "typescript": "^5.9.3",
+      },
+      "peerDependencies": {
+        "next": ">=14",
+      },
+    },
     "packages/nextjs-images": {
       "name": "@vitus-labs/tools-nextjs-images",
       "version": "1.9.0",
@@ -164,6 +180,18 @@
       "version": "1.9.0",
       "peerDependencies": {
         "typescript": ">=5",
+      },
+    },
+    "packages/vitest": {
+      "name": "@vitus-labs/tools-vitest",
+      "version": "1.9.0",
+      "devDependencies": {
+        "@vitus-labs/tools-typescript": "1.9.0",
+        "typescript": "^5.9.3",
+        "vitest": "^4.0.18",
+      },
+      "peerDependencies": {
+        "vitest": ">=4",
       },
     },
   },
@@ -758,6 +786,8 @@
 
     "@vitus-labs/tools-lint": ["@vitus-labs/tools-lint@workspace:packages/lint"],
 
+    "@vitus-labs/tools-nextjs": ["@vitus-labs/tools-nextjs@workspace:packages/nextjs"],
+
     "@vitus-labs/tools-nextjs-images": ["@vitus-labs/tools-nextjs-images@workspace:packages/nextjs-images"],
 
     "@vitus-labs/tools-rolldown": ["@vitus-labs/tools-rolldown@workspace:packages/rolldown"],
@@ -767,6 +797,8 @@
     "@vitus-labs/tools-storybook": ["@vitus-labs/tools-storybook@workspace:packages/storybook"],
 
     "@vitus-labs/tools-typescript": ["@vitus-labs/tools-typescript@workspace:packages/typescript"],
+
+    "@vitus-labs/tools-vitest": ["@vitus-labs/tools-vitest@workspace:packages/vitest"],
 
     "@vueless/storybook-dark-mode": ["@vueless/storybook-dark-mode@10.0.7", "", { "dependencies": { "@storybook/global": "^5.0.0", "lodash-es": "^4.17.23" }, "peerDependencies": { "storybook": "^10.0.0" } }, "sha512-mI+tqHykUMlhdwu7PlZ6/wvq1aZqn4DWoUbO4GMhJxLnrDSJn4zKaeEtGXp4KTO5Myv/T6k2iteIe7MSTAZVDQ=="],
 

@@ -1,5 +1,5 @@
 import { fileURLToPath } from 'node:url'
-import type { DetectedLoaders, OptimizedImagesConfig } from '../../types.js'
+import type { DetectedLoaders, OptimizedImagesConfig } from '../../types'
 
 const RUNTIME_GENERATOR = fileURLToPath(
   import.meta.resolve('./svg-runtime-generator.js'),

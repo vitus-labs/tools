@@ -1,0 +1,45 @@
+{
+  "name": "@vitus-labs/tools-nextjs",
+  "version": "1.9.0",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vitus-labs/tools",
+    "directory": "packages/nextjs"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./lib/index.js",
+      "types": "./lib/types/index.d.ts"
+    }
+  },
+  "types": "./lib/types/index.d.ts",
+  "engines": {
+    "node": ">= 22"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "lib/"
+  ],
+  "scripts": {
+    "prepublish": "bun run build",
+    "build": "rm -rf lib && tsc",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check src/"
+  },
+  "dependencies": {
+    "@vitus-labs/tools-core": "1.9.0"
+  },
+  "peerDependencies": {
+    "next": ">=14"
+  },
+  "devDependencies": {
+    "@vitus-labs/tools-typescript": "1.9.0",
+    "@vitus-labs/tools-vitest": "1.9.0",
+    "next": "^16.1.6",
+    "typescript": "^5.9.3"
+  }
+}

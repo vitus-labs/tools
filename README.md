@@ -13,7 +13,9 @@ A monorepo of shared configs and build tools used across [Vitus Labs](https://gi
 | [`@vitus-labs/tools-lint`](packages/lint) | Shared [Biome](https://biomejs.dev) configuration for formatting and linting |
 | [`@vitus-labs/tools-rollup`](packages/rollup) | Build tooling powered by [Rollup](https://rollupjs.org) with TypeScript, DTS bundling, and multi-platform output |
 | [`@vitus-labs/tools-rolldown`](packages/rolldown) | Build tooling powered by [Rolldown](https://rolldown.rs) — faster Rust-based alternative with built-in TS support |
+| [`@vitus-labs/tools-vitest`](packages/vitest) | Shared [Vitest](https://vitest.dev) configuration with coverage thresholds and sensible defaults |
 | [`@vitus-labs/tools-storybook`](packages/storybook) | Preconfigured [Storybook 10](https://storybook.js.org) with auto-discovery and rocketstories integration |
+| [`@vitus-labs/tools-nextjs`](packages/nextjs) | Opinionated [Next.js](https://nextjs.org) config wrapper with security headers and sensible defaults |
 | [`@vitus-labs/tools-favicon`](packages/favicon) | CLI tool for generating favicons from a source image |
 
 ## Getting Started
@@ -98,6 +100,29 @@ Or with Rolldown:
 ```
 
 Both tools read configuration from `vl-tools.config.mjs` (key: `build`) and support the same config-merging pattern via `@vitus-labs/tools-core`.
+
+### Vitest
+
+```ts
+// vitest.config.ts
+import { createVitestConfig } from '@vitus-labs/tools-vitest'
+
+export default createVitestConfig()
+```
+
+### Next.js
+
+```ts
+// next.config.ts
+import { withVitusLabs } from '@vitus-labs/tools-nextjs'
+
+export default withVitusLabs({
+  // standard next.config.ts options still work
+  experimental: { ppr: true },
+})
+```
+
+Configure via `vl-tools.config.mjs` (key: `next`) for security headers, image optimization, and transpilePackages.
 
 ### Storybook
 

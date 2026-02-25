@@ -2,8 +2,8 @@ import type {
   NextConfig,
   OptimizedImagesConfig,
   UrlLoaderOptions,
-} from '../types.js'
-import { getFileLoaderOptions, getFileLoaderPath } from './file-loader.js'
+} from '../types'
+import { getFileLoaderOptions, getFileLoaderPath } from './file-loader'
 
 /**
  * Build options for the webpack url loader.
