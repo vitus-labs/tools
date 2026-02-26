@@ -6,7 +6,7 @@ const baseConfig: Required<AtlasConfig> = {
   include: [],
   exclude: [],
   outputPath: './atlas.html',
-  echartsCdn: 'https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js',
+  echartsCdn: 'https://cdn.jsdelivr.net/npm/echarts@5.6.1/dist/echarts.min.js',
   open: true,
   title: 'Atlas — Dependency Graph',
   report: 'markdown',

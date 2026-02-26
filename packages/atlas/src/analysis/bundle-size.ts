@@ -2,14 +2,17 @@ import { readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import type { BundleSizeResult, DepGraph } from '../types'
 
-const dirSize = (dir: string): number => {
+const MAX_DIR_DEPTH = 20
+
+const dirSize = (dir: string, depth = 0): number => {
+  if (depth > MAX_DIR_DEPTH) return 0
   try {
     const entries = readdirSync(dir, { withFileTypes: true })
     let total = 0
     for (const entry of entries) {
       const fullPath = join(dir, entry.name)
       if (entry.isDirectory()) {
-        total += dirSize(fullPath)
+        total += dirSize(fullPath, depth + 1)
       } else {
         total += statSync(fullPath).size
       }

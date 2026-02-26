@@ -9,7 +9,7 @@ export const buildHtml = (data: AnalysisData, config: AtlasConfig): string => {
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>${config.title}</title>
-<script src="${config.echartsCdn}"></script>
+<script src="${config.echartsCdn}" integrity="sha384-4BgDtWiMQ6LkjslUOSIQCXQmx4ZytjTmbU5Pv4dtJVDQxF5xVB2H2CEDoiZCXpXy" crossorigin="anonymous"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -202,6 +202,8 @@ export const buildHtml = (data: AnalysisData, config: AtlasConfig): string => {
   var filterText = '';
 
   // ---- helpers ----
+  function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
   var depTypeColor = {
     dependencies: '#3b82f6',
     peerDependencies: '#22c55e',
@@ -258,7 +260,7 @@ export const buildHtml = (data: AnalysisData, config: AtlasConfig): string => {
 
     if (criticalPath.length > 0) {
       html += '<div class="stat-row"><span class="stat-label">Critical path</span></div>';
-      html += '<div class="critical-path">' + criticalPath.map(function (p) { return '<span>' + p + '</span>'; }).join(' &rarr; ') + '</div>';
+      html += '<div class="critical-path">' + criticalPath.map(function (p) { return '<span>' + esc(p) + '</span>'; }).join(' &rarr; ') + '</div>';
     }
 
     html += '<div class="stat-row" style="margin-top:8px"><span class="stat-label">Avg health score</span><span class="stat-value' + (avgScore < 50 ? ' warn' : ' ok') + '">' + avgScore + '</span></div>';
@@ -270,7 +272,7 @@ export const buildHtml = (data: AnalysisData, config: AtlasConfig): string => {
         var freq = GRAPH_DATA.changeFrequency && GRAPH_DATA.changeFrequency.frequencyMap[name];
         var commits = freq ? freq.commits : 0;
         var dependents = impactCount(name);
-        html += '<div class="hotspot-item"><div class="name">' + name + '</div><div class="meta">' + commits + ' commits, ' + dependents + ' dependents</div></div>';
+        html += '<div class="hotspot-item"><div class="name">' + esc(name) + '</div><div class="meta">' + commits + ' commits, ' + dependents + ' dependents</div></div>';
       });
     }
 
@@ -329,10 +331,10 @@ export const buildHtml = (data: AnalysisData, config: AtlasConfig): string => {
       tooltip: {
         formatter: function (p) {
           if (p.dataType === 'node') {
-            return '<b>' + p.name + '</b><br/>Impact: ' + impactCount(p.name) + ' dependents';
+            return '<b>' + esc(p.name) + '</b><br/>Impact: ' + impactCount(p.name) + ' dependents';
           }
           if (p.dataType === 'edge') {
-            return p.data.source + ' &rarr; ' + p.data.target;
+            return esc(p.data.source) + ' &rarr; ' + esc(p.data.target);
           }
           return '';
         }
@@ -408,10 +410,10 @@ export const buildHtml = (data: AnalysisData, config: AtlasConfig): string => {
         formatter: function (p) {
           if (p.dataType === 'node') {
             var d = depthMap[p.name] || 0;
-            return '<b>' + p.name + '</b><br/>Depth: ' + d + '<br/>Impact: ' + impactCount(p.name) + ' dependents';
+            return '<b>' + esc(p.name) + '</b><br/>Depth: ' + d + '<br/>Impact: ' + impactCount(p.name) + ' dependents';
           }
           if (p.dataType === 'edge') {
-            return p.data.source + ' &rarr; ' + p.data.target;
+            return esc(p.data.source) + ' &rarr; ' + esc(p.data.target);
           }
           return '';
         }

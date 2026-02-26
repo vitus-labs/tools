@@ -1,13 +1,13 @@
-import { execSync } from 'node:child_process'
+import { execFileSync } from 'node:child_process'
 import { describe, expect, it, vi } from 'vitest'
 import type { DepGraph, ImpactResult } from '../types'
 import { analyzeChangeFrequency } from './change-frequency'
 
 vi.mock('node:child_process', () => ({
-  execSync: vi.fn(),
+  execFileSync: vi.fn(),
 }))
 
-const mockedExecSync = vi.mocked(execSync)
+const mockedExecFileSync = vi.mocked(execFileSync)
 
 const node = (name: string) => ({
   name,
@@ -24,19 +24,19 @@ const graph: DepGraph = {
 const impact: ImpactResult = { impactMap: { a: [] } }
 
 const setupGitMock = () => {
-  mockedExecSync.mockImplementation((cmd: string) => {
-    const cmdStr = String(cmd)
-    if (cmdStr.includes('rev-parse')) return ''
-    if (cmdStr.includes('--since'))
+  mockedExecFileSync.mockImplementation((_cmd: string, args?: string[]) => {
+    const argsStr = (args ?? []).join(' ')
+    if (argsStr.includes('rev-parse')) return ''
+    if (argsStr.includes('--since'))
       return Array.from({ length: 12 }, (_, i) => `hash${i}`).join('\n')
-    if (cmdStr.includes('-1 --format=%cI')) return '2026-02-20T10:00:00+01:00'
+    if (argsStr.includes('--format=%cI')) return '2026-02-20T10:00:00+01:00'
     return ''
   })
 }
 
 describe('analyzeChangeFrequency', () => {
   it('should return null when not in a git repo', () => {
-    mockedExecSync.mockImplementation(() => {
+    mockedExecFileSync.mockImplementation(() => {
       throw new Error('not a git repo')
     })
 
@@ -60,10 +60,9 @@ describe('analyzeChangeFrequency', () => {
   })
 
   it('should handle git log failure for a package gracefully', () => {
-    mockedExecSync.mockImplementation((cmd: string) => {
-      const cmdStr = String(cmd)
-      if (cmdStr.includes('rev-parse')) return ''
-      // All other git commands throw
+    mockedExecFileSync.mockImplementation((_cmd: string, args?: string[]) => {
+      const argsStr = (args ?? []).join(' ')
+      if (argsStr.includes('rev-parse')) return ''
       throw new Error('git log failed')
     })
 
