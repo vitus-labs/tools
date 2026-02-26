@@ -1,6 +1,6 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, resolve } from 'node:path'
-import type { AtlasConfig, DepEdge, DepGraph, DepNode, DepType } from '../types'
+import type { AtlasConfig, DepEdge, DepGraph, DepNode, DepType } from '../types.js'
 
 interface PackageJson {
   name?: string
