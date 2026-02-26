@@ -1,4 +1,4 @@
-import { exec } from 'node:child_process'
+import { execFile } from 'node:child_process'
 import { writeFileSync } from 'node:fs'
 import { platform } from 'node:os'
 import { resolve } from 'node:path'
@@ -8,14 +8,10 @@ import { buildHtml } from './template'
 
 const openFile = (filePath: string) => {
   const os = platform()
-  const cmd =
-    os === 'darwin'
-      ? `open "${filePath}"`
-      : os === 'win32'
-        ? `start "" "${filePath}"`
-        : `xdg-open "${filePath}"`
+  const cmd = os === 'darwin' ? 'open' : os === 'win32' ? 'cmd' : 'xdg-open'
+  const args = os === 'win32' ? ['/c', 'start', '""', filePath] : [filePath]
 
-  exec(cmd, () => {})
+  execFile(cmd, args, () => {})
 }
 
 export const renderGraph = async (

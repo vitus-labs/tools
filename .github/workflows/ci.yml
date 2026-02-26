@@ -90,4 +90,12 @@ jobs:
       - name: Build all packages
         run: bun run pkgs:build
 
-      - run: bun run test
+      - name: Run tests with coverage
+        run: bun run test:coverage
+
+      - name: Upload coverage
+        if: always()
+        uses: codecov/codecov-action@18283e04ce6e62d37312384ff67231eb8fd56d24 # v5.4.3
+        with:
+          files: ./coverage/coverage-final.json
+          fail_ci_if_error: false

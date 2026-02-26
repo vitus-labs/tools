@@ -16,6 +16,8 @@ A monorepo of shared configs and build tools used across [Vitus Labs](https://gi
 | [`@vitus-labs/tools-vitest`](packages/vitest) | Shared [Vitest](https://vitest.dev) configuration with coverage thresholds and sensible defaults |
 | [`@vitus-labs/tools-storybook`](packages/storybook) | Preconfigured [Storybook 10](https://storybook.js.org) with auto-discovery and rocketstories integration |
 | [`@vitus-labs/tools-nextjs`](packages/nextjs) | Opinionated [Next.js](https://nextjs.org) config wrapper with security headers and sensible defaults |
+| [`@vitus-labs/tools-nextjs-images`](packages/nextjs-images) | Image optimization loaders for Next.js with webpack (webp, lqip, responsive, svg sprites) |
+| [`@vitus-labs/tools-atlas`](packages/atlas) | Dependency graph visualizer and monorepo health analyzer with ECharts and AI-readable reports |
 | [`@vitus-labs/tools-favicon`](packages/favicon) | CLI tool for generating favicons from a source image |
 
 ## Getting Started
@@ -70,7 +72,7 @@ bun run pkgs:clean
 
 ```json
 {
-  "$schema": "https://biomejs.dev/schemas/2.3.14/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.4.4/schema.json",
   "extends": ["@vitus-labs/tools-lint/biome"]
 }
 ```

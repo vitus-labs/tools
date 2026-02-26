@@ -5,7 +5,7 @@ vi.mock('node:fs', () => ({
 }))
 
 vi.mock('node:child_process', () => ({
-  exec: vi.fn(),
+  execFile: vi.fn(),
 }))
 
 vi.mock('./template', () => ({
@@ -17,7 +17,7 @@ vi.mock('./report', () => ({
   generateJsonReport: vi.fn(() => '{}'),
 }))
 
-import { exec } from 'node:child_process'
+import { execFile } from 'node:child_process'
 import { writeFileSync } from 'node:fs'
 import type { AnalysisData, AtlasConfig } from '../types'
 import { renderGraph } from './renderer'
@@ -77,20 +77,21 @@ describe('renderGraph', () => {
     expect(writeFileSync).toHaveBeenCalledTimes(1)
   })
 
-  it('should call exec to open file when config.open is true', async () => {
-    vi.mocked(exec).mockClear()
+  it('should call execFile to open file when config.open is true', async () => {
+    vi.mocked(execFile).mockClear()
     await renderGraph(mockData, { ...mockConfig, open: true })
-    expect(exec).toHaveBeenCalledTimes(1)
-    expect(exec).toHaveBeenCalledWith(
-      expect.stringContaining('atlas.html'),
+    expect(execFile).toHaveBeenCalledTimes(1)
+    expect(execFile).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.arrayContaining([expect.stringContaining('atlas.html')]),
       expect.any(Function),
     )
   })
 
-  it('should not call exec when config.open is false', async () => {
-    vi.mocked(exec).mockClear()
+  it('should not call execFile when config.open is false', async () => {
+    vi.mocked(execFile).mockClear()
     await renderGraph(mockData, { ...mockConfig, open: false })
-    expect(exec).not.toHaveBeenCalled()
+    expect(execFile).not.toHaveBeenCalled()
   })
 
   it('should write both markdown and JSON reports when config.report is true', async () => {

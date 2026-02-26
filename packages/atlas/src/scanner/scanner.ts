@@ -20,10 +20,14 @@ const readPackageJson = (dir: string): PackageJson | null => {
   }
 }
 
+/** Escape special regex characters except `*` which we handle separately. */
+const escapeRegExp = (s: string): string =>
+  s.replace(/[.+?^${}()|[\]\\]/g, '\\$&')
+
 const matchesAny = (name: string, patterns: string[]): boolean =>
   patterns.some((p) => {
     if (p.includes('*')) {
-      const regex = new RegExp(`^${p.replace(/\*/g, '.*')}$`)
+      const regex = new RegExp(`^${escapeRegExp(p).replace(/\*/g, '.*')}$`)
       return regex.test(name)
     }
     return name === p || name.includes(p)
@@ -32,7 +36,9 @@ const matchesAny = (name: string, patterns: string[]): boolean =>
 export const scanWorkspace = (config: AtlasConfig): DepGraph => {
   const cwd = process.cwd()
   const dirs = config.workspaces.flatMap((pattern) => {
-    const base = resolve(cwd, pattern.replace(/\/?\*.*$/, ''))
+    const starIdx = pattern.indexOf('*')
+    const stripped = starIdx >= 0 ? pattern.slice(0, starIdx) : pattern
+    const base = resolve(cwd, stripped.replace(/\/+$/, ''))
     try {
       return readdirSync(base)
         .map((entry) => join(base, entry))
