@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import type { DepGraph, VersionDriftResult } from '../types'
+import type { DepGraph, VersionDriftResult } from '../types.js'
 
 export const detectVersionDrift = (graph: DepGraph): VersionDriftResult => {
   // Map: external dep name -> { version -> [packages using this version] }

@@ -15,6 +15,7 @@
     "packages/*"
   ],
   "scripts": {
+    "prepare": "git config core.hooksPath .githooks",
     "release": "lerna publish --force-publish",
     "pkgs:clean": "rm -rf node_modules/ bun.lock && bun install",
     "pkgs:build": "lerna run build --stream",

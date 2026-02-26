@@ -1,4 +1,4 @@
-import type { CycleResult, DepGraph } from '../types'
+import type { CycleResult, DepGraph } from '../types.js'
 
 const WHITE = 0
 const GRAY = 1

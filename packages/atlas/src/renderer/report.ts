@@ -1,4 +1,4 @@
-import type { AnalysisData, DepType } from '../types'
+import type { AnalysisData, DepType } from '../types.js'
 
 interface ReportJson {
   summary: {

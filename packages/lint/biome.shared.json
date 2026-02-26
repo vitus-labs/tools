@@ -76,7 +76,7 @@
         "noEmptyBlockStatements": "warn"
       },
       "security": {
-        "noDangerouslySetInnerHtml": "off"
+        "noDangerouslySetInnerHtml": "error"
       },
       "performance": {
         "noAccumulatingSpread": "off"

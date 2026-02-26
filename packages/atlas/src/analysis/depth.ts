@@ -1,4 +1,4 @@
-import type { CycleResult, DepGraph, DepthResult } from '../types'
+import type { CycleResult, DepGraph, DepthResult } from '../types.js'
 
 export const analyzeDepth = (
   graph: DepGraph,

@@ -1,4 +1,4 @@
-import type { AnalysisData, AtlasConfig } from '../types'
+import type { AnalysisData, AtlasConfig } from '../types.js'
 
 export const buildHtml = (data: AnalysisData, config: AtlasConfig): string => {
   const graphJson = JSON.stringify(data)
