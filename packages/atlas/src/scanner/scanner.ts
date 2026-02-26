@@ -38,7 +38,10 @@ export const scanWorkspace = (config: AtlasConfig): DepGraph => {
   const dirs = config.workspaces.flatMap((pattern) => {
     const starIdx = pattern.indexOf('*')
     const stripped = starIdx >= 0 ? pattern.slice(0, starIdx) : pattern
-    const base = resolve(cwd, stripped.replace(/\/+$/, ''))
+    // Strip trailing slashes without regex (avoids polynomial-regex CodeQL alert)
+    let trimmed = stripped
+    while (trimmed.endsWith('/')) trimmed = trimmed.slice(0, -1)
+    const base = resolve(cwd, trimmed)
     try {
       return readdirSync(base)
         .map((entry) => join(base, entry))

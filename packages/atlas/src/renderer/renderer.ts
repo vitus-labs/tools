@@ -8,10 +8,10 @@ import { buildHtml } from './template'
 
 const openFile = (filePath: string) => {
   const os = platform()
-  const cmd = os === 'darwin' ? 'open' : os === 'win32' ? 'cmd' : 'xdg-open'
-  const args = os === 'win32' ? ['/c', 'start', '""', filePath] : [filePath]
+  const cmd =
+    os === 'darwin' ? 'open' : os === 'win32' ? 'explorer' : 'xdg-open'
 
-  execFile(cmd, args, () => {})
+  execFile(cmd, [filePath], () => {})
 }
 
 export const renderGraph = async (
