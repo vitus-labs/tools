@@ -25,6 +25,10 @@ vi.mock('../config/index.js', () => ({
       themes: true,
       vitest: true,
     },
+    rocketstories: {
+      module: '@vitus-labs/rocketstories',
+      export: 'rocketstories',
+    },
     port: 6006,
   },
 }))
@@ -129,6 +133,55 @@ describe('storybook main config', () => {
     const result = await wrappedCsf.createIndex(rocketstoriesFile, {})
     expect(result).toEqual([])
     expect(mockCsfIndexer.createIndex).not.toHaveBeenCalled()
+  })
+
+  it('should add esbuild mock plugin for next framework', async () => {
+    // Re-import with 'next' framework — need to reset modules first
+    vi.resetModules()
+    vi.doMock('node:fs/promises', () => ({ readFile: vi.fn() }))
+    vi.doMock('vite-tsconfig-paths', () => ({
+      default: vi.fn(() => ({ name: 'mock-tsconfig-paths' })),
+    }))
+    vi.doMock('../config/index.js', () => ({
+      CONFIG: {
+        storiesDir: ['/src/**/*.stories.tsx'],
+        framework: 'next',
+        addons: {},
+        rocketstories: {
+          module: '@vitus-labs/rocketstories',
+          export: 'rocketstories',
+        },
+        port: 6006,
+      },
+    }))
+
+    const { default: nextConfig } = await import('./main.js')
+    const viteConfig: any = { define: {}, plugins: [] }
+
+    await nextConfig.viteFinal?.(viteConfig, {} as any)
+
+    const esbuildPlugins =
+      viteConfig.optimizeDeps?.esbuildOptions?.plugins ?? []
+    expect(esbuildPlugins).toHaveLength(1)
+    expect(esbuildPlugins[0].name).toBe('storybook-next-font-mock')
+
+    // Verify the plugin resolves next/font
+    const resolvers: any[] = []
+    const loaders: any[] = []
+    esbuildPlugins[0].setup({
+      onResolve: (_opts: any, fn: any) => resolvers.push({ ..._opts, fn }),
+      onLoad: (_opts: any, fn: any) => loaders.push({ ..._opts, fn }),
+    })
+
+    expect(resolvers).toHaveLength(1)
+    expect(loaders).toHaveLength(1)
+
+    const fontResult = resolvers[0].fn({ path: 'next/font/local' })
+    expect(fontResult.namespace).toBe('next-font-mock')
+
+    const loadResult = loaders[0].fn()
+    expect(loadResult.contents).toContain('fontMock')
+    expect(loadResult.loader).toBe('js')
   })
 
   it('should let wrapped indexers handle standard CSF files', async () => {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import getConfig from './config.js'
+import getConfig from './config'
 
 describe('getConfig', () => {
   it('should return default config when called without arguments', () => {

@@ -1,4 +1,4 @@
-import type { OptimizedImagesConfig } from './types.js'
+import type { OptimizedImagesConfig } from './types'
 
 /**
  * Enriches the next-optimized-images configuration object with default config values

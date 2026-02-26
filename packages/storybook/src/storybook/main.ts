@@ -29,7 +29,7 @@ const ADDONS_MAP: Record<string, string> = {
 
 const resolveFramework = (key: string): StorybookConfig['framework'] =>
   key === 'next'
-    ? { name: '@storybook/nextjs', options: {} }
+    ? { name: '@storybook/nextjs-vite', options: {} }
     : { name: '@storybook/react-vite', options: {} }
 
 const autoDiscoveryIndexer = createAutoDiscoveryIndexer()
@@ -82,10 +82,51 @@ const STORYBOOK_CONFIG: StorybookConfig = {
     config.define.__CLIENT__ = JSON.stringify(true)
     config.define.__VITUS_LABS_STORIES__ = JSON.stringify(CONFIG)
 
+    // When using Next.js framework, mock next/font during Vite's dep
+    // pre-bundling. npm font packages (e.g. `geist`) import
+    // `next/font/local` internally — without this esbuild plugin, the
+    // real Next.js module gets baked into the pre-bundled chunk,
+    // bypassing @storybook/nextjs-vite's runtime mocks.
+    if (CONFIG.framework === 'next') {
+      if (!config.optimizeDeps) {
+        config.optimizeDeps = {}
+      }
+      if (!config.optimizeDeps.esbuildOptions) {
+        config.optimizeDeps.esbuildOptions = {}
+      }
+      if (!config.optimizeDeps.esbuildOptions.plugins) {
+        config.optimizeDeps.esbuildOptions.plugins = []
+      }
+
+      const FONT_MOCK = [
+        'export default function fontMock() {',
+        "  return { className: '__mocked_font', style: { fontFamily: 'mocked' } }",
+        '}',
+      ].join('\n')
+
+      config.optimizeDeps.esbuildOptions.plugins.push({
+        name: 'storybook-next-font-mock',
+        setup(build) {
+          const filter =
+            /^(next\/font\/(local|google)|@next\/font\/(local|google))$/
+
+          build.onResolve({ filter }, (args) => ({
+            path: args.path,
+            namespace: 'next-font-mock',
+          }))
+
+          build.onLoad({ filter: /.*/, namespace: 'next-font-mock' }, () => ({
+            contents: FONT_MOCK,
+            loader: 'js',
+          }))
+        },
+      })
+    }
+
     // VITE PLUGINS
     config.plugins?.push(
       tsconfigPaths({ root: process.cwd() }),
-      rocketstoriesVitePlugin(),
+      rocketstoriesVitePlugin(CONFIG.rocketstories),
     )
 
     return config

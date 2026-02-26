@@ -5,8 +5,8 @@ import type {
   NextConfig,
   OptimizedImagesConfig,
   WebpackConfig,
-} from '../types.js'
-import { getFileLoaderOptions } from './file-loader.js'
+} from '../types'
+import { getFileLoaderOptions } from './file-loader'
 
 // createRequire needed here for synchronous module loading (sharp adapter)
 const require = createRequire(import.meta.url)

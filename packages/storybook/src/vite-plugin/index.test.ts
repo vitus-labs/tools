@@ -9,8 +9,13 @@ import { rocketstoriesVitePlugin } from './index.js'
 
 const mockReadFile = vi.mocked(readFile)
 
+const defaultConfig = {
+  module: '@vitus-labs/rocketstories',
+  export: 'rocketstories',
+}
+
 describe('rocketstoriesVitePlugin', () => {
-  const plugin = rocketstoriesVitePlugin()
+  const plugin = rocketstoriesVitePlugin(defaultConfig)
 
   it('should have correct name', () => {
     expect(plugin.name).toBe('vite-plugin-rocketstories')
@@ -78,7 +83,7 @@ describe('rocketstoriesVitePlugin', () => {
       )
       expect(result).toContain('rocketstories(Component)')
       expect(result).toContain("label: 'Badge'")
-      expect(result).toContain('export default stories.init()')
+      expect(result).toContain('export default stories.init')
       expect(result).toContain('export const Default = stories.main()')
       expect(result).toContain(
         "export const States = stories.dimension('state')",
@@ -114,6 +119,29 @@ describe('rocketstoriesVitePlugin', () => {
       expect(result).toContain(
         "'normal', 'hover', 'focus', 'active', 'disabled'",
       )
+    })
+
+    it('should use custom rocketstories module and export', async () => {
+      const customPlugin = rocketstoriesVitePlugin({
+        module: '@my-org/tools-rocketstories',
+        export: 'storyOf',
+      })
+      const customLoad = customPlugin.load as (
+        id: string,
+      ) => Promise<string | undefined>
+
+      mockReadFile.mockResolvedValue(`
+        export default component.config({ name: 'Badge' }).theme(t)
+      `)
+
+      const result = await customLoad(
+        '\0virtual:rocketstory:/project/src/Badge/index.tsx',
+      )
+
+      expect(result).toContain(
+        "import { storyOf } from '@my-org/tools-rocketstories'",
+      )
+      expect(result).toContain('storyOf(Component)')
     })
   })
 })

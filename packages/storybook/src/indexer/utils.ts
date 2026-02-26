@@ -6,7 +6,7 @@ import { glob } from 'tinyglobby'
  * Check if file uses the rocketstories pattern (stories.init() default export)
  */
 export const isRocketstoriesPattern = (code: string): boolean =>
-  /export\s+default\s+\w+\.init\(\)/.test(code)
+  /export\s+default\s+\w+\.init\b/.test(code)
 
 /**
  * Check if a file exports a rocketstyle component.

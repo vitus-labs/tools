@@ -1,5 +1,5 @@
-import type { NextConfig, OptimizedImagesConfig } from '../../types.js'
-import { getFileLoaderOptions } from '../file-loader.js'
+import type { NextConfig, OptimizedImagesConfig } from '../../types'
+import { getFileLoaderOptions } from '../file-loader'
 
 /**
  * Build options for the webpack lqip loader.

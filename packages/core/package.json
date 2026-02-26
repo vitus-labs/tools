@@ -24,6 +24,9 @@
   "publishConfig": {
     "access": "public"
   },
+  "files": [
+    "lib/"
+  ],
   "scripts": {
     "prepublish": "bun run build",
     "build": "tsc",

@@ -48,8 +48,9 @@ const CONFIG: Record<string, any> = {
       },
     },
   },
-  decorators: {
-    theme: {},
+  rocketstories: {
+    module: '@vitus-labs/rocketstories',
+    export: 'rocketstories',
   },
 }
 

@@ -6,7 +6,7 @@ import type {
   NextConfig,
   OptimizedImagesConfig,
   WebpackConfig,
-} from '../types.js'
+} from '../types'
 
 /**
  * Build options for the webpack file loader.

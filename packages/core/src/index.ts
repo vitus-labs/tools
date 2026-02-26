@@ -28,6 +28,9 @@ const deepMerge = (
   const result = { ...target }
 
   for (const key of Object.keys(source)) {
+    if (key === '__proto__' || key === 'constructor' || key === 'prototype')
+      continue
+
     const srcVal = source[key]
     const tgtVal = result[key]
 

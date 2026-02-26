@@ -1,0 +1,45 @@
+{
+  "name": "@vitus-labs/tools-vitest",
+  "version": "1.9.0",
+  "license": "MIT",
+  "author": "Vit Bokisch <vit@bokisch.com>",
+  "maintainers": [
+    "Vit Bokisch <vit@bokisch.com>"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vitus-labs/tools",
+    "directory": "packages/vitest"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./lib/index.js",
+      "types": "./lib/types/index.d.ts"
+    }
+  },
+  "types": "./lib/types/index.d.ts",
+  "engines": {
+    "node": ">= 22"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "lib/"
+  ],
+  "scripts": {
+    "prepublish": "bun run build",
+    "build": "rm -rf lib && tsc",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@vitus-labs/tools-typescript": "1.9.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
+  },
+  "peerDependencies": {
+    "vite": ">=6",
+    "vitest": ">=4"
+  }
+}
