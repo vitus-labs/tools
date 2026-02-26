@@ -16,6 +16,23 @@
         "vitest": "^4.0.18",
       },
     },
+    "packages/atlas": {
+      "name": "@vitus-labs/tools-atlas",
+      "version": "1.9.0",
+      "bin": {
+        "vl_atlas": "./lib/bin/run-atlas.js",
+      },
+      "dependencies": {
+        "@vitus-labs/tools-core": "1.9.0",
+        "commander": "^13.0.0",
+        "tinyglobby": "^0.2.15",
+      },
+      "devDependencies": {
+        "@vitus-labs/tools-typescript": "1.9.0",
+        "@vitus-labs/tools-vitest": "1.9.0",
+        "typescript": "^5.9.3",
+      },
+    },
     "packages/core": {
       "name": "@vitus-labs/tools-core",
       "version": "1.9.0",
@@ -191,6 +208,7 @@
         "vitest": "^4.0.18",
       },
       "peerDependencies": {
+        "vite": ">=6",
         "vitest": ">=4",
       },
     },
@@ -780,6 +798,8 @@
 
     "@vitest/utils": ["@vitest/utils@4.0.18", "", { "dependencies": { "@vitest/pretty-format": "4.0.18", "tinyrainbow": "^3.0.3" } }, "sha512-msMRKLMVLWygpK3u2Hybgi4MNjcYJvwTb0Ru09+fOyCXIgT5raYP041DRRdiJiI3k/2U6SEbAETB3YtBrUkCFA=="],
 
+    "@vitus-labs/tools-atlas": ["@vitus-labs/tools-atlas@workspace:packages/atlas"],
+
     "@vitus-labs/tools-core": ["@vitus-labs/tools-core@workspace:packages/core"],
 
     "@vitus-labs/tools-favicon": ["@vitus-labs/tools-favicon@workspace:packages/favicon"],
@@ -1004,7 +1024,7 @@
 
     "combined-stream": ["combined-stream@1.0.8", "", { "dependencies": { "delayed-stream": "~1.0.0" } }, "sha512-FQN4MRfuJeHf7cBbBMJFXhKSDq+2kAArBlmRBvcvFE5BB1HZKXtSFASDhdlz9zOYwxh8lDdnvmMOe/+5cdoEdg=="],
 
-    "commander": ["commander@2.20.3", "", {}, "sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ=="],
+    "commander": ["commander@13.1.0", "", {}, "sha512-/rFeCpNJQbhSZjGVwO9RFV3xPqbnERS8MmIQzCtD/zl6gpJuV/bMLuN92oG3F7d8oDEHHRrujSXNUr8fpjntKw=="],
 
     "common-ancestor-path": ["common-ancestor-path@1.0.1", "", {}, "sha512-L3sHRo1pXXEqX8VU28kfgUY+YGsk09hPqZiZmLacNib6XNTCM8ubYeT7ryXQw8asB1sKgcU5lkB7ONug08aB8w=="],
 
@@ -2397,6 +2417,8 @@
     "storybook/open": ["open@10.2.0", "", { "dependencies": { "default-browser": "^5.2.1", "define-lazy-prop": "^3.0.0", "is-inside-container": "^1.0.0", "wsl-utils": "^0.1.0" } }, "sha512-YgBpdJHPyQ2UE5x+hlSXcnejzAvD0b22U2OuAP+8OnlJT+PjWPxtgmGqKKc+RgTM63U9gN0YzrYc71R2WT/hTA=="],
 
     "storybook/semver": ["semver@7.7.4", "", { "bin": { "semver": "bin/semver.js" } }, "sha512-vFKC2IEtQnVhpT78h1Yp8wzwrf8CM+MzKMHGJZfBtzhZNycRFnXsHk6E5TxIkkMsgNS7mdX3AGB7x2QM2di4lA=="],
+
+    "terser/commander": ["commander@2.20.3", "", {}, "sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ=="],
 
     "terser-webpack-plugin/schema-utils": ["schema-utils@4.3.3", "", { "dependencies": { "@types/json-schema": "^7.0.9", "ajv": "^8.9.0", "ajv-formats": "^2.1.1", "ajv-keywords": "^5.1.0" } }, "sha512-eflK8wEtyOE6+hsaRVPxvUKYCpRgzLqDTb8krvAsRIwOGlHoSgYLgBXoubGgLd2fT41/OUYdb48v4k4WWHQurA=="],
 

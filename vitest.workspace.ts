@@ -10,4 +10,5 @@ export default defineWorkspace([
   'packages/typescript',
   'packages/nextjs',
   'packages/nextjs-images',
+  'packages/atlas',
 ])

@@ -1,11 +1,11 @@
 {
-  "name": "@vitus-labs/tools-vitest",
+  "name": "@vitus-labs/tools-atlas",
   "version": "1.9.0",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/vitus-labs/tools",
-    "directory": "packages/vitest"
+    "directory": "packages/atlas"
   },
   "type": "module",
   "exports": {
@@ -14,7 +14,9 @@
       "types": "./lib/types/index.d.ts"
     }
   },
-  "types": "./lib/types/index.d.ts",
+  "bin": {
+    "vl_atlas": "./lib/bin/run-atlas.js"
+  },
   "engines": {
     "node": ">= 22"
   },
@@ -29,13 +31,14 @@
     "build": "rm -rf lib && tsc",
     "typecheck": "tsc --noEmit"
   },
+  "dependencies": {
+    "@vitus-labs/tools-core": "1.9.0",
+    "commander": "^13.0.0",
+    "tinyglobby": "^0.2.15"
+  },
   "devDependencies": {
     "@vitus-labs/tools-typescript": "1.9.0",
-    "typescript": "^5.9.3",
-    "vitest": "^4.0.18"
-  },
-  "peerDependencies": {
-    "vite": ">=6",
-    "vitest": ">=4"
+    "@vitus-labs/tools-vitest": "1.9.0",
+    "typescript": "^5.9.3"
   }
 }
