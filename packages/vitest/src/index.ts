@@ -1,4 +1,3 @@
-import type { PluginOption } from 'vite'
 import { configDefaults, defineConfig } from 'vitest/config'
 
 export interface CoverageThresholds {
@@ -14,7 +13,7 @@ export interface VitestConfigOptions {
   /** Override default 90% coverage thresholds */
   coverageThresholds?: CoverageThresholds
   /** Vite plugins (e.g. tilde resolve, tsconfig paths) */
-  plugins?: PluginOption[]
+  plugins?: any[]
   /** Setup files to run before each test (e.g. '@testing-library/jest-dom/vitest') */
   setupFiles?: string[]
   /** Test environment — 'node' (default), 'jsdom', 'happy-dom', etc. */
