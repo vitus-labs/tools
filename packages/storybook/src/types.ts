@@ -1,5 +1,5 @@
 export interface StoriesConfig {
-  framework?: 'vite' | 'next'
+  framework?: 'vite' | 'next' | 'react-native'
   outDir?: string
   port?: number
   storiesDir?: string[]

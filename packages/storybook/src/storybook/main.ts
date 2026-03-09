@@ -27,10 +27,12 @@ const ADDONS_MAP: Record<string, string> = {
   vitest: '@storybook/addon-vitest',
 }
 
-const resolveFramework = (key: string): StorybookConfig['framework'] =>
-  key === 'next'
-    ? { name: '@storybook/nextjs-vite', options: {} }
-    : { name: '@storybook/react-vite', options: {} }
+const resolveFramework = (key: string): StorybookConfig['framework'] => {
+  if (key === 'next') {
+    return { name: '@storybook/nextjs-vite', options: {} }
+  }
+  return { name: '@storybook/react-vite', options: {} }
+}
 
 const autoDiscoveryIndexer = createAutoDiscoveryIndexer()
 
@@ -75,12 +77,37 @@ const STORYBOOK_CONFIG: StorybookConfig = {
       config.define = {}
     }
 
+    const isReactNative = CONFIG.framework === 'react-native'
+
     config.define.__BROWSER__ = JSON.stringify(true)
-    config.define.__NATIVE__ = JSON.stringify(false)
-    config.define.__NODE__ = JSON.stringify(true)
-    config.define.__WEB__ = JSON.stringify(true)
+    config.define.__NATIVE__ = JSON.stringify(isReactNative)
+    config.define.__NODE__ = JSON.stringify(false)
+    config.define.__WEB__ = JSON.stringify(!isReactNative)
     config.define.__CLIENT__ = JSON.stringify(true)
     config.define.__VITUS_LABS_STORIES__ = JSON.stringify(CONFIG)
+
+    // Platform-specific extension resolution.
+    // RN projects: prefer .native.* files, alias react-native to react-native-web.
+    // Web projects (vite/next): prefer .web.* files when RN libs are used.
+    if (!config.resolve) {
+      config.resolve = {}
+    }
+
+    const platformExtensions = isReactNative
+      ? ['.native.tsx', '.native.ts', '.native.jsx', '.native.js']
+      : ['.web.tsx', '.web.ts', '.web.jsx', '.web.js']
+
+    config.resolve.extensions = [
+      ...platformExtensions,
+      ...(config.resolve.extensions ?? ['.tsx', '.ts', '.jsx', '.js', '.json']),
+    ]
+
+    if (isReactNative) {
+      config.resolve.alias = {
+        ...((config.resolve.alias as Record<string, string>) ?? {}),
+        'react-native': 'react-native-web',
+      }
+    }
 
     // When using Next.js framework, mock next/font during Vite's dep
     // pre-bundling. npm font packages (e.g. `geist`) import

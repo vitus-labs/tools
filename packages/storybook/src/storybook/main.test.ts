@@ -75,7 +75,7 @@ describe('storybook main config', () => {
 
     expect(result.define.__BROWSER__).toBe('true')
     expect(result.define.__NATIVE__).toBe('false')
-    expect(result.define.__NODE__).toBe('true')
+    expect(result.define.__NODE__).toBe('false')
     expect(result.define.__WEB__).toBe('true')
     expect(result.define.__CLIENT__).toBe('true')
     expect(result.define.__VITUS_LABS_STORIES__).toBeDefined()
@@ -92,6 +92,20 @@ describe('storybook main config', () => {
       'name',
       'vite-plugin-rocketstories',
     )
+  })
+
+  it('should add .web.* extensions for vite framework', async () => {
+    const viteConfig: any = { define: {}, plugins: [] }
+
+    const result = (await STORYBOOK_CONFIG.viteFinal?.(
+      viteConfig,
+      {} as any,
+    )) as any
+
+    expect(result.resolve.extensions[0]).toBe('.web.tsx')
+    expect(result.resolve.extensions[1]).toBe('.web.ts')
+    expect(result.resolve.extensions[2]).toBe('.web.jsx')
+    expect(result.resolve.extensions[3]).toBe('.web.js')
   })
 
   it('should handle viteFinal when define already exists', async () => {
@@ -182,6 +196,50 @@ describe('storybook main config', () => {
     const loadResult = loaders[0].fn()
     expect(loadResult.contents).toContain('fontMock')
     expect(loadResult.loader).toBe('js')
+  })
+
+  it('should alias react-native to react-native-web for react-native framework', async () => {
+    vi.resetModules()
+    vi.doMock('node:fs/promises', () => ({ readFile: vi.fn() }))
+    vi.doMock('vite-tsconfig-paths', () => ({
+      default: vi.fn(() => ({ name: 'mock-tsconfig-paths' })),
+    }))
+    vi.doMock('../config/index.js', () => ({
+      CONFIG: {
+        storiesDir: ['/src/**/*.stories.tsx'],
+        framework: 'react-native',
+        addons: {},
+        rocketstories: {
+          module: '@vitus-labs/rocketstories',
+          export: 'rocketstories',
+        },
+        port: 6006,
+      },
+    }))
+
+    const { default: rnConfig } = await import('./main.js')
+    const viteConfig: any = { define: {}, plugins: [] }
+
+    const result = (await rnConfig.viteFinal?.(viteConfig, {} as any)) as any
+
+    // Should alias react-native to react-native-web
+    expect(result.resolve.alias['react-native']).toBe('react-native-web')
+
+    // Should add .native.* extensions first (not .web.*)
+    expect(result.resolve.extensions[0]).toBe('.native.tsx')
+    expect(result.resolve.extensions[1]).toBe('.native.ts')
+    expect(result.resolve.extensions[2]).toBe('.native.jsx')
+    expect(result.resolve.extensions[3]).toBe('.native.js')
+
+    // Should set __NATIVE__ to true and __WEB__ to false
+    expect(result.define.__NATIVE__).toBe('true')
+    expect(result.define.__WEB__).toBe('false')
+
+    // Should still use react-vite framework
+    expect(rnConfig.framework).toEqual({
+      name: '@storybook/react-vite',
+      options: {},
+    })
   })
 
   it('should let wrapped indexers handle standard CSF files', async () => {
