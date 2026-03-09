@@ -43,7 +43,17 @@
   },
   "peerDependencies": {
     "react": ">=19",
-    "react-dom": ">=19"
+    "react-dom": ">=19",
+    "react-native": ">=0.74",
+    "react-native-web": ">=0.19"
+  },
+  "peerDependenciesMeta": {
+    "react-native": {
+      "optional": true
+    },
+    "react-native-web": {
+      "optional": true
+    }
   },
   "dependencies": {
     "@chromatic-com/storybook": "^5.0.1",
@@ -54,6 +64,7 @@
     "@storybook/addon-vitest": "^10.2.16",
     "@storybook/nextjs-vite": "^10.2.16",
     "@storybook/react": "^10.2.16",
+    "@storybook/react-native": "^10.2.3",
     "@storybook/react-vite": "^10.2.16",
     "@vitus-labs/tools-core": "1.9.0",
     "@vueless/storybook-dark-mode": "^10.0.7",

@@ -1,6 +1,6 @@
 # @vitus-labs/tools-storybook
 
-Preconfigured [Storybook 10](https://storybook.js.org) setup for React projects with Vite or Next.js.
+Preconfigured [Storybook 10](https://storybook.js.org) setup for React projects with Vite, Next.js, or React Native.
 
 Includes auto-discovery of components, rocketstories integration, and curated addon presets.
 
@@ -11,6 +11,8 @@ bun add -d @vitus-labs/tools-storybook
 ```
 
 **Peer dependencies:** `react >= 19`, `react-dom >= 19`
+
+For React Native projects, also install: `react-native >= 0.74`, `react-native-web >= 0.19`
 
 ## Usage
 
@@ -74,6 +76,7 @@ The Vite plugin generates story imports from a configurable rocketstories module
 
 - `vite` — uses `@storybook/react-vite` (default)
 - `next` — uses `@storybook/nextjs-vite` with `next/font` mocking
+- `react-native` — uses `@storybook/react-vite` with `react-native-web` aliasing and `.web.*` extension priority
 
 ### Included addons
 
