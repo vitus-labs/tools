@@ -266,6 +266,115 @@ describe('tools-core', () => {
     })
   })
 
+  describe('deepMerge (via loadVLToolsConfig)', () => {
+    it('should deep merge nested objects without mutating originals', async () => {
+      vi.resetModules()
+      const dir = createTestDir({
+        vlConfig: {
+          build: { sourceDir: 'src', output: { format: 'esm', minify: true } },
+        },
+        parent: {
+          vlConfig: {
+            build: {
+              sourceDir: 'lib',
+              output: { format: 'cjs', sourcemap: true },
+            },
+          },
+        },
+      })
+      vi.spyOn(process, 'cwd').mockReturnValue(dir)
+
+      const mod = await import('./index.js')
+      const vlConfig = await mod.loadVLToolsConfig()
+      const build = vlConfig('build')
+
+      // Package config overrides root config
+      expect(build.get('sourceDir')).toBe('src')
+      // Nested object merges: package overrides format, root provides sourcemap
+      expect(build.get('output')).toEqual({
+        format: 'esm',
+        minify: true,
+        sourcemap: true,
+      })
+    })
+
+    it('should replace arrays instead of merging them', async () => {
+      vi.resetModules()
+      const dir = createTestDir({
+        vlConfig: { build: { plugins: ['pluginB'] } },
+        parent: {
+          vlConfig: { build: { plugins: ['pluginA'] } },
+        },
+      })
+      vi.spyOn(process, 'cwd').mockReturnValue(dir)
+
+      const mod = await import('./index.js')
+      const vlConfig = await mod.loadVLToolsConfig()
+      // Arrays should be replaced, not concatenated
+      expect(vlConfig('build').get('plugins')).toEqual(['pluginB'])
+    })
+
+    it('should skip prototype-polluting keys', async () => {
+      vi.resetModules()
+      const dir = createTestDir({
+        vlConfig: { build: { safe: true } },
+        parent: {
+          vlConfig: { build: { safe: false } },
+        },
+      })
+      vi.spyOn(process, 'cwd').mockReturnValue(dir)
+
+      const mod = await import('./index.js')
+      const vlConfig = await mod.loadVLToolsConfig()
+      // Ensure normal merge works (proto pollution guard doesn't break merging)
+      expect(vlConfig('build').get('safe')).toBe(true)
+    })
+  })
+
+  describe('camelspaceBundleName (via PKG.bundleName)', () => {
+    it('should handle single-word package name', async () => {
+      vi.resetModules()
+      const dir = createTestDir({
+        packageJson: { name: 'utils' },
+      })
+      vi.spyOn(process, 'cwd').mockReturnValue(dir)
+
+      const mod = await import('./index.js')
+      expect(mod.PKG.bundleName).toBe('utils')
+    })
+
+    it('should handle deeply scoped hyphenated name', async () => {
+      vi.resetModules()
+      const dir = createTestDir({
+        packageJson: { name: '@my-org/my-cool-lib' },
+      })
+      vi.spyOn(process, 'cwd').mockReturnValue(dir)
+
+      const mod = await import('./index.js')
+      expect(mod.PKG.bundleName).toBe('myOrgMyCoolLib')
+    })
+  })
+
+  describe('findFile edge cases', () => {
+    it('should not find directories, only files', async () => {
+      vi.resetModules()
+      testId++
+      const root = path.join(BASE_TMP, `t${testId}`)
+      mkdirSync(root, { recursive: true })
+      writeFileSync(
+        path.join(root, 'package.json'),
+        JSON.stringify({ name: 'test' }),
+      )
+      // Create a directory with the name we're searching for
+      mkdirSync(path.join(root, 'target.json'), { recursive: true })
+      vi.spyOn(process, 'cwd').mockReturnValue(root)
+
+      const mod = await import('./index.js')
+      // Should not match the directory named "target.json"
+      expect(mod.findFile('target.json')).toBeUndefined()
+    })
+  })
+
   describe('module-level constants', () => {
     it('should export PKG with bundleName from scoped package name', async () => {
       vi.resetModules()

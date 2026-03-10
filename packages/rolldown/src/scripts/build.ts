@@ -45,20 +45,24 @@ const createBuilds = async () => {
     p = p.then(() => {
       const start = performance.now()
 
-      return build({ inputOptions: input, outputOptions: output }).then(() => {
-        const duration = Math.round(performance.now() - start)
-        log(
-          `  ${chalk.green('+')} ${bold(format)} ${dim('->')} ${dim(`${output.dir}/${output.entryFileNames}`)} ${dim(`(${duration}ms)`)}`,
-        )
-      })
+      return build({ inputOptions: input, outputOptions: output })
+        .then(() => {
+          const duration = Math.round(performance.now() - start)
+          log(
+            `  ${chalk.green('+')} ${bold(format)} ${dim('->')} ${dim(`${output.dir}/${output.entryFileNames}`)} ${dim(`(${duration}ms)`)}`,
+          )
+        })
+        .catch((e) => {
+          log(`\n${chalk.bold.red('Build failed')}`)
+          log(chalk.gray(`  Format: ${format}`))
+          log(chalk.gray(`  File:   ${output.dir}/${output.entryFileNames}`))
+          log(e)
+          throw e
+        })
     })
   })
 
-  return p.catch((e) => {
-    log(`\n${chalk.bold.red('Build failed')}\n`)
-    log(e)
-    throw e
-  })
+  return p
 }
 
 const runBuild = async () => {

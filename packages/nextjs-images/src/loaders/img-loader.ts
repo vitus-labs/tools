@@ -12,12 +12,13 @@ import { getSvgSpriteLoaderResourceQuery } from './svg-sprite-loader/index'
 import { getUrlLoaderOptions } from './url-loader'
 import { getWebpResourceQuery } from './webp-loader'
 
-// Dynamic import wrapper invisible to webpack's static analysis,
-// avoiding PackFileCacheStrategy build dependency warnings.
-const dynamicImport = new Function(
-  'moduleName',
-  'return import(moduleName)',
-) as (moduleName: string) => Promise<Record<string, unknown>>
+// Wrapper that hides the import() from webpack's static analysis
+// using the official webpackIgnore magic comment, avoiding
+// PackFileCacheStrategy build dependency warnings.
+const dynamicImport = (moduleName: string): Promise<Record<string, unknown>> =>
+  import(/* webpackIgnore: true */ moduleName) as Promise<
+    Record<string, unknown>
+  >
 
 /**
  * Dynamically imports an imagemin plugin and configures it.
@@ -32,9 +33,10 @@ const importImageminPlugin = async (
   let moduleName = plugin
 
   if (nextConfig.overwriteImageLoaderPaths) {
+    const normalizedPath = path.resolve(nextConfig.overwriteImageLoaderPaths)
     moduleName = import.meta.resolve(
       plugin,
-      pathToFileURL(path.join(nextConfig.overwriteImageLoaderPaths, '_')).href,
+      pathToFileURL(path.join(normalizedPath, '_')).href,
     )
   }
 

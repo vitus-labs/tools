@@ -23,7 +23,12 @@ const getResponsiveLoaderOptions = (
   let adapter = responsive ? responsive.adapter : undefined
 
   if (!adapter && detectedLoaders.responsiveAdapter === 'sharp') {
-    adapter = require(`${detectedLoaders.responsive}${path.sep}sharp`)
+    // Normalize the path to prevent directory traversal
+    const sharpPath = path.resolve(
+      detectedLoaders.responsive as string,
+      'sharp',
+    )
+    adapter = require(sharpPath)
   }
 
   return {

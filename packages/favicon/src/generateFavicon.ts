@@ -18,12 +18,8 @@ const handleSuccess = (outputPath: string, response: any) => {
   })
 }
 
-const handleError = (error: any) => {
-  console.log(error.message) // Error description e.g. "An unknown error has occurred"
-}
-
-const generateFavicons = () =>
-  Promise.all(
+const generateFavicons = async () => {
+  const results = await Promise.allSettled(
     icons.map((item: any) => {
       const inputPath = `${process.cwd()}/${item.input}`
       const outputPath = `${process.cwd()}/${item.output}/`
@@ -31,11 +27,20 @@ const generateFavicons = () =>
       return favicons(inputPath, {
         ...restConfig,
         path: `${path}/${item.path}`,
-      }).then(
-        (res) => handleSuccess(outputPath, res),
-        (err) => handleError(err),
-      )
+      }).then((res) => handleSuccess(outputPath, res))
     }),
   )
+
+  const failures = results.filter(
+    (r): r is PromiseRejectedResult => r.status === 'rejected',
+  )
+
+  if (failures.length > 0) {
+    for (const f of failures) {
+      console.error(`[favicon] ${f.reason?.message ?? f.reason}`)
+    }
+    throw new Error(`${failures.length} favicon generation(s) failed`)
+  }
+}
 
 export { generateFavicons }
