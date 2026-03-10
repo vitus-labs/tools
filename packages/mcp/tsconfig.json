@@ -1,0 +1,12 @@
+{
+  "extends": "@vitus-labs/tools-typescript/lib",
+  "compilerOptions": {
+    "noEmit": false,
+    "outDir": "lib",
+    "rootDir": "src",
+    "baseUrl": ".",
+    "declarationDir": "./lib/types"
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "lib", "**/*.test.ts"]
+}

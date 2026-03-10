@@ -11,4 +11,5 @@ export default defineWorkspace([
   'packages/nextjs',
   'packages/nextjs-images',
   'packages/atlas',
+  'packages/mcp',
 ])
