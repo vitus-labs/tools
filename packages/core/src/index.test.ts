@@ -1,9 +1,9 @@
-import { mkdirSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
-const BASE_TMP = path.join(tmpdir(), `vl-core-test-${Date.now()}`)
+const BASE_TMP = mkdtempSync(path.join(tmpdir(), 'vl-core-test-'))
 let testId = 0
 
 const createTestDir = (opts: {
