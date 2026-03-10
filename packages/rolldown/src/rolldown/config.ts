@@ -101,12 +101,17 @@ const rolldownConfig = ({
       format,
       globals: swapGlobals(CONFIG.globals),
       sourcemap: true,
+      sourcemapIgnoreList: (relativeSourcePath: string) =>
+        relativeSourcePath.includes('node_modules'),
       exports: ['cjs', 'umd'].includes(format) ? ('named' as const) : undefined,
       name: ['umd', 'iife'].includes(format) ? PKG.bundleName : undefined,
       esModule: true,
       minify: env === 'production',
     },
     external: [...PKG.externalDependencies, ...CONFIG.external],
+    treeshake: {
+      moduleSideEffects: false,
+    },
     plugins,
   }
 

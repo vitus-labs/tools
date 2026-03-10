@@ -46,19 +46,23 @@ const createBuilds = async () => {
         chalk.gray(`(format: ${MODULE_TYPES[type]})`),
       )
 
-      return build({ inputOptions: input, outputOptions: output })
+      return build({ inputOptions: input, outputOptions: output }).catch(
+        (e) => {
+          log(
+            `${chalk.bold.bgRed.white('⚠️ ERROR')} ${chalk.red(
+              `Build ${i + 1}/${allBuildsCount} failed`,
+            )}`,
+          )
+          log(chalk.gray(`  Format: ${MODULE_TYPES[type]}`))
+          log(chalk.gray(`  File:   ${output.file}`))
+          log(e)
+          throw e
+        },
+      )
     })
   })
 
-  return p.catch((e) => {
-    log(
-      `${chalk.bold.bgRed.white('⚠️ ERROR')} ${chalk.red(
-        'Something went wrong',
-      )}`,
-    )
-    log(e)
-    throw e
-  })
+  return p
 }
 
 const runBuild = async () => {

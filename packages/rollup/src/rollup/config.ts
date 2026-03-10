@@ -167,6 +167,10 @@ const rollupConfig = ({
       systemNullSetters: false,
     },
     external: [...PKG.externalDependencies, ...CONFIG.external],
+    treeshake: {
+      moduleSideEffects: false,
+      propertyReadSideEffects: false,
+    },
     plugins,
   }
 

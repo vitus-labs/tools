@@ -48,7 +48,7 @@ describe('generateFavicons', () => {
 
   it('should handle favicon generation errors', async () => {
     const consoleSpy = vi
-      .spyOn(console, 'log')
+      .spyOn(console, 'error')
       .mockImplementation(() => undefined)
 
     mockFavicons.mockRejectedValue(new Error('Generation failed'))
@@ -56,9 +56,11 @@ describe('generateFavicons', () => {
     vi.resetModules()
     const { generateFavicons } = await import('./generateFavicon.js')
 
-    await generateFavicons()
+    await expect(generateFavicons()).rejects.toThrow(
+      '1 favicon generation(s) failed',
+    )
 
-    expect(consoleSpy).toHaveBeenCalledWith('Generation failed')
+    expect(consoleSpy).toHaveBeenCalledWith('[favicon] Generation failed')
     consoleSpy.mockRestore()
   })
 

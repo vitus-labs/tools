@@ -14,14 +14,21 @@ import { applyWebpLoader } from './webp-loader'
 
 /**
  * Resolve a module specifier, optionally from a custom directory.
+ * When resolvePath is provided it is normalized with path.resolve()
+ * to prevent directory-traversal attacks.
  */
-const resolveModule = (name: string, resolvePath?: string): string =>
-  fileURLToPath(
+const resolveModule = (name: string, resolvePath?: string): string => {
+  const normalizedPath = resolvePath ? path.resolve(resolvePath) : undefined
+
+  return fileURLToPath(
     import.meta.resolve(
       name,
-      resolvePath ? pathToFileURL(path.join(resolvePath, '_')).href : undefined,
+      normalizedPath
+        ? pathToFileURL(path.join(normalizedPath, '_')).href
+        : undefined,
     ),
   )
+}
 
 /**
  * Checks if a node module is installed in the current context.
