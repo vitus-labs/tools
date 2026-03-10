@@ -7,7 +7,7 @@ import { registerScaffoldPackage } from './tools/scaffold-package.js'
 const createServer = () => {
   const server = new McpServer({
     name: '@vitus-labs/tools-mcp',
-    version: '1.10.0',
+    version: '1.11.0',
   })
 
   registerScaffoldPackage(server)
