@@ -1,0 +1,47 @@
+{
+  "name": "@vitus-labs/tools-mcp",
+  "version": "1.10.0",
+  "license": "MIT",
+  "author": "Vit Bokisch <vit@bokisch.com>",
+  "maintainers": [
+    "Vit Bokisch <vit@bokisch.com>"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vitus-labs/tools",
+    "directory": "packages/mcp"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./lib/index.js",
+      "types": "./lib/types/index.d.ts"
+    }
+  },
+  "bin": {
+    "vl_mcp": "./lib/bin/serve.js"
+  },
+  "engines": {
+    "node": ">= 22"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "lib/"
+  ],
+  "scripts": {
+    "prepublish": "bun run build",
+    "build": "rm -rf lib && tsc",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "zod": "^3.25.67"
+  },
+  "devDependencies": {
+    "@vitus-labs/tools-typescript": "1.10.0",
+    "@vitus-labs/tools-vitest": "1.10.0",
+    "typescript": "^5.9.3"
+  }
+}
