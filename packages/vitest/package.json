@@ -1,6 +1,6 @@
 {
   "name": "@vitus-labs/tools-vitest",
-  "version": "1.12.0",
+  "version": "1.13.0",
   "license": "MIT",
   "author": "Vit Bokisch <vit@bokisch.com>",
   "maintainers": [
@@ -34,7 +34,7 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "@vitus-labs/tools-typescript": "1.12.0",
+    "@vitus-labs/tools-typescript": "1.13.0",
     "typescript": "^5.9.3",
     "vitest": "^4.1.0"
   },
