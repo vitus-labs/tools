@@ -7,6 +7,11 @@ on:
       - 'feature/**'
       - 'release/**'
 
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write
+
 concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: false
@@ -17,11 +22,6 @@ jobs:
     if: github.ref == 'refs/heads/main'
     name: Release
     runs-on: ubuntu-latest
-    environment: npm-publish
-    permissions:
-      contents: write
-      pull-requests: write
-      id-token: write
     steps:
       - name: Harden runner
         uses: step-security/harden-runner@58077d3c7e43986b6b15fba718e8ea69e387dfcc # v2.15.1
@@ -35,7 +35,7 @@ jobs:
 
       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
-          node-version: 22
+          node-version: 24
           registry-url: 'https://registry.npmjs.org'
 
       - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
@@ -62,16 +62,12 @@ jobs:
           commit: 'chore: version packages'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_CONFIG_PROVENANCE: true
 
   # ── Prerelease (feature/release branches) ───────────────────────
   prerelease:
     if: github.ref != 'refs/heads/main'
     name: Publish Prerelease
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
     steps:
       - name: Harden runner
         uses: step-security/harden-runner@58077d3c7e43986b6b15fba718e8ea69e387dfcc # v2.15.1
@@ -84,7 +80,7 @@ jobs:
 
       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
-          node-version: 22
+          node-version: 24
           registry-url: 'https://registry.npmjs.org'
 
       - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
@@ -105,5 +101,3 @@ jobs:
         run: |
           bunx changeset version --snapshot alpha
           bunx changeset publish --tag next
-        env:
-          NPM_CONFIG_PROVENANCE: true
