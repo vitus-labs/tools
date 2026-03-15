@@ -47,4 +47,14 @@ describe('baseConfig', () => {
   it('should include react/jsx-runtime as external', () => {
     expect(baseConfig.external).toContain('react/jsx-runtime')
   })
+
+  it('should have safe defaults for advanced build options', () => {
+    expect(baseConfig.entries).toBeUndefined()
+    expect(baseConfig.bundleAll).toBe(false)
+    expect(baseConfig.copyFiles).toBeUndefined()
+    expect(baseConfig.banner).toBeUndefined()
+    expect(baseConfig.footer).toBeUndefined()
+    expect(baseConfig.alias).toBeUndefined()
+    expect(baseConfig.plugins).toEqual([])
+  })
 })

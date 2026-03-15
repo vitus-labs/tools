@@ -1,4 +1,4 @@
-import { PKG } from '../config/index.js'
+import { CONFIG, PKG } from '../config/index.js'
 
 const isESModuleOnly = PKG.type === 'module'
 
@@ -154,6 +154,16 @@ const createBrowserBuildVariants = () => {
 }
 
 const createBuildPipeline = () => {
+  if (Array.isArray(CONFIG.entries) && CONFIG.entries.length > 0) {
+    return CONFIG.entries.map((entry: Record<string, string | undefined>) => ({
+      format: entry.format || 'es',
+      env: entry.env || 'development',
+      platform: entry.platform || 'universal',
+      file: entry.file,
+      input: entry.input,
+    }))
+  }
+
   return [...createBasicBuildVariants(), ...createBrowserBuildVariants()]
 }
 
