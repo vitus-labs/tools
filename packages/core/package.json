@@ -1,6 +1,6 @@
 {
   "name": "@vitus-labs/tools-core",
-  "version": "1.11.0",
+  "version": "1.12.0",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -33,7 +33,7 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "@vitus-labs/tools-typescript": "1.11.0",
+    "@vitus-labs/tools-typescript": "1.12.0",
     "typescript": "^5.9.3"
   }
 }
