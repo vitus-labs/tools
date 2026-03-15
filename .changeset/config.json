@@ -1,0 +1,28 @@
+{
+  "$schema": "https://unpkg.com/@changesets/config@3.1.1/schema.json",
+  "changelog": [
+    "@changesets/changelog-github",
+    { "repo": "vitus-labs/tools" }
+  ],
+  "commit": false,
+  "fixed": [
+    [
+      "@vitus-labs/tools-core",
+      "@vitus-labs/tools-rolldown",
+      "@vitus-labs/tools-rollup",
+      "@vitus-labs/tools-favicon",
+      "@vitus-labs/tools-storybook",
+      "@vitus-labs/tools-lint",
+      "@vitus-labs/tools-typescript",
+      "@vitus-labs/tools-vitest",
+      "@vitus-labs/tools-nextjs",
+      "@vitus-labs/tools-nextjs-images",
+      "@vitus-labs/tools-atlas",
+      "@vitus-labs/tools-mcp"
+    ]
+  ],
+  "access": "public",
+  "baseBranch": "main",
+  "updateInternalDependencies": "patch",
+  "ignore": []
+}
