@@ -169,6 +169,30 @@ export default {
     globals: { react: 'React' },
   },
 }
+\`\`\`
+
+## Advanced build options
+For non-library builds (Chrome extensions, CLI tools, Lambda, Electron):
+- entries: explicit input/output pairs with format (es/cjs/umd/iife), skips package.json detection
+- bundleAll: true — bundle all deps, no externals
+- copyFiles: [{ from, to }] — copy static assets post-build
+- banner/footer: inject text (e.g. shebang) at top/bottom of output
+- alias: { '@': './src' } — resolve aliases
+- plugins: custom rolldown plugins appended to built-ins
+
+\`\`\`js
+export default {
+  build: {
+    entries: [
+      { input: 'src/background.ts', file: 'dist/background.js', format: 'iife', env: 'production' },
+      { input: 'src/popup.ts', file: 'dist/popup.js', format: 'es' },
+    ],
+    bundleAll: true,
+    copyFiles: [{ from: 'src/manifest.json', to: 'dist/manifest.json' }],
+    banner: '#!/usr/bin/env node',
+    typescript: false,
+  },
+}
 \`\`\``,
   },
   {

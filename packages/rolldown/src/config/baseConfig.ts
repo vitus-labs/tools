@@ -31,4 +31,21 @@ export default {
     ReactDOM: 'react-dom',
     styled: 'styled-components',
   },
+
+  // Advanced build options
+  entries: undefined as
+    | {
+        input: string
+        file: string
+        format?: string
+        env?: string
+        platform?: string
+      }[]
+    | undefined,
+  bundleAll: false,
+  copyFiles: undefined as { from: string; to: string }[] | undefined,
+  banner: undefined as string | undefined,
+  footer: undefined as string | undefined,
+  alias: undefined as Record<string, string> | undefined,
+  plugins: [] as unknown[],
 }

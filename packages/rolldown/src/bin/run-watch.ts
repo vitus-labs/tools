@@ -14,7 +14,7 @@ const label = (text: string) => chalk.bold.bgCyan.black(` ${text} `)
 const dim = chalk.dim
 const bold = chalk.bold
 
-const watchConfigs = allBuilds.map((item) => {
+const watchConfigs = allBuilds.map((item: Record<string, any>) => {
   const { output, ...input } = rolldownConfig(item)
   return { ...input, output }
 })

@@ -78,21 +78,28 @@ const rolldownConfig = ({
   format,
   env,
   platform,
+  input: entryInput,
 }: Record<string, any>) => {
   const extensions = defineExtensions(platform)
-  const plugins = loadPlugins({ file })
+  const builtinPlugins = loadPlugins({ file })
+  const userPlugins = (CONFIG.plugins || []) as RolldownPlugin[]
   const define = buildDefineOptions(env, platform)
 
   const lastSlash = file.lastIndexOf('/')
   const dir = lastSlash >= 0 ? file.substring(0, lastSlash) : '.'
   const entryFileName = lastSlash >= 0 ? file.substring(lastSlash + 1) : file
 
+  const external = CONFIG.bundleAll
+    ? []
+    : [...PKG.externalDependencies, ...CONFIG.external]
+
   const buildOutput = {
-    input: CONFIG.sourceDir,
+    input: entryInput || CONFIG.sourceDir,
     platform: mapPlatform(platform),
     tsconfig: CONFIG.typescript ? 'tsconfig.json' : undefined,
     resolve: {
       extensions,
+      alias: CONFIG.alias || undefined,
     },
     transform: define ? { define } : undefined,
     output: {
@@ -103,16 +110,20 @@ const rolldownConfig = ({
       sourcemap: true,
       sourcemapIgnoreList: (relativeSourcePath: string) =>
         relativeSourcePath.includes('node_modules'),
-      exports: ['cjs', 'umd'].includes(format) ? ('named' as const) : undefined,
+      exports: ['cjs', 'umd', 'iife'].includes(format)
+        ? ('named' as const)
+        : undefined,
       name: ['umd', 'iife'].includes(format) ? PKG.bundleName : undefined,
       esModule: true,
       minify: env === 'production',
+      banner: CONFIG.banner || undefined,
+      footer: CONFIG.footer || undefined,
     },
-    external: [...PKG.externalDependencies, ...CONFIG.external],
+    external,
     treeshake: {
       moduleSideEffects: false,
     },
-    plugins,
+    plugins: [...builtinPlugins, ...userPlugins],
   }
 
   return buildOutput
@@ -135,7 +146,9 @@ const buildDts = () => {
     resolve: {
       extensions: CONFIG.extensions,
     },
-    external: [...PKG.externalDependencies, ...CONFIG.external],
+    external: CONFIG.bundleAll
+      ? []
+      : [...PKG.externalDependencies, ...CONFIG.external],
     plugins: [...(dts({ tsconfig: 'tsconfig.json' }) as RolldownPlugin[])],
     output: {
       dir,
