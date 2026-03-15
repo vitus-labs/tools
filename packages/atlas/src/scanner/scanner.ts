@@ -39,30 +39,52 @@ const matchesAny = (name: string, patterns: string[]): boolean =>
     return name === p || name.includes(p)
   })
 
-export const scanWorkspace = (config: AtlasConfig): DepGraph => {
-  const cwd = process.cwd()
-  const dirs = config.workspaces.flatMap((pattern) => {
+const stripTrailingSlashes = (s: string): string => {
+  let trimmed = s
+  while (trimmed.endsWith('/')) trimmed = trimmed.slice(0, -1)
+  return trimmed
+}
+
+const listDirectories = (base: string): string[] => {
+  try {
+    return readdirSync(base)
+      .map((entry) => join(base, entry))
+      .filter((p) => {
+        try {
+          return statSync(p).isDirectory()
+        } catch {
+          return false
+        }
+      })
+  } catch {
+    return []
+  }
+}
+
+const resolveWorkspaceDirs = (workspaces: string[], cwd: string): string[] => {
+  return workspaces.flatMap((pattern) => {
     const starIdx = pattern.indexOf('*')
     const stripped = starIdx >= 0 ? pattern.slice(0, starIdx) : pattern
-    // Strip trailing slashes without regex (avoids polynomial-regex CodeQL alert)
-    let trimmed = stripped
-    while (trimmed.endsWith('/')) trimmed = trimmed.slice(0, -1)
-    const base = resolve(cwd, trimmed)
-    try {
-      return readdirSync(base)
-        .map((entry) => join(base, entry))
-        .filter((p) => {
-          try {
-            return statSync(p).isDirectory()
-          } catch {
-            return false
-          }
-        })
-    } catch {
-      return []
-    }
+    const base = resolve(cwd, stripTrailingSlashes(stripped))
+    return listDirectories(base)
   })
+}
 
+const shouldIncludePackage = (name: string, config: AtlasConfig): boolean => {
+  if (config.include.length > 0 && !matchesAny(name, config.include))
+    return false
+  if (config.exclude.length > 0 && matchesAny(name, config.exclude))
+    return false
+  return true
+}
+
+const collectNodes = (
+  dirs: string[],
+  config: AtlasConfig,
+): {
+  nodes: DepNode[]
+  pkgDeps: Map<string, { deps: Record<string, string>; depType: DepType }[]>
+} => {
   const nodes: DepNode[] = []
   const pkgDeps = new Map<
     string,
@@ -72,11 +94,7 @@ export const scanWorkspace = (config: AtlasConfig): DepGraph => {
   for (const dir of dirs) {
     const pkg = readPackageJson(dir)
     if (!pkg?.name) continue
-
-    if (config.include.length > 0 && !matchesAny(pkg.name, config.include))
-      continue
-    if (config.exclude.length > 0 && matchesAny(pkg.name, config.exclude))
-      continue
+    if (!shouldIncludePackage(pkg.name, config)) continue
 
     nodes.push({
       name: pkg.name,
@@ -95,6 +113,13 @@ export const scanWorkspace = (config: AtlasConfig): DepGraph => {
     pkgDeps.set(pkg.name, depEntries)
   }
 
+  return { nodes, pkgDeps }
+}
+
+const collectEdges = (
+  nodes: DepNode[],
+  pkgDeps: Map<string, { deps: Record<string, string>; depType: DepType }[]>,
+): DepEdge[] => {
   const nodeNames = new Set(nodes.map((n) => n.name))
   const edges: DepEdge[] = []
 
@@ -107,6 +132,15 @@ export const scanWorkspace = (config: AtlasConfig): DepGraph => {
       }
     }
   }
+
+  return edges
+}
+
+export const scanWorkspace = (config: AtlasConfig): DepGraph => {
+  const cwd = process.cwd()
+  const dirs = resolveWorkspaceDirs(config.workspaces, cwd)
+  const { nodes, pkgDeps } = collectNodes(dirs, config)
+  const edges = collectEdges(nodes, pkgDeps)
 
   return { nodes, edges }
 }

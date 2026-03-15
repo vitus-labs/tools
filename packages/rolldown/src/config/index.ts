@@ -7,4 +7,4 @@ const CONFIG = VL_CONFIG(CONFIG_KEY).merge(baseConfig).config
 
 const PLATFORMS = ['browser', 'node', 'web', 'native'] as const
 
-export { CONFIG, TS_CONFIG, PKG, PLATFORMS }
+export { CONFIG, PKG, PLATFORMS, TS_CONFIG }

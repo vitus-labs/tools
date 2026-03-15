@@ -128,7 +128,7 @@ const buildReportData = (data: AnalysisData): ReportJson => {
       }))
       .sort((a, b) => b.transitiveSize - a.transitiveSize),
     healthScores: Object.entries(healthScore.scores)
-      .map(([name, data]) => ({ name, ...data }))
+      .map(([name, scoreData]) => ({ name, ...scoreData }))
       .sort((a, b) => a.score - b.score),
     hotspots,
   }
@@ -137,14 +137,11 @@ const buildReportData = (data: AnalysisData): ReportJson => {
 export const generateJsonReport = (data: AnalysisData): string =>
   JSON.stringify(buildReportData(data), null, 2)
 
-export const generateMarkdownReport = (data: AnalysisData): string => {
-  const report = buildReportData(data)
+const renderSummarySection = (
+  report: ReportJson,
+  criticalPath: string[],
+): string[] => {
   const lines: string[] = []
-
-  lines.push('# Atlas — Dependency Analysis Report')
-  lines.push('')
-
-  // Summary
   lines.push('## Summary')
   lines.push(
     `- ${report.summary.packages} packages, ${report.summary.edges} dependencies`,
@@ -155,87 +152,105 @@ export const generateMarkdownReport = (data: AnalysisData): string => {
     )
   }
   lines.push(`- Max dependency depth: ${report.summary.maxDepth}`)
-  if (data.depth.criticalPath.length > 0) {
-    lines.push(`- Critical path: ${data.depth.criticalPath.join(' -> ')}`)
+  if (criticalPath.length > 0) {
+    lines.push(`- Critical path: ${criticalPath.join(' -> ')}`)
   }
   lines.push('')
+  return lines
+}
 
-  // Circular Dependencies
-  if (report.cycles.length > 0) {
-    lines.push('## Circular Dependencies')
-    for (const c of report.cycles) {
-      lines.push(`1. \`${c.cycle.join('` -> `')}\` -> \`${c.cycle[0]}\``)
-      lines.push(`   **Suggestion:** ${c.suggestion}`)
-    }
-    lines.push('')
+const renderCyclesSection = (report: ReportJson): string[] => {
+  if (report.cycles.length === 0) return []
+  const lines: string[] = []
+  lines.push('## Circular Dependencies')
+  for (const c of report.cycles) {
+    lines.push(`1. \`${c.cycle.join('` -> `')}\` -> \`${c.cycle[0]}\``)
+    lines.push(`   **Suggestion:** ${c.suggestion}`)
   }
+  lines.push('')
+  return lines
+}
 
-  // High-Impact Packages
-  if (report.highImpact.length > 0) {
-    lines.push('## High-Impact Packages')
-    lines.push('| Package | Direct deps | Transitive dependents |')
-    lines.push('| --- | --- | --- |')
-    for (const p of report.highImpact.slice(0, 15)) {
-      lines.push(`| ${p.name} | ${p.directDeps} | ${p.transitiveDependents} |`)
-    }
-    lines.push('')
+const renderHighImpactSection = (report: ReportJson): string[] => {
+  if (report.highImpact.length === 0) return []
+  const lines: string[] = []
+  lines.push('## High-Impact Packages')
+  lines.push('| Package | Direct deps | Transitive dependents |')
+  lines.push('| --- | --- | --- |')
+  for (const p of report.highImpact.slice(0, 15)) {
+    lines.push(`| ${p.name} | ${p.directDeps} | ${p.transitiveDependents} |`)
   }
+  lines.push('')
+  return lines
+}
 
-  // Deep Chains
-  if (report.deepChains.length > 0) {
-    lines.push('## Deeply Nested Chains')
-    for (const c of report.deepChains) {
-      lines.push(`- Depth ${c.depth}: ${c.path.join(' -> ')}`)
-      lines.push(`  **Suggestion:** ${c.suggestion}`)
-    }
-    lines.push('')
+const renderDeepChainsSection = (report: ReportJson): string[] => {
+  if (report.deepChains.length === 0) return []
+  const lines: string[] = []
+  lines.push('## Deeply Nested Chains')
+  for (const c of report.deepChains) {
+    lines.push(`- Depth ${c.depth}: ${c.path.join(' -> ')}`)
+    lines.push(`  **Suggestion:** ${c.suggestion}`)
   }
+  lines.push('')
+  return lines
+}
 
-  // Dependency Type Distribution
+const renderDistributionSection = (report: ReportJson): string[] => {
+  const lines: string[] = []
   lines.push('## Dependency Type Distribution')
   lines.push(`- Production: ${report.depTypeDistribution.dependencies} edges`)
   lines.push(`- Peer: ${report.depTypeDistribution.peerDependencies} edges`)
   lines.push(`- Dev: ${report.depTypeDistribution.devDependencies} edges`)
   lines.push('')
+  return lines
+}
 
-  // Orphans
-  if (report.orphans.length > 0) {
-    lines.push('## Packages With No Dependents')
-    for (const o of report.orphans) {
-      lines.push(`- ${o}`)
-    }
-    lines.push('')
+const renderOrphansSection = (report: ReportJson): string[] => {
+  if (report.orphans.length === 0) return []
+  const lines: string[] = []
+  lines.push('## Packages With No Dependents')
+  for (const o of report.orphans) {
+    lines.push(`- ${o}`)
   }
+  lines.push('')
+  return lines
+}
 
-  // Version Drift
-  if (report.versionDrift.length > 0) {
-    lines.push('## Version Drift')
-    lines.push('| Dependency | Versions | Packages |')
-    lines.push('| --- | --- | --- |')
-    for (const d of report.versionDrift) {
-      const versions = Object.keys(d.versions).join(', ')
-      const packages = Object.entries(d.versions)
-        .map(([v, pkgs]) => pkgs.map((p) => `${p} (${v})`).join(', '))
-        .join(', ')
-      lines.push(`| ${d.dependency} | ${versions} | ${packages} |`)
-    }
-    lines.push('')
+const renderVersionDriftSection = (report: ReportJson): string[] => {
+  if (report.versionDrift.length === 0) return []
+  const lines: string[] = []
+  lines.push('## Version Drift')
+  lines.push('| Dependency | Versions | Packages |')
+  lines.push('| --- | --- | --- |')
+  for (const d of report.versionDrift) {
+    const versions = Object.keys(d.versions).join(', ')
+    const packages = Object.entries(d.versions)
+      .map(([v, pkgs]) => pkgs.map((p) => `${p} (${v})`).join(', '))
+      .join(', ')
+    lines.push(`| ${d.dependency} | ${versions} | ${packages} |`)
   }
+  lines.push('')
+  return lines
+}
 
-  // Bundle Size
-  if (report.bundleSize.some((b) => b.ownSize > 0)) {
-    lines.push('## Bundle Size')
-    lines.push('| Package | Own size | Transitive size |')
-    lines.push('| --- | --- | --- |')
-    for (const b of report.bundleSize.filter((b) => b.ownSize > 0)) {
-      lines.push(
-        `| ${b.name} | ${formatBytes(b.ownSize)} | ${formatBytes(b.transitiveSize)} |`,
-      )
-    }
-    lines.push('')
+const renderBundleSizeSection = (report: ReportJson): string[] => {
+  if (!report.bundleSize.some((entry) => entry.ownSize > 0)) return []
+  const lines: string[] = []
+  lines.push('## Bundle Size')
+  lines.push('| Package | Own size | Transitive size |')
+  lines.push('| --- | --- | --- |')
+  for (const b of report.bundleSize.filter((item) => item.ownSize > 0)) {
+    lines.push(
+      `| ${b.name} | ${formatBytes(b.ownSize)} | ${formatBytes(b.transitiveSize)} |`,
+    )
   }
+  lines.push('')
+  return lines
+}
 
-  // Health Scores
+const renderHealthScoresSection = (report: ReportJson): string[] => {
+  const lines: string[] = []
   lines.push('## Health Scores')
   lines.push('| Package | Score | Issues |')
   lines.push('| --- | --- | --- |')
@@ -243,20 +258,41 @@ export const generateMarkdownReport = (data: AnalysisData): string => {
     lines.push(`| ${h.name} | ${h.score} | ${h.factors.join(', ')} |`)
   }
   lines.push('')
+  return lines
+}
 
-  // Hotspots
-  if (report.hotspots.length > 0) {
-    lines.push('## Change Frequency Hotspots')
-    for (const h of report.hotspots) {
-      lines.push(
-        `- **${h.name}**: ${h.commits} commits in 90 days, ${h.dependents} transitive dependents`,
-      )
-      lines.push(
-        '  **Risk:** Frequently changing a high-impact package increases breakage risk.',
-      )
-    }
-    lines.push('')
+const renderHotspotsSection = (report: ReportJson): string[] => {
+  if (report.hotspots.length === 0) return []
+  const lines: string[] = []
+  lines.push('## Change Frequency Hotspots')
+  for (const h of report.hotspots) {
+    lines.push(
+      `- **${h.name}**: ${h.commits} commits in 90 days, ${h.dependents} transitive dependents`,
+    )
+    lines.push(
+      '  **Risk:** Frequently changing a high-impact package increases breakage risk.',
+    )
   }
+  lines.push('')
+  return lines
+}
 
-  return lines.join('\n')
+export const generateMarkdownReport = (data: AnalysisData): string => {
+  const report = buildReportData(data)
+
+  const sections = [
+    ['# Atlas — Dependency Analysis Report', ''],
+    ...renderSummarySection(report, data.depth.criticalPath),
+    ...renderCyclesSection(report),
+    ...renderHighImpactSection(report),
+    ...renderDeepChainsSection(report),
+    ...renderDistributionSection(report),
+    ...renderOrphansSection(report),
+    ...renderVersionDriftSection(report),
+    ...renderBundleSizeSection(report),
+    ...renderHealthScoresSection(report),
+    ...renderHotspotsSection(report),
+  ]
+
+  return sections.join('\n')
 }

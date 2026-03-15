@@ -245,8 +245,8 @@ export {
   loadConfigParam,
   loadFileToJSON,
   loadVLToolsConfig,
-  swapGlobals,
   PKG,
-  VL_CONFIG,
+  swapGlobals,
   TS_CONFIG,
+  VL_CONFIG,
 }

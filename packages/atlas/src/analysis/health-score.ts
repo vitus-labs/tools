@@ -17,18 +17,19 @@ interface HealthInput {
   changeFrequency: ChangeFrequencyResult | null
 }
 
-export const computeHealthScores = (input: HealthInput): HealthScoreResult => {
-  const { graph, cycles, impact, depth, versionDrift, changeFrequency } = input
-
-  // Build set of packages involved in cycles
+const collectCyclePackages = (cycles: CycleResult): Set<string> => {
   const cyclePackages = new Set<string>()
   for (const cycle of cycles.cycles) {
     for (const pkg of cycle) {
       cyclePackages.add(pkg)
     }
   }
+  return cyclePackages
+}
 
-  // Build map of packages with version drift
+const collectDriftPackages = (
+  versionDrift: VersionDriftResult,
+): Map<string, number> => {
   const driftPackages = new Map<string, number>()
   for (const drift of versionDrift.drifts) {
     for (const packages of Object.values(drift.versions)) {
@@ -37,12 +38,91 @@ export const computeHealthScores = (input: HealthInput): HealthScoreResult => {
       }
     }
   }
+  return driftPackages
+}
 
-  // Find packages with no dependents (orphans)
+const collectDependentSet = (graph: DepGraph): Set<string> => {
   const hasDependent = new Set<string>()
   for (const edge of graph.edges) {
     hasDependent.add(edge.target)
   }
+  return hasDependent
+}
+
+const applyCyclePenalty = (
+  name: string,
+  cycles: CycleResult,
+  cyclePackages: Set<string>,
+): { penalty: number; factor: string | null } => {
+  if (!cyclePackages.has(name)) return { penalty: 0, factor: null }
+  const cycleCount = cycles.cycles.filter((c) => c.includes(name)).length
+  const penalty = Math.min(cycleCount * 20, 40)
+  return { penalty, factor: `in ${cycleCount} cycle(s)` }
+}
+
+const applyOrphanPenalty = (
+  name: string,
+  hasDependent: Set<string>,
+  nodeCount: number,
+): { penalty: number; factor: string | null } => {
+  if (!hasDependent.has(name) && nodeCount > 1) {
+    return { penalty: 15, factor: 'no dependents (orphan)' }
+  }
+  return { penalty: 0, factor: null }
+}
+
+const applyDepthPenalty = (
+  name: string,
+  depth: DepthResult,
+): { penalty: number; factor: string | null } => {
+  const nodeDepth = depth.depthMap[name] ?? 0
+  if (nodeDepth > 3) {
+    return { penalty: 10, factor: `deep chain (depth ${nodeDepth})` }
+  }
+  return { penalty: 0, factor: null }
+}
+
+const applyDriftPenalty = (
+  name: string,
+  driftPackages: Map<string, number>,
+): { penalty: number; factor: string | null } => {
+  const driftCount = driftPackages.get(name) ?? 0
+  if (driftCount > 0) {
+    const penalty = Math.min(driftCount * 5, 20)
+    return { penalty, factor: `${driftCount} version drift(s)` }
+  }
+  return { penalty: 0, factor: null }
+}
+
+const applyBonuses = (
+  name: string,
+  score: number,
+  impact: ImpactResult,
+  changeFrequency: ChangeFrequencyResult | null,
+): number => {
+  let result = score
+  const dependentCount = (impact.impactMap[name] ?? []).length
+  if (dependentCount > 0) {
+    const bonus = Math.min(dependentCount * 5, 20)
+    result = Math.min(result + bonus, 100)
+  }
+
+  if (changeFrequency) {
+    const freq = changeFrequency.frequencyMap[name]
+    if (freq && freq.commits > 0) {
+      result = Math.min(result + 5, 100)
+    }
+  }
+
+  return result
+}
+
+export const computeHealthScores = (input: HealthInput): HealthScoreResult => {
+  const { graph, cycles, impact, depth, versionDrift, changeFrequency } = input
+
+  const cyclePackages = collectCyclePackages(cycles)
+  const driftPackages = collectDriftPackages(versionDrift)
+  const hasDependent = collectDependentSet(graph)
 
   const scores: HealthScoreResult['scores'] = {}
 
@@ -50,51 +130,19 @@ export const computeHealthScores = (input: HealthInput): HealthScoreResult => {
     let score = 100
     const factors: string[] = []
 
-    // Cycle involvement: -20 per cycle
-    if (cyclePackages.has(node.name)) {
-      const cycleCount = cycles.cycles.filter((c) =>
-        c.includes(node.name),
-      ).length
-      const penalty = Math.min(cycleCount * 20, 40)
+    const penalties = [
+      applyCyclePenalty(node.name, cycles, cyclePackages),
+      applyOrphanPenalty(node.name, hasDependent, graph.nodes.length),
+      applyDepthPenalty(node.name, depth),
+      applyDriftPenalty(node.name, driftPackages),
+    ]
+
+    for (const { penalty, factor } of penalties) {
       score -= penalty
-      factors.push(`in ${cycleCount} cycle(s)`)
+      if (factor) factors.push(factor)
     }
 
-    // Orphan: -15
-    if (!hasDependent.has(node.name) && graph.nodes.length > 1) {
-      score -= 15
-      factors.push('no dependents (orphan)')
-    }
-
-    // Deep chain: -10 if depth > 3
-    const nodeDepth = depth.depthMap[node.name] ?? 0
-    if (nodeDepth > 3) {
-      score -= 10
-      factors.push(`deep chain (depth ${nodeDepth})`)
-    }
-
-    // Version drift: -5 per drifted dep
-    const driftCount = driftPackages.get(node.name) ?? 0
-    if (driftCount > 0) {
-      const penalty = Math.min(driftCount * 5, 20)
-      score -= penalty
-      factors.push(`${driftCount} version drift(s)`)
-    }
-
-    // Has dependents bonus: +5 per dependent (capped at 20)
-    const dependentCount = (impact.impactMap[node.name] ?? []).length
-    if (dependentCount > 0) {
-      const bonus = Math.min(dependentCount * 5, 20)
-      score = Math.min(score + bonus, 100)
-    }
-
-    // Recently changed bonus: +5
-    if (changeFrequency) {
-      const freq = changeFrequency.frequencyMap[node.name]
-      if (freq && freq.commits > 0) {
-        score = Math.min(score + 5, 100)
-      }
-    }
+    score = applyBonuses(node.name, score, impact, changeFrequency)
 
     scores[node.name] = {
       score: Math.max(0, Math.min(100, score)),

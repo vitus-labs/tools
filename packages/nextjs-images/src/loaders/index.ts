@@ -237,9 +237,9 @@ const appendLoaders = (
 }
 
 export {
-  isModuleInstalled,
+  appendLoaders,
   detectLoaders,
   getHandledImageTypes,
   getNumOptimizationLoadersInstalled,
-  appendLoaders,
+  isModuleInstalled,
 }

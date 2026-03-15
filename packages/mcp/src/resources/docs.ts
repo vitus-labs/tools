@@ -91,7 +91,7 @@ Shared Biome configuration.
 ## Usage
 \`\`\`json
 {
-  "$schema": "https://biomejs.dev/schemas/2.4.4/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.4.7/schema.json",
   "extends": ["@vitus-labs/tools-lint/biome"]
 }
 \`\`\`
