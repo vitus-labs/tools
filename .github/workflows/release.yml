@@ -1,21 +1,9 @@
 name: Release
 
 on:
-  # Stable releases — manual trigger from GitHub UI
-  workflow_dispatch:
-    inputs:
-      type:
-        description: 'Version bump type'
-        required: true
-        type: choice
-        options:
-          - patch
-          - minor
-          - major
-
-  # Prereleases — automatic on feature/release branch pushes
   push:
     branches:
+      - main
       - 'feature/**'
       - 'release/**'
 
@@ -24,13 +12,14 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # ── Stable release (main only, manual) ──────────────────────────
+  # ── Stable release (main only) ──────────────────────────────────
   stable:
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
-    name: Publish Stable
+    if: github.ref == 'refs/heads/main'
+    name: Release
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: write
       id-token: write
     steps:
       - name: Harden runner
@@ -59,31 +48,24 @@ jobs:
 
       - run: bun install --frozen-lockfile
 
-      - name: Lint & Format
-        run: bun run lint
-
       - name: Build all packages
         run: bun run pkgs:build
 
-      - name: Type Check
-        run: bun run typecheck
-
-      - name: Test
-        run: bun run test
-
-      - name: Configure git
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-      - name: Publish
-        run: bunx lerna publish ${{ inputs.type }} --yes
+      - name: Create Release PR or Publish
+        id: changesets
+        uses: changesets/action@6a0a831ff30acef54f2c6aa1cbbc1096b066edaf # v1.7.0
+        with:
+          version: bun run version-packages
+          publish: bun run release
+          title: 'chore: version packages'
+          commit: 'chore: version packages'
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
 
-  # ── Prerelease (feature/release branches, automatic) ────────────
+  # ── Prerelease (feature/release branches) ───────────────────────
   prerelease:
-    if: github.event_name == 'push'
+    if: github.ref != 'refs/heads/main'
     name: Publish Prerelease
     runs-on: ubuntu-latest
     permissions:
@@ -115,13 +97,12 @@ jobs:
 
       - run: bun install --frozen-lockfile
 
-      - name: Lint & Format
-        run: bun run lint
-
       - name: Build all packages
         run: bun run pkgs:build
 
-      - name: Publish canary
-        run: bunx lerna publish --canary --preid alpha --dist-tag next --force-publish --yes
+      - name: Publish snapshot
+        run: |
+          bunx changeset version --snapshot alpha
+          bunx changeset publish --tag next
         env:
           NPM_CONFIG_PROVENANCE: true
