@@ -45,7 +45,7 @@ const scaffoldLibrary = (dir: string, name: string) => {
   }
 
   const biome = {
-    $schema: 'https://biomejs.dev/schemas/2.4.4/schema.json',
+    $schema: 'https://biomejs.dev/schemas/2.4.7/schema.json',
     extends: ['@vitus-labs/tools-lint/biome'],
   }
 
@@ -116,7 +116,7 @@ const scaffoldNextjs = (dir: string, name: string) => {
   }
 
   const biome = {
-    $schema: 'https://biomejs.dev/schemas/2.4.4/schema.json',
+    $schema: 'https://biomejs.dev/schemas/2.4.7/schema.json',
     extends: ['@vitus-labs/tools-lint/biome'],
   }
 
@@ -166,7 +166,7 @@ const scaffoldStorybook = (dir: string, name: string) => {
   }
 
   const biome = {
-    $schema: 'https://biomejs.dev/schemas/2.4.4/schema.json',
+    $schema: 'https://biomejs.dev/schemas/2.4.7/schema.json',
     extends: ['@vitus-labs/tools-lint/biome'],
   }
 

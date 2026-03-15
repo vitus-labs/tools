@@ -69,4 +69,4 @@ const applyResponsiveLoader = (
   return webpackConfig
 }
 
-export { getResponsiveLoaderOptions, applyResponsiveLoader }
+export { applyResponsiveLoader, getResponsiveLoaderOptions }

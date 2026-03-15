@@ -14,5 +14,5 @@ const updatedConfig = {
   storiesDir: storiesPatterns.map((item: string) => `${process.cwd()}${item}`),
 }
 
-export { updatedConfig as CONFIG, TS_CONFIG }
 export type { StoriesConfig, VLToolsConfig } from '../types.js'
+export { TS_CONFIG, updatedConfig as CONFIG }

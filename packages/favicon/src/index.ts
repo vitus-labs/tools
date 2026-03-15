@@ -4,4 +4,4 @@ import { generateFavicons } from './generateFavicon.js'
 
 export type { Configuration }
 
-export { generateFavicons, configuration }
+export { configuration, generateFavicons }

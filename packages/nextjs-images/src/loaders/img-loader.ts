@@ -160,8 +160,8 @@ const applyImgLoader = (
 }
 
 export {
-  importImageminPlugin,
-  getImgLoaderOptions,
-  getHandledFilesRegex,
   applyImgLoader,
+  getHandledFilesRegex,
+  getImgLoaderOptions,
+  importImageminPlugin,
 }

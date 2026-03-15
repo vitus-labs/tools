@@ -11,7 +11,9 @@ const openFile = (filePath: string) => {
   const cmd =
     os === 'darwin' ? 'open' : os === 'win32' ? 'explorer' : 'xdg-open'
 
-  execFile(cmd, [filePath], () => {})
+  execFile(cmd, [filePath], () => {
+    // intentionally ignored — best-effort open
+  })
 }
 
 export const renderGraph = async (

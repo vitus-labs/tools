@@ -113,7 +113,9 @@ describe('getResponsiveLoaderOptions', () => {
   })
 
   it('should use adapter from responsive config when provided', () => {
-    const customAdapter = () => {}
+    const customAdapter = () => {
+      // noop adapter stub
+    }
     const config: OptimizedImagesConfig = {
       ...defaultOptimized,
       responsive: { adapter: customAdapter, sizes: [300, 600, 900] },

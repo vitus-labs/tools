@@ -83,4 +83,4 @@ const applyFileLoader = (
   return webpackConfig
 }
 
-export { getFileLoaderOptions, getFileLoaderPath, applyFileLoader }
+export { applyFileLoader, getFileLoaderOptions, getFileLoaderPath }

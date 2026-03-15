@@ -18,4 +18,4 @@ const storybookBuild = {
   configDir: storybookConfigDir,
 }
 
-export { storybookStandalone, storybookBuild }
+export { storybookBuild, storybookStandalone }

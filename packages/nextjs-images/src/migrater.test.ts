@@ -3,7 +3,9 @@ import { showWarning } from './migrater'
 
 describe('showWarning', () => {
   it('should log a warning message to console', () => {
-    const spy = vi.spyOn(console, 'log').mockImplementation(() => {})
+    const spy = vi.spyOn(console, 'log').mockImplementation(() => {
+      // suppress console output during test
+    })
 
     showWarning()
 

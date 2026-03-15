@@ -102,4 +102,4 @@ const getWebpResourceQuery = (
   }
 }
 
-export { getWebpLoaderOptions, applyWebpLoader, getWebpResourceQuery }
+export { applyWebpLoader, getWebpLoaderOptions, getWebpResourceQuery }
