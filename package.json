@@ -17,8 +17,8 @@
   "scripts": {
     "prepare": "git config core.hooksPath .githooks",
     "changeset": "changeset",
-    "version-packages": "changeset version",
-    "release": "changeset publish",
+    "version-packages": "changeset version && bun install",
+    "release": "node scripts/publish.js",
     "pkgs:clean": "rm -rf node_modules/ bun.lock && bun install",
     "pkgs:build": "bun run --filter '*' build",
     "test": "vitest run",

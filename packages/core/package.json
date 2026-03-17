@@ -33,7 +33,7 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "@vitus-labs/tools-typescript": "1.13.0",
+    "@vitus-labs/tools-typescript": "workspace:^",
     "typescript": "^5.9.3"
   }
 }

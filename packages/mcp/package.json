@@ -40,8 +40,8 @@
     "zod": "^3.25.67"
   },
   "devDependencies": {
-    "@vitus-labs/tools-typescript": "1.13.0",
-    "@vitus-labs/tools-vitest": "1.13.0",
+    "@vitus-labs/tools-typescript": "workspace:^",
+    "@vitus-labs/tools-vitest": "workspace:^",
     "typescript": "^5.9.3"
   }
 }
