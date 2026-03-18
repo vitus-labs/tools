@@ -1,5 +1,15 @@
 # @vitus-labs/tools-nextjs-images
 
+## 1.15.0
+
+### Patch Changes
+
+- [`41ac6c5`](https://github.com/vitus-labs/tools/commit/41ac6c5288dec3d1e113db15c2a62a042174f6b4) Thanks [@vitbokisch](https://github.com/vitbokisch)! - **vitest**: Upgrade to vite 8 peer dependency. Plugin types use `unknown[]` for cross-version compatibility.
+
+  **rolldown**: Skip passthrough exports (e.g. `"./package.json": "./package.json"`) and exports without build conditions.
+
+  **all**: Update next 16.1.7, vite 8.0.0. Fix publish script tarball parsing.
+
 ## 1.14.0
 
 ### Patch Changes
