@@ -41,10 +41,14 @@ for (const dir of packageDirs) {
     console.log(`📦 Publishing ${pkg.name}@${pkg.version}...`)
 
     // Pack with bun (resolves workspace:^ → ^x.y.z)
-    const tarball = execSync('bun pm pack', { cwd: dir, encoding: 'utf8' })
+    const packOutput = execSync('bun pm pack', { cwd: dir, encoding: 'utf8' })
+    const tarball = packOutput
       .trim()
       .split('\n')
-      .pop()
+      .find((line) => line.endsWith('.tgz'))
+    if (!tarball) {
+      throw new Error(`Could not find .tgz in bun pm pack output:\n${packOutput}`)
+    }
     const tarballPath = join(dir, tarball)
 
     // Publish tarball with npm (OIDC provenance)
