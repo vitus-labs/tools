@@ -9,8 +9,10 @@ export interface CoverageThresholds {
 }
 
 export interface VitestConfigOptions {
-  /** Extra glob patterns to exclude from coverage */
+  /** Extra glob patterns to exclude from coverage (appended to defaults) */
   coverageExclude?: string[]
+  /** Extra glob patterns to include in coverage (appended to defaults) */
+  coverageInclude?: string[]
   /** Override default 90% coverage thresholds */
   coverageThresholds?: CoverageThresholds
   /** Vite plugins (e.g. tilde resolve, tsconfig paths) */
@@ -39,6 +41,17 @@ const DEFAULT_THRESHOLDS: Required<CoverageThresholds> = {
   functions: 90,
   lines: 90,
 }
+
+/** Default coverage exclude patterns — exported for consumers using mergeConfig */
+export const DEFAULT_COVERAGE_EXCLUDE = [
+  'src/**/*.test.ts',
+  'src/**/*.test.tsx',
+  'src/**/index.ts',
+  'src/bin/**',
+]
+
+/** Default coverage include patterns — exported for consumers using mergeConfig */
+export const DEFAULT_COVERAGE_INCLUDE = ['src/**/*.ts', 'src/**/*.tsx']
 
 const buildAliases = (
   aliases: Record<string, string>,
@@ -84,14 +97,8 @@ export const createVitestConfig = (
       exclude: [...configDefaults.exclude, 'lib/**', ...(opts.exclude ?? [])],
       coverage: {
         provider: 'v8',
-        include: ['src/**/*.ts', 'src/**/*.tsx'],
-        exclude: [
-          'src/**/*.test.ts',
-          'src/**/*.test.tsx',
-          'src/**/index.ts',
-          'src/bin/**',
-          ...(opts.coverageExclude ?? []),
-        ],
+        include: [...DEFAULT_COVERAGE_INCLUDE, ...(opts.coverageInclude ?? [])],
+        exclude: [...DEFAULT_COVERAGE_EXCLUDE, ...(opts.coverageExclude ?? [])],
         thresholds: {
           ...DEFAULT_THRESHOLDS,
           ...opts.coverageThresholds,
