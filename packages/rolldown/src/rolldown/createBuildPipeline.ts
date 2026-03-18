@@ -98,12 +98,25 @@ const parseSubpathExports = (
 
   for (const [exportPath, exportConfig] of Object.entries(exportsOptions)) {
     if (typeof exportConfig === 'string') {
+      // Skip passthrough exports (e.g. "./package.json": "./package.json")
+      if (!exportConfig.endsWith('.js') && !exportConfig.endsWith('.mjs')) {
+        continue
+      }
       result.push({
         file: exportConfig,
         input: resolveSubpathInput(exportPath),
         ...BUILD_VARIANTS.module,
       })
-    } else if (typeof exportConfig === 'object') {
+    } else if (typeof exportConfig === 'object' && exportConfig !== null) {
+      // Skip exports without build conditions (import/require/node/default)
+      if (
+        !exportConfig.import &&
+        !exportConfig.require &&
+        !exportConfig.node &&
+        !exportConfig.default
+      ) {
+        continue
+      }
       const input = resolveSubpathInput(exportPath)
       result.push(...parseConditions(exportConfig, input))
     }

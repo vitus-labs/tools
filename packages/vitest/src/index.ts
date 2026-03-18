@@ -1,4 +1,3 @@
-import type { PluginOption } from 'vite'
 import { configDefaults, defineConfig } from 'vitest/config'
 
 export interface CoverageThresholds {
@@ -16,7 +15,7 @@ export interface VitestConfigOptions {
   /** Override default 90% coverage thresholds */
   coverageThresholds?: CoverageThresholds
   /** Vite plugins (e.g. tilde resolve, tsconfig paths) */
-  plugins?: PluginOption[]
+  plugins?: unknown[]
   /** Setup files to run before each test (e.g. '@testing-library/jest-dom/vitest') */
   setupFiles?: string[]
   /** Test environment — 'node' (default), 'jsdom', 'happy-dom', etc. */
@@ -79,7 +78,7 @@ export const createVitestConfig = (
   const aliases = opts.aliases ? buildAliases(opts.aliases) : undefined
 
   return defineConfig({
-    plugins: opts.plugins,
+    plugins: opts.plugins as any,
     resolve: aliases ? { alias: aliases } : undefined,
     test: {
       globals: true,
