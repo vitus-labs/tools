@@ -1,5 +1,18 @@
 # Change Log
 
+## 1.14.0
+
+### Patch Changes
+
+- [`3605125`](https://github.com/vitus-labs/tools/commit/36051255315da3d87a2a6b8d6b7ecd8cb9f718f9) Thanks [@vitbokisch](https://github.com/vitbokisch)! - **rolldown**: Auto-derive build entries from package.json subpath exports (e.g., `"./devtools"`, `"./validation/zod"`). Generates separate `.d.ts` declarations per subpath.
+
+  **vitest**: Export `DEFAULT_COVERAGE_EXCLUDE` and `DEFAULT_COVERAGE_INCLUDE` for `mergeConfig` compatibility. Add `coverageInclude` option.
+
+  **all**: Switch to `workspace:^` protocol, custom publish script with OIDC provenance.
+
+- Updated dependencies [[`3605125`](https://github.com/vitus-labs/tools/commit/36051255315da3d87a2a6b8d6b7ecd8cb9f718f9)]:
+  - @vitus-labs/tools-core@1.14.0
+
 ## 1.13.0
 
 ### Minor Changes
