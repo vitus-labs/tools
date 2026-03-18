@@ -12,7 +12,7 @@ const { mockPKG } = vi.hoisted(() => ({
 
 vi.mock('../config/index.js', () => ({
   PKG: mockPKG,
-  CONFIG: {},
+  CONFIG: { sourceDir: 'src' },
   PLATFORMS: ['browser', 'node', 'web', 'native'],
 }))
 
@@ -117,15 +117,16 @@ describe('createBuildPipeline', () => {
       createBuildPipeline = mod.default
     })
 
-    it('should include node and default exports', () => {
+    it('should include node export and skip default when import exists', () => {
       const builds = createBuildPipeline()
 
       const nodeBuild = builds.find((b) => b.file === './lib/node.js')
       expect(nodeBuild).toBeDefined()
       expect(nodeBuild.platform).toBe('node')
 
+      // default is skipped when import is present (avoids duplicate builds)
       const defaultBuild = builds.find((b) => b.file === './lib/default.js')
-      expect(defaultBuild).toBeDefined()
+      expect(defaultBuild).toBeUndefined()
     })
   })
 
@@ -200,6 +201,124 @@ describe('createBuildPipeline', () => {
         (b) => b.file === 'lib/index.cjs' && b.platform === 'node',
       )
       expect(nodeBuild).toBeDefined()
+    })
+  })
+
+  describe('with subpath exports', () => {
+    let createBuildPipeline: () => any[]
+
+    beforeEach(async () => {
+      vi.resetModules()
+      mockPKG.type = 'module'
+      delete mockPKG.main
+      delete mockPKG.module
+      mockPKG.exports = {
+        '.': {
+          types: './lib/types/index.d.ts',
+          import: './lib/index.js',
+        },
+        './devtools': {
+          types: './lib/types/devtools/index.d.ts',
+          import: './lib/devtools/index.js',
+        },
+        './validation/zod': {
+          types: './lib/types/validation/zod.d.ts',
+          import: './lib/validation/zod.js',
+        },
+      }
+      const mod = await import('./createBuildPipeline.js')
+      createBuildPipeline = mod.default
+    })
+
+    it('should create builds for all subpath exports', () => {
+      const builds = createBuildPipeline()
+
+      expect(builds).toHaveLength(3)
+    })
+
+    it('should set correct input for root export', () => {
+      const builds = createBuildPipeline()
+      const root = builds.find((b) => b.file === './lib/index.js')
+
+      expect(root).toBeDefined()
+      expect(root.input).toBe('src/index.ts')
+      expect(root.format).toBe('es')
+    })
+
+    it('should set correct input for subpath export', () => {
+      const builds = createBuildPipeline()
+      const devtools = builds.find((b) => b.file === './lib/devtools/index.js')
+
+      expect(devtools).toBeDefined()
+      expect(devtools.input).toBe('src/devtools')
+    })
+
+    it('should set correct input for nested subpath export', () => {
+      const builds = createBuildPipeline()
+      const zod = builds.find((b) => b.file === './lib/validation/zod.js')
+
+      expect(zod).toBeDefined()
+      expect(zod.input).toBe('src/validation/zod')
+    })
+  })
+
+  describe('with subpath exports having multiple conditions', () => {
+    let createBuildPipeline: () => any[]
+
+    beforeEach(async () => {
+      vi.resetModules()
+      mockPKG.type = 'module'
+      delete mockPKG.main
+      delete mockPKG.module
+      mockPKG.exports = {
+        '.': {
+          import: './lib/index.js',
+          require: './lib/index.cjs',
+        },
+      }
+      const mod = await import('./createBuildPipeline.js')
+      createBuildPipeline = mod.default
+    })
+
+    it('should create builds for each condition', () => {
+      const builds = createBuildPipeline()
+
+      const esBuild = builds.find((b) => b.file === './lib/index.js')
+      expect(esBuild).toBeDefined()
+      expect(esBuild.format).toBe('es')
+
+      const cjsBuild = builds.find((b) => b.file === './lib/index.cjs')
+      expect(cjsBuild).toBeDefined()
+      expect(cjsBuild.format).toBe('cjs')
+    })
+  })
+
+  describe('with subpath string export', () => {
+    let createBuildPipeline: () => any[]
+
+    beforeEach(async () => {
+      vi.resetModules()
+      mockPKG.type = 'module'
+      delete mockPKG.main
+      delete mockPKG.module
+      mockPKG.exports = {
+        '.': './lib/index.js',
+        './utils': './lib/utils.js',
+      }
+      const mod = await import('./createBuildPipeline.js')
+      createBuildPipeline = mod.default
+    })
+
+    it('should handle string subpath exports', () => {
+      const builds = createBuildPipeline()
+
+      const root = builds.find((b) => b.file === './lib/index.js')
+      expect(root).toBeDefined()
+      expect(root.input).toBe('src/index.ts')
+
+      const utils = builds.find((b) => b.file === './lib/utils.js')
+      expect(utils).toBeDefined()
+      expect(utils.input).toBe('src/utils')
     })
   })
 
