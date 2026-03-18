@@ -148,6 +148,32 @@ describe('createBuildPipeline', () => {
     })
   })
 
+  describe('with passthrough exports like package.json', () => {
+    let createBuildPipeline: () => any[]
+
+    beforeEach(async () => {
+      vi.resetModules()
+      mockPKG.type = 'module'
+      delete mockPKG.main
+      delete mockPKG.module
+      mockPKG.exports = {
+        '.': {
+          import: './lib/index.js',
+        },
+        './package.json': './package.json',
+      }
+      const mod = await import('./createBuildPipeline.js')
+      createBuildPipeline = mod.default
+    })
+
+    it('should skip passthrough exports that are not JS files', () => {
+      const builds = createBuildPipeline()
+
+      expect(builds).toHaveLength(1)
+      expect(builds[0].file).toBe('./lib/index.js')
+    })
+  })
+
   describe('with react-native build', () => {
     let createBuildPipeline: () => any[]
 
