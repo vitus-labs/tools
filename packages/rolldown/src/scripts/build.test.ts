@@ -7,7 +7,7 @@ const {
   mockReaddirSync,
   mockCreateBuildPipeline,
   mockRolldownConfig,
-  mockBuildDts,
+  mockBuildAllDts,
 } = vi.hoisted(() => ({
   mockRolldown: vi.fn(),
   mockBundleWrite: vi.fn(),
@@ -15,7 +15,7 @@ const {
   mockReaddirSync: vi.fn(),
   mockCreateBuildPipeline: vi.fn(),
   mockRolldownConfig: vi.fn(),
-  mockBuildDts: vi.fn(),
+  mockBuildAllDts: vi.fn(),
 }))
 
 vi.mock('rolldown', () => ({ rolldown: mockRolldown }))
@@ -25,6 +25,7 @@ vi.mock('node:fs', () => ({
   renameSync: vi.fn(),
   statSync: vi.fn(),
   unlinkSync: vi.fn(),
+  cpSync: vi.fn(),
 }))
 
 vi.mock('../config/index.js', () => ({
@@ -35,7 +36,7 @@ vi.mock('../config/index.js', () => ({
 vi.mock('../rolldown/index.js', () => ({
   createBuildPipeline: mockCreateBuildPipeline,
   config: mockRolldownConfig,
-  buildDts: mockBuildDts,
+  buildAllDts: mockBuildAllDts,
 }))
 
 describe('build', () => {
@@ -66,7 +67,7 @@ describe('build', () => {
         format: item.format,
       },
     }))
-    mockBuildDts.mockReturnValue(null)
+    mockBuildAllDts.mockReturnValue([])
   })
 
   it('should execute build pipeline successfully', async () => {
@@ -80,16 +81,18 @@ describe('build', () => {
     expect(mockBundleClose).toHaveBeenCalled()
   })
 
-  it('should generate DTS when buildDts returns config', async () => {
-    mockBuildDts.mockReturnValue({
-      file: './lib/index.d.ts',
-      input: 'src/index.ts',
-      output: {
-        dir: 'lib',
-        entryFileNames: 'index.d.ts',
-        format: 'es',
+  it('should generate DTS when buildAllDts returns configs', async () => {
+    mockBuildAllDts.mockReturnValue([
+      {
+        file: './lib/index.d.ts',
+        input: 'src/index.ts',
+        output: {
+          dir: 'lib',
+          entryFileNames: 'index.d.ts',
+          format: 'es',
+        },
       },
-    })
+    ])
 
     vi.resetModules()
     const { runBuild } = await import('./build.js')
@@ -111,15 +114,17 @@ describe('build', () => {
         format: item.format,
       },
     }))
-    mockBuildDts.mockReturnValue({
-      file: './lib/index.d.ts',
-      input: 'src/index.ts',
-      output: {
-        dir: 'lib',
-        entryFileNames: 'index.d.ts',
-        format: 'es',
+    mockBuildAllDts.mockReturnValue([
+      {
+        file: './lib/index.d.ts',
+        input: 'src/index.ts',
+        output: {
+          dir: 'lib',
+          entryFileNames: 'index.d.ts',
+          format: 'es',
+        },
       },
-    })
+    ])
 
     await runBuild()
 
@@ -128,15 +133,17 @@ describe('build', () => {
   })
 
   it('should handle DTS chunk consolidation', async () => {
-    mockBuildDts.mockReturnValue({
-      file: './lib/index.d.ts',
-      input: 'src/index.ts',
-      output: {
-        dir: 'lib',
-        entryFileNames: 'index.d.ts',
-        format: 'es',
+    mockBuildAllDts.mockReturnValue([
+      {
+        file: './lib/index.d.ts',
+        input: 'src/index.ts',
+        output: {
+          dir: 'lib',
+          entryFileNames: 'index.d.ts',
+          format: 'es',
+        },
       },
-    })
+    ])
 
     vi.resetModules()
     const { runBuild } = await import('./build.js')
@@ -158,15 +165,17 @@ describe('build', () => {
         format: item.format,
       },
     }))
-    mockBuildDts.mockReturnValue({
-      file: './lib/index.d.ts',
-      input: 'src/index.ts',
-      output: {
-        dir: 'lib',
-        entryFileNames: 'index.d.ts',
-        format: 'es',
+    mockBuildAllDts.mockReturnValue([
+      {
+        file: './lib/index.d.ts',
+        input: 'src/index.ts',
+        output: {
+          dir: 'lib',
+          entryFileNames: 'index.d.ts',
+          format: 'es',
+        },
       },
-    })
+    ])
     mockReaddirSync.mockReturnValue(['chunk-abc.d.ts'])
     vi.mocked(statSync).mockImplementation((p: any) => {
       if (String(p).includes('chunk'))
@@ -196,7 +205,7 @@ describe('build', () => {
         format: item.format,
       },
     }))
-    mockBuildDts.mockReturnValue(null)
+    mockBuildAllDts.mockReturnValue([])
 
     await expect(runBuild()).rejects.toThrow('rolldown failed')
   })
@@ -236,11 +245,79 @@ describe('build', () => {
         format: item.format,
       },
     }))
-    mockBuildDts.mockReturnValue(null)
+    mockBuildAllDts.mockReturnValue([])
 
     await runBuild()
 
     expect(mockRolldownConfig).toHaveBeenCalledTimes(2)
     expect(mockRolldown).toHaveBeenCalledTimes(2)
+  })
+
+  it('should generate multiple DTS for subpath exports', async () => {
+    mockBuildAllDts.mockReturnValue([
+      {
+        file: './lib/types/index.d.ts',
+        input: 'src/index.ts',
+        output: {
+          dir: 'lib/types',
+          entryFileNames: 'index.d.ts',
+          format: 'es',
+        },
+      },
+      {
+        file: './lib/types/devtools/index.d.ts',
+        input: 'src/devtools/index.ts',
+        output: {
+          dir: 'lib/types/devtools',
+          entryFileNames: 'index.d.ts',
+          format: 'es',
+        },
+      },
+    ])
+
+    vi.resetModules()
+    const { runBuild } = await import('./build.js')
+    vi.clearAllMocks()
+
+    mockRolldown.mockResolvedValue({
+      write: mockBundleWrite,
+      close: mockBundleClose,
+    })
+    mockBundleWrite.mockResolvedValue(undefined)
+    mockBundleClose.mockResolvedValue(undefined)
+    mockReaddirSync.mockReturnValue([])
+    mockRolldownConfig.mockImplementation((item: any) => ({
+      input: 'src',
+      output: {
+        dir: 'lib',
+        entryFileNames: 'index.js',
+        format: item.format,
+      },
+    }))
+    mockBuildAllDts.mockReturnValue([
+      {
+        file: './lib/types/index.d.ts',
+        input: 'src/index.ts',
+        output: {
+          dir: 'lib/types',
+          entryFileNames: 'index.d.ts',
+          format: 'es',
+        },
+      },
+      {
+        file: './lib/types/devtools/index.d.ts',
+        input: 'src/devtools/index.ts',
+        output: {
+          dir: 'lib/types/devtools',
+          entryFileNames: 'index.d.ts',
+          format: 'es',
+        },
+      },
+    ])
+
+    await runBuild()
+
+    // 1 main build + 2 DTS builds = 3 rolldown calls
+    expect(mockRolldown).toHaveBeenCalledTimes(3)
   })
 })

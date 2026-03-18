@@ -129,11 +129,7 @@ const rolldownConfig = ({
   return buildOutput
 }
 
-const buildDts = () => {
-  const typesFilePath = PKG?.exports?.types || PKG.types || PKG.typings
-
-  if (!CONFIG.typescript || !typesFilePath) return null
-
+const createDtsConfig = (typesFilePath: string, inputFile: string) => {
   const lastSlash = typesFilePath.lastIndexOf('/')
   const dir = lastSlash >= 0 ? typesFilePath.substring(0, lastSlash) : '.'
   const entryFileName =
@@ -141,7 +137,7 @@ const buildDts = () => {
 
   return {
     file: typesFilePath,
-    input: `${CONFIG.sourceDir}/index.ts`,
+    input: inputFile,
     tsconfig: 'tsconfig.json',
     resolve: {
       extensions: CONFIG.extensions,
@@ -161,5 +157,56 @@ const buildDts = () => {
   }
 }
 
+/** Check if exports object uses subpath keys */
+const isSubpathExports = (obj: Record<string, any>): boolean =>
+  Object.keys(obj).some((k) => k === '.' || k.startsWith('./'))
+
+/** Resolve input .ts file from a subpath export key */
+const resolveSubpathInput = (exportPath: string): string => {
+  if (exportPath === '.') return `${CONFIG.sourceDir}/index.ts`
+  const subpath = exportPath.slice(2)
+  return `${CONFIG.sourceDir}/${subpath}`
+}
+
+const buildDts = (): ReturnType<typeof createDtsConfig> | null => {
+  if (!CONFIG.typescript) return null
+
+  // Simple case: no subpath exports
+  const typesFilePath = PKG?.exports?.types || PKG.types || PKG.typings
+  if (typesFilePath) {
+    return createDtsConfig(typesFilePath, `${CONFIG.sourceDir}/index.ts`)
+  }
+
+  return null
+}
+
+/** Build DTS configs for all subpath exports that have a `types` field */
+const buildAllDts = (): ReturnType<typeof createDtsConfig>[] => {
+  if (!CONFIG.typescript) return []
+
+  const exportsOptions = PKG.exports
+  if (
+    !exportsOptions ||
+    typeof exportsOptions !== 'object' ||
+    !isSubpathExports(exportsOptions)
+  ) {
+    const single = buildDts()
+    return single ? [single] : []
+  }
+
+  const results: ReturnType<typeof createDtsConfig>[] = []
+  for (const [exportPath, exportConfig] of Object.entries(exportsOptions)) {
+    if (!exportConfig || typeof exportConfig !== 'object') continue
+    const typesPath = (exportConfig as Record<string, string>).types
+    if (!typesPath) continue
+    const inputFile = `${resolveSubpathInput(exportPath)}.ts`
+      .replace('/index.ts.ts', '/index.ts')
+      .replace('.ts.ts', '.ts')
+    results.push(createDtsConfig(typesPath, inputFile))
+  }
+
+  return results
+}
+
 export default rolldownConfig
-export { buildDts }
+export { buildAllDts, buildDts }

@@ -42,53 +42,89 @@ const BUILD_VARIANTS: Record<
   unpkg: { format: 'umd', env: 'production' },
 }
 
+/** Check if an exports object uses subpath keys (e.g. ".", "./devtools") */
+const isSubpathExports = (obj: Record<string, any>): boolean =>
+  Object.keys(obj).some((k) => k === '.' || k.startsWith('./'))
+
+/** Resolve the source input file for a subpath export using convention:
+ *  "." → "src/index.ts", "./devtools" → "src/devtools/index.ts",
+ *  "./validation/zod" → "src/validation/zod.ts" (file) or "src/validation/zod/index.ts" (dir) */
+const resolveSubpathInput = (exportPath: string): string => {
+  if (exportPath === '.') return `${CONFIG.sourceDir}/index.ts`
+  const subpath = exportPath.slice(2) // strip "./"
+  return `${CONFIG.sourceDir}/${subpath}`
+}
+
+/** Extract build variants from a single export's condition object */
+const parseConditions = (
+  conditions: Record<string, any>,
+  input?: string,
+): Record<string, any>[] => {
+  const result: Record<string, any>[] = []
+  const base = input ? { input } : {}
+
+  if (conditions.import) {
+    result.push({ file: conditions.import, ...BUILD_VARIANTS.module, ...base })
+  }
+  if (conditions.require) {
+    result.push({
+      file: conditions.require,
+      format: 'cjs',
+      env: 'development',
+      platform: 'universal',
+      ...base,
+    })
+  }
+  if (conditions.node) {
+    result.push({
+      file: conditions.node,
+      ...BUILD_VARIANTS.module,
+      platform: 'node',
+      ...base,
+    })
+  }
+  if (conditions.default && !conditions.import) {
+    result.push({ file: conditions.default, ...BUILD_VARIANTS.module, ...base })
+  }
+
+  return result
+}
+
+/** Parse subpath exports object into build variants */
+const parseSubpathExports = (
+  exportsOptions: Record<string, any>,
+): Record<string, any>[] => {
+  const result: Record<string, any>[] = []
+
+  for (const [exportPath, exportConfig] of Object.entries(exportsOptions)) {
+    if (typeof exportConfig === 'string') {
+      result.push({
+        file: exportConfig,
+        input: resolveSubpathInput(exportPath),
+        ...BUILD_VARIANTS.module,
+      })
+    } else if (typeof exportConfig === 'object') {
+      const input = resolveSubpathInput(exportPath)
+      result.push(...parseConditions(exportConfig, input))
+    }
+  }
+
+  return result
+}
+
 const getExportsOptions = () => {
   const exportsOptions = PKG.exports
 
   if (!exportsOptions) return []
 
   if (typeof exportsOptions === 'string') {
-    return [
-      {
-        file: PKG.exports,
-        ...BUILD_VARIANTS.module,
-      },
-    ]
+    return [{ file: PKG.exports, ...BUILD_VARIANTS.module }]
   }
 
   if (typeof exportsOptions === 'object') {
-    const result: Record<string, any>[] = []
-
-    if (exportsOptions.import) {
-      result.push({
-        file: exportsOptions.import,
-        ...BUILD_VARIANTS.module,
-      })
-    }
-
-    if (exportsOptions.require) {
-      result.push({
-        file: exportsOptions.require,
-        ...BUILD_VARIANTS.main,
-      })
-    }
-
-    if (exportsOptions.node) {
-      result.push({
-        file: exportsOptions.node,
-        ...BUILD_VARIANTS.module,
-        platform: 'node',
-      })
-    }
-
-    if (exportsOptions.default) {
-      result.push({
-        file: exportsOptions.default,
-        ...BUILD_VARIANTS.module,
-      })
-    }
-
-    return result
+    return isSubpathExports(exportsOptions)
+      ? parseSubpathExports(exportsOptions)
+      : parseConditions(exportsOptions)
   }
 
   return []

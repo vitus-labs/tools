@@ -5,7 +5,7 @@ import { rimraf } from 'rimraf'
 import { rolldown } from 'rolldown'
 import { CONFIG, PKG } from '../config/index.js'
 import {
-  buildDts,
+  buildAllDts,
   createBuildPipeline,
   config as rolldownConfig,
 } from '../rolldown/index.js'
@@ -104,20 +104,22 @@ const fixDtsCodeSplit = (outDir: string, entryName: string) => {
 }
 
 const generateDeclarations = async () => {
-  const dtsFile = buildDts()
-  if (!dtsFile) return
+  const dtsConfigs = buildAllDts()
+  if (dtsConfigs.length === 0) return
 
   log(`\n${dim('Generating')} declarations...`)
-  const tscStart = performance.now()
 
-  const { output, file, ...input } = dtsFile
-  await build({ inputOptions: input, outputOptions: output })
-  fixDtsCodeSplit(output.dir as string, output.entryFileNames as string)
+  for (const dtsFile of dtsConfigs) {
+    const tscStart = performance.now()
+    const { output, file, ...input } = dtsFile
+    await build({ inputOptions: input, outputOptions: output })
+    fixDtsCodeSplit(output.dir as string, output.entryFileNames as string)
 
-  const tscDuration = Math.round(performance.now() - tscStart)
-  log(
-    `  ${chalk.green('+')} ${bold('DTS')} ${dim('->')} ${dim(file)} ${dim(`(${tscDuration}ms)`)}`,
-  )
+    const tscDuration = Math.round(performance.now() - tscStart)
+    log(
+      `  ${chalk.green('+')} ${bold('DTS')} ${dim('->')} ${dim(file)} ${dim(`(${tscDuration}ms)`)}`,
+    )
+  }
 }
 
 const runBuild = async () => {
