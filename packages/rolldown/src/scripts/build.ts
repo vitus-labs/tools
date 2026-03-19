@@ -103,11 +103,30 @@ const fixDtsCodeSplit = (outDir: string, entryName: string) => {
   }
 }
 
+/** Collect all unique DTS output directories from the configs */
+const getDtsOutputDirs = (
+  dtsConfigs: ReturnType<typeof buildAllDts>,
+): string[] => {
+  const dirs = new Set<string>()
+  for (const config of dtsConfigs) {
+    const dir = config.output.dir as string
+    if (dir) dirs.add(dir)
+  }
+  return [...dirs]
+}
+
 const generateDeclarations = async () => {
   const dtsConfigs = buildAllDts()
   if (dtsConfigs.length === 0) return
 
   log(`\n${dim('Generating')} declarations...`)
+
+  // Clean all DTS output directories before generating.
+  // This prevents collisions when multiple subpath exports
+  // share the same types directory (e.g., lib/types/).
+  for (const dir of getDtsOutputDirs(dtsConfigs)) {
+    rimraf.sync(`${process.cwd()}/${dir}`)
+  }
 
   for (const dtsFile of dtsConfigs) {
     const tscStart = performance.now()
