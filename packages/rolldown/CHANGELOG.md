@@ -1,5 +1,14 @@
 # Change Log
 
+## 1.15.2
+
+### Patch Changes
+
+- [`99a7d1f`](https://github.com/vitus-labs/tools/commit/99a7d1f5548f81009a616baeb726487e0affcaa6) Thanks [@vitbokisch](https://github.com/vitbokisch)! - Fix DTS generation collisions for packages with multiple subpath exports
+
+- Updated dependencies []:
+  - @vitus-labs/tools-core@1.15.2
+
 ## 1.15.1
 
 ### Patch Changes
