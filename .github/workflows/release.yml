@@ -101,3 +101,5 @@ jobs:
         run: |
           bunx changeset version --snapshot alpha
           bunx changeset publish --tag next
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
