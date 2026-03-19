@@ -1,5 +1,12 @@
 # @vitus-labs/tools-atlas
 
+## 1.15.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @vitus-labs/tools-core@1.15.1
+
 ## 1.15.0
 
 ### Patch Changes
