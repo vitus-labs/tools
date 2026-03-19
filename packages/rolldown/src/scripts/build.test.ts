@@ -26,6 +26,7 @@ vi.mock('node:fs', () => ({
   statSync: vi.fn(),
   unlinkSync: vi.fn(),
   cpSync: vi.fn(),
+  mkdirSync: vi.fn(),
 }))
 
 vi.mock('../config/index.js', () => ({
@@ -125,6 +126,12 @@ describe('build', () => {
         },
       },
     ])
+    // buildDtsIsolated reads temp dir to find largest .d.ts
+    mockReaddirSync.mockReturnValue(['index.d.ts'])
+    const { statSync } = await import('node:fs')
+    vi.mocked(statSync).mockReturnValue({ size: 100 } as ReturnType<
+      typeof statSync
+    >)
 
     await runBuild()
 
@@ -132,7 +139,7 @@ describe('build', () => {
     expect(mockRolldown).toHaveBeenCalledTimes(2)
   })
 
-  it('should handle DTS chunk consolidation', async () => {
+  it('should pick largest DTS file when code-split occurs', async () => {
     mockBuildAllDts.mockReturnValue([
       {
         file: './lib/index.d.ts',
@@ -147,7 +154,7 @@ describe('build', () => {
 
     vi.resetModules()
     const { runBuild } = await import('./build.js')
-    const { statSync, unlinkSync, renameSync } = await import('node:fs')
+    const { statSync, renameSync, mkdirSync } = await import('node:fs')
     vi.clearAllMocks()
 
     // Re-setup
@@ -176,7 +183,8 @@ describe('build', () => {
         },
       },
     ])
-    mockReaddirSync.mockReturnValue(['index2.d.ts'])
+    // Temp dir has entry stub + larger chunk — largest should be picked
+    mockReaddirSync.mockReturnValue(['index.d.ts', 'index2.d.ts'])
     vi.mocked(statSync).mockImplementation((p: any) => {
       if (String(p).includes('index2'))
         return { size: 1000 } as ReturnType<typeof statSync>
@@ -185,7 +193,8 @@ describe('build', () => {
 
     await runBuild()
 
-    expect(unlinkSync).toHaveBeenCalled()
+    // buildDtsIsolated creates temp dir, picks largest, moves to final
+    expect(mkdirSync).toHaveBeenCalled()
     expect(renameSync).toHaveBeenCalled()
   })
 
@@ -277,6 +286,7 @@ describe('build', () => {
 
     vi.resetModules()
     const { runBuild } = await import('./build.js')
+    const { statSync } = await import('node:fs')
     vi.clearAllMocks()
 
     mockRolldown.mockResolvedValue({
@@ -285,7 +295,10 @@ describe('build', () => {
     })
     mockBundleWrite.mockResolvedValue(undefined)
     mockBundleClose.mockResolvedValue(undefined)
-    mockReaddirSync.mockReturnValue([])
+    mockReaddirSync.mockReturnValue(['index.d.ts'])
+    vi.mocked(statSync).mockReturnValue({ size: 100 } as ReturnType<
+      typeof statSync
+    >)
     mockRolldownConfig.mockImplementation((item: any) => ({
       input: 'src',
       output: {
@@ -317,7 +330,7 @@ describe('build', () => {
 
     await runBuild()
 
-    // 1 main build + 2 DTS builds = 3 rolldown calls
+    // 1 main build + 2 isolated DTS builds = 3 rolldown calls
     expect(mockRolldown).toHaveBeenCalledTimes(3)
   })
 })

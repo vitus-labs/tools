@@ -1,4 +1,4 @@
-import { cpSync, readdirSync, renameSync, statSync, unlinkSync } from 'node:fs'
+import { cpSync, mkdirSync, readdirSync, renameSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import chalk from 'chalk'
 import { rimraf } from 'rimraf'
@@ -79,40 +79,55 @@ const copyStaticFiles = () => {
   }
 }
 
-const fixDtsCodeSplit = (outDir: string, entryName: string) => {
-  const entryPath = join(outDir, entryName)
-  const allDts = readdirSync(outDir).filter(
-    (f) => f.endsWith('.d.ts') && f !== entryName,
-  )
+/**
+ * Build a single DTS entry in an isolated temp directory, then move the
+ * largest .d.ts file (the real declarations) to the final output path.
+ *
+ * Rolldown code-splits DTS output: the entry file is a tiny re-export stub,
+ * and the actual types go into a chunk. Building into a temp dir avoids
+ * collisions when multiple DTS entries share the same output directory.
+ */
+const buildDtsIsolated = async (
+  dtsConfig: ReturnType<typeof buildAllDts>[number],
+) => {
+  const { output, file, ...input } = dtsConfig
+  const finalDir = output.dir as string
+  const entryName = output.entryFileNames as string
+  const tempDir = join(finalDir, `__dts_tmp_${entryName.replace(/\W/g, '_')}`)
 
-  if (allDts.length !== 1 || !allDts[0]) return
+  // Build into isolated temp directory
+  const tempOutput = { ...output, dir: tempDir }
+  await build({ inputOptions: input, outputOptions: tempOutput })
 
-  const chunkPath = join(outDir, allDts[0])
-  const chunkSize = statSync(chunkPath).size
-  const entrySize = statSync(entryPath).size
+  // Find the largest .d.ts file — that's the real declarations
+  const absTempDir = join(process.cwd(), tempDir)
+  const dtsFiles = readdirSync(absTempDir).filter((f) => f.endsWith('.d.ts'))
 
-  if (chunkSize > entrySize) {
-    unlinkSync(entryPath)
-    renameSync(chunkPath, entryPath)
-    try {
-      unlinkSync(`${entryPath}.map`)
-      renameSync(`${chunkPath}.map`, `${entryPath}.map`)
-    } catch {
-      // sourcemap may not exist
+  let bestFile = dtsFiles[0] || entryName
+  let bestSize = 0
+  for (const f of dtsFiles) {
+    const size = statSync(join(absTempDir, f)).size
+    if (size > bestSize) {
+      bestSize = size
+      bestFile = f
     }
   }
-}
 
-/** Collect all unique DTS output directories from the configs */
-const getDtsOutputDirs = (
-  dtsConfigs: ReturnType<typeof buildAllDts>,
-): string[] => {
-  const dirs = new Set<string>()
-  for (const config of dtsConfigs) {
-    const dir = config.output.dir as string
-    if (dir) dirs.add(dir)
+  // Move the best file to the final location
+  const absFinalDir = join(process.cwd(), finalDir)
+  mkdirSync(absFinalDir, { recursive: true })
+  renameSync(join(absTempDir, bestFile), join(absFinalDir, entryName))
+
+  // Move sourcemap if it exists
+  const mapName = `${bestFile}.map`
+  try {
+    renameSync(join(absTempDir, mapName), join(absFinalDir, `${entryName}.map`))
+  } catch {
+    // sourcemap may not exist
   }
-  return [...dirs]
+
+  // Clean up temp directory
+  rimraf.sync(absTempDir)
 }
 
 const generateDeclarations = async () => {
@@ -121,22 +136,13 @@ const generateDeclarations = async () => {
 
   log(`\n${dim('Generating')} declarations...`)
 
-  // Clean all DTS output directories before generating.
-  // This prevents collisions when multiple subpath exports
-  // share the same types directory (e.g., lib/types/).
-  for (const dir of getDtsOutputDirs(dtsConfigs)) {
-    rimraf.sync(`${process.cwd()}/${dir}`)
-  }
-
   for (const dtsFile of dtsConfigs) {
     const tscStart = performance.now()
-    const { output, file, ...input } = dtsFile
-    await build({ inputOptions: input, outputOptions: output })
-    fixDtsCodeSplit(output.dir as string, output.entryFileNames as string)
+    await buildDtsIsolated(dtsFile)
 
     const tscDuration = Math.round(performance.now() - tscStart)
     log(
-      `  ${chalk.green('+')} ${bold('DTS')} ${dim('->')} ${dim(file)} ${dim(`(${tscDuration}ms)`)}`,
+      `  ${chalk.green('+')} ${bold('DTS')} ${dim('->')} ${dim(dtsFile.file)} ${dim(`(${tscDuration}ms)`)}`,
     )
   }
 }
