@@ -1,5 +1,7 @@
 # @vitus-labs/tools-mcp
 
+## 1.15.1
+
 ## 1.15.0
 
 ### Patch Changes

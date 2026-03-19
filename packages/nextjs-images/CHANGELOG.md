@@ -1,5 +1,7 @@
 # @vitus-labs/tools-nextjs-images
 
+## 1.15.1
+
 ## 1.15.0
 
 ### Patch Changes
