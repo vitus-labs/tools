@@ -1,5 +1,14 @@
 # Change Log
 
+## 1.15.3
+
+### Patch Changes
+
+- [`559aa76`](https://github.com/vitus-labs/tools/commit/559aa76cbcfd95f21a20d15a38cea04174294192) Thanks [@vitbokisch](https://github.com/vitbokisch)! - Build each DTS entry in an isolated temp dir to prevent collisions with subpath exports
+
+- Updated dependencies []:
+  - @vitus-labs/tools-core@1.15.3
+
 ## 1.15.2
 
 ### Patch Changes
