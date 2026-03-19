@@ -176,9 +176,9 @@ describe('build', () => {
         },
       },
     ])
-    mockReaddirSync.mockReturnValue(['chunk-abc.d.ts'])
+    mockReaddirSync.mockReturnValue(['index2.d.ts'])
     vi.mocked(statSync).mockImplementation((p: any) => {
-      if (String(p).includes('chunk'))
+      if (String(p).includes('index2'))
         return { size: 1000 } as ReturnType<typeof statSync>
       return { size: 10 } as ReturnType<typeof statSync>
     })
