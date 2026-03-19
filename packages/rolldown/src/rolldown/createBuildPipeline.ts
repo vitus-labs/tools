@@ -47,8 +47,7 @@ const isSubpathExports = (obj: Record<string, any>): boolean =>
   Object.keys(obj).some((k) => k === '.' || k.startsWith('./'))
 
 /** Resolve the source input file for a subpath export using convention:
- *  "." → "src/index.ts", "./devtools" → "src/devtools/index.ts",
- *  "./validation/zod" → "src/validation/zod.ts" (file) or "src/validation/zod/index.ts" (dir) */
+ *  "." → "src/index.ts", "./devtools" → "src/devtools" */
 const resolveSubpathInput = (exportPath: string): string => {
   if (exportPath === '.') return `${CONFIG.sourceDir}/index.ts`
   const subpath = exportPath.slice(2) // strip "./"

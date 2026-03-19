@@ -161,7 +161,7 @@ const createDtsConfig = (typesFilePath: string, inputFile: string) => {
 const isSubpathExports = (obj: Record<string, any>): boolean =>
   Object.keys(obj).some((k) => k === '.' || k.startsWith('./'))
 
-/** Resolve input .ts file from a subpath export key */
+/** Resolve input .ts file from a subpath export key using convention. */
 const resolveSubpathInput = (exportPath: string): string => {
   if (exportPath === '.') return `${CONFIG.sourceDir}/index.ts`
   const subpath = exportPath.slice(2)
@@ -199,9 +199,9 @@ const buildAllDts = (): ReturnType<typeof createDtsConfig>[] => {
     if (!exportConfig || typeof exportConfig !== 'object') continue
     const typesPath = (exportConfig as Record<string, string>).types
     if (!typesPath) continue
-    const inputFile = `${resolveSubpathInput(exportPath)}.ts`
-      .replace('/index.ts.ts', '/index.ts')
-      .replace('.ts.ts', '.ts')
+    const resolved = resolveSubpathInput(exportPath)
+    // Ensure .ts extension — bun condition already has it, convention needs it
+    const inputFile = resolved.endsWith('.ts') ? resolved : `${resolved}.ts`
     results.push(createDtsConfig(typesPath, inputFile))
   }
 
