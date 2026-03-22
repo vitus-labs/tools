@@ -145,7 +145,12 @@ const createDtsConfig = (typesFilePath: string, inputFile: string) => {
     external: CONFIG.bundleAll
       ? []
       : [...PKG.externalDependencies, ...CONFIG.external],
-    plugins: [...(dts({ tsconfig: 'tsconfig.json' }) as RolldownPlugin[])],
+    plugins: [
+      ...(dts({
+        tsconfig: 'tsconfig.json',
+        emitDtsOnly: true,
+      }) as RolldownPlugin[]),
+    ],
     output: {
       dir,
       entryFileNames: entryFileName,
