@@ -1,5 +1,14 @@
 # Change Log
 
+## 1.15.4
+
+### Patch Changes
+
+- [#85](https://github.com/vitus-labs/tools/pull/85) [`c0b6735`](https://github.com/vitus-labs/tools/commit/c0b6735c3255f0fa275d247b3dee6f95696e0fda) Thanks [@vitbokisch](https://github.com/vitbokisch)! - Pass `emitDtsOnly: true` to rolldown-plugin-dts to prevent JS output chunks in declaration builds
+
+- Updated dependencies []:
+  - @vitus-labs/tools-core@1.15.4
+
 ## 1.15.3
 
 ### Patch Changes
