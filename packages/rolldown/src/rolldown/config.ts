@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs'
 import { swapGlobals } from '@vitus-labs/tools-core'
 import type { RolldownPlugin } from 'rolldown'
 import { dts } from 'rolldown-plugin-dts'
@@ -166,6 +167,14 @@ const createDtsConfig = (typesFilePath: string, inputFile: string) => {
 const isSubpathExports = (obj: Record<string, any>): boolean =>
   Object.keys(obj).some((k) => k === '.' || k.startsWith('./'))
 
+/** Resolve the actual source file extension (.ts, .tsx, etc.) */
+const resolveWithExtension = (path: string): string => {
+  for (const ext of ['.ts', '.tsx', '.js', '.jsx']) {
+    if (existsSync(`${path}${ext}`)) return `${path}${ext}`
+  }
+  return `${path}.ts`
+}
+
 /** Resolve input .ts file from a subpath export key using convention. */
 const resolveSubpathInput = (exportPath: string): string => {
   if (exportPath === '.') return `${CONFIG.sourceDir}/index.ts`
@@ -205,8 +214,10 @@ const buildAllDts = (): ReturnType<typeof createDtsConfig>[] => {
     const typesPath = (exportConfig as Record<string, string>).types
     if (!typesPath) continue
     const resolved = resolveSubpathInput(exportPath)
-    // Ensure .ts extension — bun condition already has it, convention needs it
-    const inputFile = resolved.endsWith('.ts') ? resolved : `${resolved}.ts`
+    const inputFile =
+      resolved.endsWith('.ts') || resolved.endsWith('.tsx')
+        ? resolved
+        : resolveWithExtension(resolved)
     results.push(createDtsConfig(typesPath, inputFile))
   }
 
