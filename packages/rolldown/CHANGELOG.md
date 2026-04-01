@@ -1,5 +1,14 @@
 # Change Log
 
+## 1.15.5
+
+### Patch Changes
+
+- [#98](https://github.com/vitus-labs/tools/pull/98) [`9ec732d`](https://github.com/vitus-labs/tools/commit/9ec732d7899c10e035cce253088eaa10bf63f1af) Thanks [@vitbokisch](https://github.com/vitbokisch)! - Resolve `.tsx`, `.js`, and `.jsx` extensions for DTS subpath export inputs instead of assuming `.ts`
+
+- Updated dependencies []:
+  - @vitus-labs/tools-core@1.15.5
+
 ## 1.15.4
 
 ### Patch Changes
