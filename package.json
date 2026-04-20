@@ -38,7 +38,7 @@
     "@vitus-labs/tools-lint": "*",
     "@vitus-labs/tools-storybook": "workspace:*",
     "react": "^19.2.4",
-    "typescript": "5.9.3",
+    "typescript": "6.0.3",
     "vite": "^8.0.0",
     "vitest": "^4.1.0"
   },
