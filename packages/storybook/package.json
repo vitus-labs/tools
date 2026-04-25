@@ -42,10 +42,10 @@
     "lint": "biome check src/"
   },
   "peerDependencies": {
-    "react": ">=19",
-    "react-dom": ">=19",
-    "react-native": ">=0.74",
-    "react-native-web": ">=0.19"
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "react-native": "^0.84.1",
+    "react-native-web": "latest"
   },
   "peerDependenciesMeta": {
     "react-native": {
@@ -56,26 +56,26 @@
     }
   },
   "dependencies": {
-    "@chromatic-com/storybook": "^5.0.1",
-    "@storybook/addon-a11y": "^10.2.19",
-    "@storybook/addon-designs": "^11.1.2",
-    "@storybook/addon-docs": "^10.2.19",
-    "@storybook/addon-themes": "^10.2.19",
-    "@storybook/addon-vitest": "^10.2.19",
-    "@storybook/nextjs-vite": "^10.2.19",
-    "@storybook/react": "^10.2.19",
-    "@storybook/react-native": "^10.2.3",
-    "@storybook/react-vite": "^10.2.19",
+    "@chromatic-com/storybook": "^5.1.2",
+    "@storybook/addon-a11y": "^10.3.5",
+    "@storybook/addon-designs": "^11.1.3",
+    "@storybook/addon-docs": "^10.3.5",
+    "@storybook/addon-themes": "^10.3.5",
+    "@storybook/addon-vitest": "^10.3.5",
+    "@storybook/nextjs-vite": "^10.3.5",
+    "@storybook/react": "^10.3.5",
+    "@storybook/react-native": "^10.3.2",
+    "@storybook/react-vite": "^10.3.5",
     "@vitus-labs/tools-core": "workspace:^",
     "@vueless/storybook-dark-mode": "^10.0.7",
-    "storybook": "^10.2.19",
-    "storybook-addon-pseudo-states": "^10.2.19",
-    "tinyglobby": "^0.2.15",
-    "vite": "^7.3.1",
+    "storybook": "^10.3.5",
+    "storybook-addon-pseudo-states": "^10.3.5",
+    "tinyglobby": "^0.2.16",
+    "vite": "^8.0.10",
     "vite-tsconfig-paths": "^6.1.1"
   },
   "devDependencies": {
     "@vitus-labs/tools-typescript": "workspace:^",
-    "typescript": "^5.9.3"
+    "typescript": "^6.0.3"
   }
 }

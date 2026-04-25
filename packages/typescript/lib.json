@@ -8,6 +8,7 @@
     "verbatimModuleSyntax": true,
     "jsx": "react-jsx",
     "lib": ["ES2024", "dom"],
+    "types": ["node"],
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
