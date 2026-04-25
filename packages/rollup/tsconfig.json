@@ -4,11 +4,7 @@
     "noEmit": false,
     "outDir": "lib",
     "rootDir": "src",
-    "baseUrl": ".",
-    "declarationDir": "./lib/types",
-    "paths": {
-      "~/*": ["src/*"]
-    }
+    "declarationDir": "./lib/types"
   },
   "include": ["typings", "src"],
   "exclude": ["node_modules", "__stories__", "lib", "**/*.test.ts"]

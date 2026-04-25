@@ -28,6 +28,6 @@
     "access": "public"
   },
   "peerDependencies": {
-    "typescript": ">=5"
+    "typescript": "^6.0.3"
   }
 }

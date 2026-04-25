@@ -4,7 +4,6 @@
     "noEmit": false,
     "outDir": "lib",
     "rootDir": "src",
-    "baseUrl": ".",
     "declarationDir": "./lib/types"
   },
   "include": ["src"],
