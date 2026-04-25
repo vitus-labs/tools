@@ -24,7 +24,7 @@
     },
     "packages/atlas": {
       "name": "@vitus-labs/tools-atlas",
-      "version": "1.15.5",
+      "version": "2.0.0",
       "bin": {
         "vl_atlas": "./lib/bin/run-atlas.js",
       },
@@ -42,7 +42,7 @@
     },
     "packages/core": {
       "name": "@vitus-labs/tools-core",
-      "version": "1.15.5",
+      "version": "2.0.0",
       "devDependencies": {
         "@types/node": "^25.6.0",
         "@vitus-labs/tools-typescript": "workspace:^",
@@ -51,7 +51,7 @@
     },
     "packages/favicon": {
       "name": "@vitus-labs/tools-favicon",
-      "version": "1.15.5",
+      "version": "2.0.0",
       "bin": {
         "vl_favicon": "./lib/bin/run-favicon.js",
       },
@@ -65,16 +65,9 @@
         "typescript": "^6.0.3",
       },
     },
-    "packages/lint": {
-      "name": "@vitus-labs/tools-lint",
-      "version": "1.15.5",
-      "dependencies": {
-        "@biomejs/biome": "^2.4.13",
-      },
-    },
     "packages/mcp": {
       "name": "@vitus-labs/tools-mcp",
-      "version": "1.15.5",
+      "version": "2.0.0",
       "bin": {
         "vl_mcp": "./lib/bin/serve.js",
       },
@@ -91,7 +84,7 @@
     },
     "packages/nextjs": {
       "name": "@vitus-labs/tools-nextjs",
-      "version": "1.15.5",
+      "version": "2.0.0",
       "dependencies": {
         "@vitus-labs/tools-core": "workspace:^",
       },
@@ -107,7 +100,7 @@
     },
     "packages/nextjs-images": {
       "name": "@vitus-labs/tools-nextjs-images",
-      "version": "1.15.5",
+      "version": "2.0.0",
       "dependencies": {
         "chalk": "^5.6.2",
         "file-loader": "^6.2.0",
@@ -127,7 +120,7 @@
     },
     "packages/rolldown": {
       "name": "@vitus-labs/tools-rolldown",
-      "version": "1.15.5",
+      "version": "2.0.0",
       "bin": {
         "vl_rolldown_build": "./lib/bin/run-build.js",
         "vl_rolldown_build-watch": "./lib/bin/run-watch.js",
@@ -149,7 +142,7 @@
     },
     "packages/rollup": {
       "name": "@vitus-labs/tools-rollup",
-      "version": "1.15.5",
+      "version": "2.0.0",
       "bin": {
         "vl_build": "./lib/bin/run-build.js",
         "vl_build-watch": "./lib/bin/run-watch.js",
@@ -185,7 +178,7 @@
     },
     "packages/storybook": {
       "name": "@vitus-labs/tools-storybook",
-      "version": "1.15.5",
+      "version": "2.0.0",
       "bin": {
         "vl_stories": "./lib/bin/run-stories.js",
         "vl_stories-build": "./lib/bin/run-stories-build.js",
@@ -228,14 +221,14 @@
     },
     "packages/typescript": {
       "name": "@vitus-labs/tools-typescript",
-      "version": "1.15.5",
+      "version": "2.0.0",
       "peerDependencies": {
         "typescript": "^6.0.3",
       },
     },
     "packages/vitest": {
       "name": "@vitus-labs/tools-vitest",
-      "version": "1.15.5",
+      "version": "2.0.0",
       "devDependencies": {
         "@vitus-labs/tools-typescript": "workspace:^",
         "typescript": "^6.0.3",
@@ -926,7 +919,7 @@
 
     "@vitus-labs/tools-favicon": ["@vitus-labs/tools-favicon@workspace:packages/favicon"],
 
-    "@vitus-labs/tools-lint": ["@vitus-labs/tools-lint@workspace:packages/lint"],
+    "@vitus-labs/tools-lint": ["@vitus-labs/tools-lint@1.15.5", "", { "dependencies": { "@biomejs/biome": "^2.4.7" } }, "sha512-vytqVCY0BHNK6XrBhqy/+J6MtVv8dLvs6XR2bxYAuSr2Q32b1Q3KVOiluSwmnSycpnHVuPsLy9kGunG9bDyosQ=="],
 
     "@vitus-labs/tools-mcp": ["@vitus-labs/tools-mcp@workspace:packages/mcp"],
 
