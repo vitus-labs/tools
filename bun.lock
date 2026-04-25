@@ -216,10 +216,10 @@
         "typescript": "^6.0.3",
       },
       "peerDependencies": {
-        "react": "^19.2.5",
-        "react-dom": "^19.2.5",
-        "react-native": "^0.84.1",
-        "react-native-web": "latest",
+        "react": ">=19",
+        "react-dom": ">=19",
+        "react-native": ">=0.74",
+        "react-native-web": ">=0.19",
       },
       "optionalPeers": [
         "react-native",
