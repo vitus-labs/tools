@@ -12,6 +12,7 @@
     "Vit Bokisch <vit@bokisch.com>"
   ],
   "type": "module",
+  "files": ["lib", "global"],
   "exports": {
     ".": {
       "types": "./lib/types/index.d.ts",
