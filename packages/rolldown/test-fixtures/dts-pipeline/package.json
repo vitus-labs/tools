@@ -1,0 +1,23 @@
+{
+  "name": "dts-pipeline-fixture",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "peerDependencies": {
+    "react": "*"
+  },
+  "exports": {
+    ".": {
+      "types": "./lib/types/index.d.ts",
+      "import": "./lib/index.js"
+    },
+    "./component": {
+      "types": "./lib/types/component.d.ts",
+      "import": "./lib/component.js"
+    },
+    "./utils": {
+      "types": "./lib/types/utils.d.ts",
+      "import": "./lib/utils.js"
+    }
+  }
+}
