@@ -1,6 +1,6 @@
 {
   "name": "@vitus-labs/tools-rolldown",
-  "version": "1.15.5",
+  "version": "2.0.0",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -12,7 +12,10 @@
     "Vit Bokisch <vit@bokisch.com>"
   ],
   "type": "module",
-  "files": ["lib", "global"],
+  "files": [
+    "lib",
+    "global"
+  ],
   "exports": {
     ".": {
       "types": "./lib/types/index.d.ts",
