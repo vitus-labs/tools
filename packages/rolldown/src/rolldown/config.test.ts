@@ -42,10 +42,16 @@ vi.mock('../config/index.js', () => ({
   PLATFORMS: ['browser', 'node', 'web', 'native'],
 }))
 
-import rolldownConfig, { buildDts } from './config.js'
+import rolldownConfig, { buildDts, expandExternal } from './config.js'
 
 const defaultConfig = { ...mockConfig }
 const defaultPKG = { ...mockPKG }
+
+const matchesExternal = (
+  externals: (string | RegExp)[] | undefined,
+  id: string,
+): boolean =>
+  (externals ?? []).some((e) => (typeof e === 'string' ? e === id : e.test(id)))
 
 describe('rolldownConfig', () => {
   beforeEach(() => {
@@ -65,8 +71,8 @@ describe('rolldownConfig', () => {
     expect(config.output.format).toBe('es')
     expect(config.output.sourcemap).toBe(true)
     expect(config.output.esModule).toBe(true)
-    expect(config.external).toContain('react')
-    expect(config.external).toContain('react/jsx-runtime')
+    expect(matchesExternal(config.external, 'react')).toBe(true)
+    expect(matchesExternal(config.external, 'react/jsx-runtime')).toBe(true)
   })
 
   it('should set platform to node for node builds', () => {
@@ -333,8 +339,8 @@ describe('buildDts', () => {
   it('should include external dependencies', () => {
     const result = buildDts()
 
-    expect(result?.external).toContain('react')
-    expect(result?.external).toContain('react/jsx-runtime')
+    expect(matchesExternal(result?.external, 'react')).toBe(true)
+    expect(matchesExternal(result?.external, 'react/jsx-runtime')).toBe(true)
   })
 
   it('should handle types path without slash', () => {
@@ -344,5 +350,77 @@ describe('buildDts', () => {
 
     expect(result?.output.dir).toBe('.')
     expect(result?.output.entryFileNames).toBe('index.d.ts')
+  })
+})
+
+describe('expandExternal', () => {
+  it('expands a bare package name to match deep imports', () => {
+    const re = expandExternal('echarts') as RegExp
+    expect(re.test('echarts')).toBe(true)
+    expect(re.test('echarts/core')).toBe(true)
+    expect(re.test('echarts/charts/BarChart')).toBe(true)
+  })
+
+  it('does not match unrelated packages with the same prefix', () => {
+    const re = expandExternal('echarts') as RegExp
+    expect(re.test('echartsjs')).toBe(false)
+    expect(re.test('echarts-extension')).toBe(false)
+  })
+
+  it('handles scoped packages', () => {
+    const re = expandExternal('@scope/pkg') as RegExp
+    expect(re.test('@scope/pkg')).toBe(true)
+    expect(re.test('@scope/pkg/sub')).toBe(true)
+    expect(re.test('@scope/other')).toBe(false)
+  })
+
+  it('passes RegExp inputs through unchanged', () => {
+    const original = /^foo$/
+    expect(expandExternal(original)).toBe(original)
+  })
+
+  it('escapes regex metacharacters in package names', () => {
+    const re = expandExternal('foo.bar') as RegExp
+    expect(re.test('foo.bar')).toBe(true)
+    expect(re.test('fooXbar')).toBe(false)
+  })
+})
+
+describe('rolldownConfig external deep imports', () => {
+  beforeEach(() => {
+    Object.assign(mockConfig, defaultConfig)
+    Object.assign(mockPKG, defaultPKG)
+  })
+
+  it('matches deep imports of dependencies', () => {
+    mockPKG.externalDependencies = ['echarts', 'react']
+    mockConfig.external = []
+
+    const config = rolldownConfig({
+      file: 'lib/index.js',
+      format: 'es',
+      env: 'development',
+      platform: 'universal',
+    })
+
+    expect(matchesExternal(config.external, 'echarts')).toBe(true)
+    expect(matchesExternal(config.external, 'echarts/core')).toBe(true)
+    expect(matchesExternal(config.external, 'echarts/charts/BarChart')).toBe(
+      true,
+    )
+    expect(matchesExternal(config.external, 'react/jsx-runtime')).toBe(true)
+  })
+
+  it('returns empty externals when bundleAll is enabled', () => {
+    mockConfig.bundleAll = true
+
+    const config = rolldownConfig({
+      file: 'lib/index.js',
+      format: 'es',
+      env: 'development',
+      platform: 'universal',
+    })
+
+    expect(config.external).toEqual([])
   })
 })
