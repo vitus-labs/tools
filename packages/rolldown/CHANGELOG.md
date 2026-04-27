@@ -1,5 +1,30 @@
 # Change Log
 
+## 2.1.0
+
+### Minor Changes
+
+- [#112](https://github.com/vitus-labs/tools/pull/112) [`917fed1`](https://github.com/vitus-labs/tools/commit/917fed1e5e6c21e62e7edc112198d22092deddbe) Thanks [@vitbokisch](https://github.com/vitbokisch)! - External package names now also match deep imports. Listing `echarts` as an external automatically externalizes `echarts/core`, `echarts/charts/BarChart`, etc. — no need to enumerate every subpath.
+
+  This applies to both `package.json` dependencies/peerDependencies (auto-externalized) and entries in `CONFIG.external`. Users who need granular control can still pass a `RegExp` directly in `CONFIG.external` — it will be used as-is.
+
+  **Behavior change**: previously, only exact-match strings were externalized. If you relied on a package's deep imports being bundled while the bare import was external, you'll need to handle that explicitly now.
+
+### Patch Changes
+
+- [#114](https://github.com/vitus-labs/tools/pull/114) [`a8659c5`](https://github.com/vitus-labs/tools/commit/a8659c5af954580e3b7ee98ae94e9ef84aa2f0ff) Thanks [@vitbokisch](https://github.com/vitbokisch)! - Three bug fixes for build-time configuration handling. All three previously produced wrong-but-successful builds — externals not applied, bundles ballooning silently.
+
+  **1. Throw on `vl-tools.config.mjs` load failure** — a malformed config (syntax error, throwing top-level code) used to print a stderr warning and silently fall back to defaults. Now throws with the file path and underlying parse error.
+
+  **2. Subpath imports of declared deps now externalize** — listing `echarts` in dependencies/peerDependencies previously externalized the bare import only; `echarts/core`, `echarts/charts/BarChart`, etc. got bundled. Each declared dep is now expanded into a regex matching the bare name and any subpath. The `expandExternal` helper lives in `@vitus-labs/tools-core` and is reused by both `tools-rolldown` and `tools-rollup`.
+
+  **3. `optionalDependencies` now externalized by default** — only `dependencies` + `peerDependencies` were considered before. Packages putting heavy renderers (pdfmake, docx, exceljs) in `optionalDependencies` ended up bundling them. If you actually want an optional dep bundled, move it to `dependencies`.
+
+  The combined effect: declared deps in any of the three dep fields, including their subpaths, are now correctly externalized. The pre-existing `expandExternal` in `tools-rolldown` (added in v2.0.1) has been removed in favor of the canonical implementation in `tools-core`.
+
+- Updated dependencies [[`a8659c5`](https://github.com/vitus-labs/tools/commit/a8659c5af954580e3b7ee98ae94e9ef84aa2f0ff)]:
+  - @vitus-labs/tools-core@2.1.0
+
 ## 2.0.0
 
 ### Patch Changes
