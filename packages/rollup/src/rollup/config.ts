@@ -2,7 +2,7 @@ import { createRequire } from 'node:module'
 import { nodeResolve } from '@rollup/plugin-node-resolve'
 import replace from '@rollup/plugin-replace'
 import terser from '@rollup/plugin-terser'
-import { swapGlobals } from '@vitus-labs/tools-core'
+import { expandExternal, swapGlobals } from '@vitus-labs/tools-core'
 import { apiExtractor } from 'rollup-plugin-api-extractor'
 import filesize from 'rollup-plugin-filesize'
 import typescript from 'rollup-plugin-typescript2'
@@ -166,7 +166,9 @@ const rollupConfig = ({
       interop: 'compat',
       systemNullSetters: false,
     },
-    external: [...PKG.externalDependencies, ...CONFIG.external],
+    external: [...PKG.externalDependencies, ...CONFIG.external].map(
+      expandExternal,
+    ),
     treeshake: {
       moduleSideEffects: false,
       propertyReadSideEffects: false,

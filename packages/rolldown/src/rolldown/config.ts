@@ -1,21 +1,10 @@
 import { existsSync } from 'node:fs'
-import { swapGlobals } from '@vitus-labs/tools-core'
+import { expandExternal, swapGlobals } from '@vitus-labs/tools-core'
 import type { RolldownPlugin } from 'rolldown'
 import { dts } from 'rolldown-plugin-dts'
 import filesize from 'rollup-plugin-filesize'
 import { visualizer } from 'rollup-plugin-visualizer'
 import { CONFIG, PKG, PLATFORMS } from '../config/index.js'
-
-/**
- * Convert a bare package name into a regex that matches the package itself
- * AND any of its deep imports (e.g. `echarts` also matches `echarts/core`).
- * Pass-through for RegExp inputs.
- */
-const expandExternal = (id: string | RegExp): string | RegExp => {
-  if (id instanceof RegExp) return id
-  const escaped = id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-  return new RegExp(`^${escaped}(\\/.*)?$`)
-}
 
 const resolveExternals = (): (string | RegExp)[] =>
   CONFIG.bundleAll
@@ -237,4 +226,4 @@ const buildAllDts = (): ReturnType<typeof createDtsConfig>[] => {
 }
 
 export default rolldownConfig
-export { buildAllDts, buildDts, expandExternal }
+export { buildAllDts, buildDts }

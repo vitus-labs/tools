@@ -12,6 +12,11 @@ vi.mock('rollup-plugin-visualizer', () => ({
 vi.mock('@vitus-labs/tools-core', () => ({
   swapGlobals: (globals: Record<string, string>) =>
     Object.fromEntries(Object.entries(globals).map(([k, v]) => [v, k])),
+  expandExternal: (id: string | RegExp): string | RegExp => {
+    if (id instanceof RegExp) return id
+    const escaped = id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    return new RegExp(`^${escaped}(\\/|$)`)
+  },
 }))
 
 const { mockConfig, mockPKG } = vi.hoisted(() => ({
@@ -42,7 +47,7 @@ vi.mock('../config/index.js', () => ({
   PLATFORMS: ['browser', 'node', 'web', 'native'],
 }))
 
-import rolldownConfig, { buildDts, expandExternal } from './config.js'
+import rolldownConfig, { buildDts } from './config.js'
 
 const defaultConfig = { ...mockConfig }
 const defaultPKG = { ...mockPKG }
@@ -350,39 +355,6 @@ describe('buildDts', () => {
 
     expect(result?.output.dir).toBe('.')
     expect(result?.output.entryFileNames).toBe('index.d.ts')
-  })
-})
-
-describe('expandExternal', () => {
-  it('expands a bare package name to match deep imports', () => {
-    const re = expandExternal('echarts') as RegExp
-    expect(re.test('echarts')).toBe(true)
-    expect(re.test('echarts/core')).toBe(true)
-    expect(re.test('echarts/charts/BarChart')).toBe(true)
-  })
-
-  it('does not match unrelated packages with the same prefix', () => {
-    const re = expandExternal('echarts') as RegExp
-    expect(re.test('echartsjs')).toBe(false)
-    expect(re.test('echarts-extension')).toBe(false)
-  })
-
-  it('handles scoped packages', () => {
-    const re = expandExternal('@scope/pkg') as RegExp
-    expect(re.test('@scope/pkg')).toBe(true)
-    expect(re.test('@scope/pkg/sub')).toBe(true)
-    expect(re.test('@scope/other')).toBe(false)
-  })
-
-  it('passes RegExp inputs through unchanged', () => {
-    const original = /^foo$/
-    expect(expandExternal(original)).toBe(original)
-  })
-
-  it('escapes regex metacharacters in package names', () => {
-    const re = expandExternal('foo.bar') as RegExp
-    expect(re.test('foo.bar')).toBe(true)
-    expect(re.test('fooXbar')).toBe(false)
   })
 })
 

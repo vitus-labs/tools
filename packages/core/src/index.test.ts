@@ -51,6 +51,12 @@ afterAll(() => {
   rmSync(BASE_TMP, { recursive: true, force: true })
 })
 
+const matchesExternal = (
+  externals: (string | RegExp)[] | undefined,
+  id: string,
+): boolean =>
+  (externals ?? []).some((e) => (typeof e === 'string' ? e === id : e.test(id)))
+
 describe('tools-core', () => {
   beforeEach(() => {
     vi.restoreAllMocks()
@@ -240,6 +246,26 @@ describe('tools-core', () => {
       expect(vlConfig('build').get('missing')).toEqual({})
     })
 
+    it('throws when vl-tools.config.mjs has a syntax error', async () => {
+      vi.resetModules()
+      testId++
+      const dir = path.join(BASE_TMP, `t${testId}`)
+      mkdirSync(dir, { recursive: true })
+      writeFileSync(
+        path.join(dir, 'package.json'),
+        JSON.stringify({ name: 'broken-pkg' }),
+      )
+      writeFileSync(
+        path.join(dir, 'vl-tools.config.mjs'),
+        'export default { broken: */ }',
+      )
+      vi.spyOn(process, 'cwd').mockReturnValue(dir)
+
+      await expect(import('./index.js')).rejects.toThrow(
+        /Failed to load config.*vl-tools\.config\.mjs/s,
+      )
+    })
+
     it('should cascade configs from root to package (deep merge)', async () => {
       vi.resetModules()
       const dir = createTestDir({
@@ -390,7 +416,7 @@ describe('tools-core', () => {
       const mod = await import('./index.js')
       expect(mod.PKG.name).toBe('@test/pkg')
       expect(mod.PKG.bundleName).toBe('testPkg')
-      expect(mod.PKG.externalDependencies).toContain('react')
+      expect(matchesExternal(mod.PKG.externalDependencies, 'react')).toBe(true)
     })
 
     it('should handle simple hyphenated package names in bundleName', async () => {
@@ -415,7 +441,57 @@ describe('tools-core', () => {
       vi.spyOn(process, 'cwd').mockReturnValue(dir)
 
       const mod = await import('./index.js')
-      expect(mod.PKG.externalDependencies).toContain('styled-components')
+      expect(
+        matchesExternal(mod.PKG.externalDependencies, 'styled-components'),
+      ).toBe(true)
+    })
+
+    it('should include optionalDependencies in externalDependencies', async () => {
+      vi.resetModules()
+      const dir = createTestDir({
+        packageJson: {
+          name: 'my-lib',
+          optionalDependencies: { pdfmake: '^0.2', docx: '^9' },
+        },
+      })
+      vi.spyOn(process, 'cwd').mockReturnValue(dir)
+
+      const mod = await import('./index.js')
+      expect(matchesExternal(mod.PKG.externalDependencies, 'pdfmake')).toBe(
+        true,
+      )
+      expect(matchesExternal(mod.PKG.externalDependencies, 'docx')).toBe(true)
+    })
+
+    it('should match deep imports of declared dependencies', async () => {
+      vi.resetModules()
+      const dir = createTestDir({
+        packageJson: {
+          name: '@test/pkg',
+          dependencies: { echarts: '^5', '@scope/pkg': '^1' },
+        },
+      })
+      vi.spyOn(process, 'cwd').mockReturnValue(dir)
+
+      const mod = await import('./index.js')
+      expect(matchesExternal(mod.PKG.externalDependencies, 'echarts')).toBe(
+        true,
+      )
+      expect(
+        matchesExternal(mod.PKG.externalDependencies, 'echarts/core'),
+      ).toBe(true)
+      expect(
+        matchesExternal(
+          mod.PKG.externalDependencies,
+          'echarts/charts/BarChart',
+        ),
+      ).toBe(true)
+      expect(
+        matchesExternal(mod.PKG.externalDependencies, '@scope/pkg/sub'),
+      ).toBe(true)
+      expect(
+        matchesExternal(mod.PKG.externalDependencies, 'echarts-extension'),
+      ).toBe(false)
     })
 
     it('should export VL_CONFIG as a function', async () => {
@@ -449,6 +525,64 @@ describe('tools-core', () => {
       const stories = mod.VL_CONFIG('stories')
       expect(stories.get('framework')).toBe('next')
       expect(stories.get('port')).toBe(3000)
+    })
+  })
+
+  describe('expandExternal', () => {
+    it('expands a bare package name to match deep imports', async () => {
+      vi.resetModules()
+      const dir = createTestDir({})
+      vi.spyOn(process, 'cwd').mockReturnValue(dir)
+      const mod = await import('./index.js')
+
+      const re = mod.expandExternal('echarts') as RegExp
+      expect(re.test('echarts')).toBe(true)
+      expect(re.test('echarts/core')).toBe(true)
+      expect(re.test('echarts/charts/BarChart')).toBe(true)
+    })
+
+    it('does not match unrelated packages with the same prefix', async () => {
+      vi.resetModules()
+      const dir = createTestDir({})
+      vi.spyOn(process, 'cwd').mockReturnValue(dir)
+      const mod = await import('./index.js')
+
+      const re = mod.expandExternal('echarts') as RegExp
+      expect(re.test('echartsjs')).toBe(false)
+      expect(re.test('echarts-extension')).toBe(false)
+    })
+
+    it('handles scoped packages', async () => {
+      vi.resetModules()
+      const dir = createTestDir({})
+      vi.spyOn(process, 'cwd').mockReturnValue(dir)
+      const mod = await import('./index.js')
+
+      const re = mod.expandExternal('@scope/pkg') as RegExp
+      expect(re.test('@scope/pkg')).toBe(true)
+      expect(re.test('@scope/pkg/sub')).toBe(true)
+      expect(re.test('@scope/pkg-extra')).toBe(false)
+    })
+
+    it('passes RegExp inputs through unchanged', async () => {
+      vi.resetModules()
+      const dir = createTestDir({})
+      vi.spyOn(process, 'cwd').mockReturnValue(dir)
+      const mod = await import('./index.js')
+
+      const original = /^foo$/
+      expect(mod.expandExternal(original)).toBe(original)
+    })
+
+    it('escapes regex metacharacters in package names', async () => {
+      vi.resetModules()
+      const dir = createTestDir({})
+      vi.spyOn(process, 'cwd').mockReturnValue(dir)
+      const mod = await import('./index.js')
+
+      const re = mod.expandExternal('foo.bar') as RegExp
+      expect(re.test('foo.bar')).toBe(true)
+      expect(re.test('fooXbar')).toBe(false)
     })
   })
 })
