@@ -97,10 +97,9 @@ const loadModuleAsync = async (
     const mod = await import(pathToFileURL(filePath).href)
     return mod?.default ?? mod ?? {}
   } catch (e: any) {
-    console.warn(
+    throw new Error(
       `[tools-core] Failed to load config: ${filePath}\n  ${e.message}`,
     )
-    return {}
   }
 }
 
@@ -124,6 +123,17 @@ const getDependenciesList = (types: any) => {
   })
 
   return result
+}
+
+/**
+ * Convert a bare package name into a regex that matches the package itself
+ * AND any of its deep imports (e.g. `echarts` also matches `echarts/core`).
+ * Pass-through for RegExp inputs so users can override with their own pattern.
+ */
+const expandExternal = (id: string | RegExp): string | RegExp => {
+  if (id instanceof RegExp) return id
+  const escaped = id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  return new RegExp(`^${escaped}(\\/|$)`)
 }
 
 // converts package name to umd or iife valid format
@@ -155,7 +165,8 @@ const getPkgData = (): Record<string, any> => {
     externalDependencies: getDependenciesList([
       'dependencies',
       'peerDependencies',
-    ]),
+      'optionalDependencies',
+    ]).map(expandExternal),
   }
 }
 
@@ -241,6 +252,7 @@ const TS_CONFIG = loadFileToJSON(TYPESCRIPT_FILE_NAME)
 
 export {
   defineConfig,
+  expandExternal,
   findFile,
   loadConfigParam,
   loadFileToJSON,

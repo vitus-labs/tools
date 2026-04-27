@@ -36,7 +36,7 @@ export default defineConfig({
 ### PKG
 Parsed package.json with computed properties:
 - bundleName — camelCase package name
-- externalDependencies — merged dependencies + peerDependencies
+- externalDependencies — merged dependencies + peerDependencies + optionalDependencies, each expanded to a regex matching the bare package name and any subpath (e.g. \`echarts\` matches \`echarts/core\`)
 
 ### VL_CONFIG
 Config from vl-tools.config.mjs:

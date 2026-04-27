@@ -59,6 +59,11 @@ vi.mock('node:module', () => ({
 vi.mock('@vitus-labs/tools-core', () => ({
   swapGlobals: (globals: Record<string, string>) =>
     Object.fromEntries(Object.entries(globals).map(([k, v]) => [v, k])),
+  expandExternal: (id: string | RegExp): string | RegExp => {
+    if (id instanceof RegExp) return id
+    const escaped = id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    return new RegExp(`^${escaped}(\\/|$)`)
+  },
 }))
 
 vi.mock('../config/index.js', () => ({
@@ -71,6 +76,12 @@ import rollupConfig from './config.js'
 
 const defaultConfig = { ...mockConfig }
 const defaultPKG = { ...mockPKG }
+
+const matchesExternal = (
+  externals: (string | RegExp)[] | undefined,
+  id: string,
+): boolean =>
+  (externals ?? []).some((e) => (typeof e === 'string' ? e === id : e.test(id)))
 
 describe('rollupConfig', () => {
   beforeEach(() => {
@@ -91,8 +102,9 @@ describe('rollupConfig', () => {
     expect(config.output.file).toBe('lib/index.js')
     expect(config.output.format).toBe('es')
     expect(config.output.sourcemap).toBe(true)
-    expect(config.external).toContain('react')
-    expect(config.external).toContain('react/jsx-runtime')
+    expect(matchesExternal(config.external, 'react')).toBe(true)
+    expect(matchesExternal(config.external, 'react/jsx-runtime')).toBe(true)
+    expect(matchesExternal(config.external, 'react/jsx-dev-runtime')).toBe(true)
   })
 
   it('should set named exports for CJS format', () => {
