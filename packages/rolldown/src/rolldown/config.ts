@@ -6,6 +6,22 @@ import filesize from 'rollup-plugin-filesize'
 import { visualizer } from 'rollup-plugin-visualizer'
 import { CONFIG, PKG, PLATFORMS } from '../config/index.js'
 
+/**
+ * Convert a bare package name into a regex that matches the package itself
+ * AND any of its deep imports (e.g. `echarts` also matches `echarts/core`).
+ * Pass-through for RegExp inputs.
+ */
+const expandExternal = (id: string | RegExp): string | RegExp => {
+  if (id instanceof RegExp) return id
+  const escaped = id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  return new RegExp(`^${escaped}(\\/.*)?$`)
+}
+
+const resolveExternals = (): (string | RegExp)[] =>
+  CONFIG.bundleAll
+    ? []
+    : [...PKG.externalDependencies, ...CONFIG.external].map(expandExternal)
+
 const defineExtensions = (platform: string) => {
   const platformExtensions: string[] = []
 
@@ -90,9 +106,7 @@ const rolldownConfig = ({
   const dir = lastSlash >= 0 ? file.substring(0, lastSlash) : '.'
   const entryFileName = lastSlash >= 0 ? file.substring(lastSlash + 1) : file
 
-  const external = CONFIG.bundleAll
-    ? []
-    : [...PKG.externalDependencies, ...CONFIG.external]
+  const external = resolveExternals()
 
   const buildOutput = {
     input: entryInput || CONFIG.sourceDir,
@@ -143,9 +157,7 @@ const createDtsConfig = (typesFilePath: string, inputFile: string) => {
     resolve: {
       extensions: CONFIG.extensions,
     },
-    external: CONFIG.bundleAll
-      ? []
-      : [...PKG.externalDependencies, ...CONFIG.external],
+    external: resolveExternals(),
     plugins: [
       ...(dts({
         tsconfig: 'tsconfig.json',
@@ -225,4 +237,4 @@ const buildAllDts = (): ReturnType<typeof createDtsConfig>[] => {
 }
 
 export default rolldownConfig
-export { buildAllDts, buildDts }
+export { buildAllDts, buildDts, expandExternal }
