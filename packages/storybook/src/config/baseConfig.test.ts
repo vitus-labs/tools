@@ -8,7 +8,7 @@ vi.mock('storybook/viewport', () => ({
   MINIMAL_VIEWPORTS: { mobile: { name: 'Mobile' } },
 }))
 
-import CONFIG from './baseConfig.js'
+import CONFIG from './baseConfig.ts'
 
 describe('storybook baseConfig', () => {
   it('should have correct output and port defaults', () => {

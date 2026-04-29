@@ -1,8 +1,8 @@
 import chalk from 'chalk'
 import { rimraf } from 'rimraf'
 import { rollup } from 'rollup'
-import { CONFIG } from '../config/index.js'
-import { createBuildPipeline, config as rollupConfig } from '../rollup/index.js'
+import { CONFIG } from '../config/index.ts'
+import { createBuildPipeline, config as rollupConfig } from '../rollup/index.ts'
 
 const { log } = console
 const allBuilds = createBuildPipeline()

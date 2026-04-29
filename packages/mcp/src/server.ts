@@ -1,8 +1,8 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
-import { registerDocs } from './resources/docs.js'
-import { registerAddTooling } from './tools/add-tooling.js'
-import { registerDiagnoseConfig } from './tools/diagnose-config.js'
-import { registerScaffoldPackage } from './tools/scaffold-package.js'
+import { registerDocs } from './resources/docs.ts'
+import { registerAddTooling } from './tools/add-tooling.ts'
+import { registerDiagnoseConfig } from './tools/diagnose-config.ts'
+import { registerScaffoldPackage } from './tools/scaffold-package.ts'
 
 const createServer = () => {
   const server = new McpServer({

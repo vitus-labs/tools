@@ -9,7 +9,7 @@ import {
   extractNamedExports,
   findManualStories,
   isRocketstoriesPattern,
-} from './utils.js'
+} from './utils.ts'
 
 // Virtual module prefix for auto-generated stories
 export const VIRTUAL_STORY_PREFIX = 'virtual:rocketstory:'

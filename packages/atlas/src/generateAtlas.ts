@@ -6,10 +6,10 @@ import {
   computeHealthScores,
   detectCycles,
   detectVersionDrift,
-} from './analysis/index.js'
-import { renderGraph } from './renderer/renderer.js'
-import { scanWorkspace } from './scanner/scanner.js'
-import type { AnalysisData, AtlasConfig } from './types.js'
+} from './analysis/index.ts'
+import { renderGraph } from './renderer/renderer.ts'
+import { scanWorkspace } from './scanner/scanner.ts'
+import type { AnalysisData, AtlasConfig } from './types.ts'
 
 export const generateAtlas = async (
   config: AtlasConfig,

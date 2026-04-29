@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import baseConfig from './baseConfig'
+import baseConfig from './baseConfig.ts'
 
 describe('baseConfig', () => {
   it('should have correct directory settings', () => {

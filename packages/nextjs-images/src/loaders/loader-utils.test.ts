@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import type { DetectedLoaders, OptimizedImagesConfig } from '../types'
-import { getImageTraceLoaderOptions } from './image-trace-loader'
-import { getHandledFilesRegex } from './img-loader'
+import type { DetectedLoaders, OptimizedImagesConfig } from '../types.ts'
+import { getImageTraceLoaderOptions } from './image-trace-loader.ts'
+import { getHandledFilesRegex } from './img-loader.ts'
 import {
   getHandledImageTypes,
   getNumOptimizationLoadersInstalled,
-} from './index'
-import { getWebpLoaderOptions } from './webp-loader'
+} from './index.ts'
+import { getWebpLoaderOptions } from './webp-loader.ts'
 
 const defaultConfig = {
   handleImages: ['jpeg', 'png', 'svg', 'webp', 'gif'],

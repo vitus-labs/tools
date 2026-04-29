@@ -1,6 +1,6 @@
-import type { Configuration } from './baseConfig.js'
-import { configuration } from './baseConfig.js'
-import { generateFavicons } from './generateFavicon.js'
+import type { Configuration } from './baseConfig.ts'
+import { configuration } from './baseConfig.ts'
+import { generateFavicons } from './generateFavicon.ts'
 
 export type { Configuration }
 

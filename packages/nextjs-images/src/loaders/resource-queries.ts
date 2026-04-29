@@ -4,12 +4,12 @@ import type {
   NextConfig,
   OptimizedImagesConfig,
   ResourceQueryConfig,
-} from '../types'
-import { getFileLoaderOptions, getFileLoaderPath } from './file-loader'
-import { getImageTraceLoaderOptions } from './image-trace-loader'
-import { getLqipLoaderOptions } from './lqip-loader/index'
-import { getResponsiveLoaderOptions } from './responsive-loader'
-import { getUrlLoaderOptions } from './url-loader'
+} from '../types.ts'
+import { getFileLoaderOptions, getFileLoaderPath } from './file-loader.ts'
+import { getImageTraceLoaderOptions } from './image-trace-loader.ts'
+import { getLqipLoaderOptions } from './lqip-loader/index.ts'
+import { getResponsiveLoaderOptions } from './responsive-loader.ts'
+import { getUrlLoaderOptions } from './url-loader.ts'
 
 const LQIP_EXPORT_LOADER = fileURLToPath(
   import.meta.resolve('./lqip-export-loader.js'),

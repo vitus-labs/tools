@@ -1,6 +1,6 @@
 import { VL_CONFIG } from '@vitus-labs/tools-core'
-import type { NextjsToolsConfig } from '../types'
-import baseConfig from './baseConfig'
+import type { NextjsToolsConfig } from '../types.ts'
+import baseConfig from './baseConfig.ts'
 
 const CONFIG_KEY = 'next'
 

@@ -16,14 +16,14 @@ import type {
   DetectedLoaders,
   OptimizedImagesConfig,
   WebpackConfig,
-} from '../types'
+} from '../types.ts'
 import {
   appendLoaders,
   detectLoaders,
   getHandledImageTypes,
   getNumOptimizationLoadersInstalled,
   isModuleInstalled,
-} from './index'
+} from './index.ts'
 
 const defaultOptimized: OptimizedImagesConfig = {
   optimizeImages: true,

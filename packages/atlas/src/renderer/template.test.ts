@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import type { AnalysisData, AtlasConfig } from '../types'
-import { buildHtml } from './template'
+import type { AnalysisData, AtlasConfig } from '../types.ts'
+import { buildHtml } from './template.ts'
 
 const mockConfig: AtlasConfig = {
   workspaces: ['packages/*'],

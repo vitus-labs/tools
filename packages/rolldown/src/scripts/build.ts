@@ -3,12 +3,12 @@ import { join } from 'node:path'
 import chalk from 'chalk'
 import { rimraf } from 'rimraf'
 import { rolldown } from 'rolldown'
-import { CONFIG, PKG } from '../config/index.js'
+import { CONFIG, PKG } from '../config/index.ts'
 import {
   buildAllDts,
   createBuildPipeline,
   config as rolldownConfig,
-} from '../rolldown/index.js'
+} from '../rolldown/index.ts'
 
 const { log } = console
 const allBuilds = createBuildPipeline()

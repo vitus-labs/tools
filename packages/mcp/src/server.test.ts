@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createServer } from './server.js'
+import { createServer } from './server.ts'
 
 describe('createServer', () => {
   it('should create an MCP server instance', () => {

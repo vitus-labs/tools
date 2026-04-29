@@ -5,7 +5,7 @@ vi.mock('node:fs/promises', () => ({
 }))
 
 import { readFile } from 'node:fs/promises'
-import { rocketstoriesVitePlugin } from './index.js'
+import { rocketstoriesVitePlugin } from './index.ts'
 
 const mockReadFile = vi.mocked(readFile)
 

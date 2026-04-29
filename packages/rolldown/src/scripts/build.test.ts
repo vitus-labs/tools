@@ -29,12 +29,12 @@ vi.mock('node:fs', () => ({
   mkdirSync: vi.fn(),
 }))
 
-vi.mock('../config/index.js', () => ({
+vi.mock('../config/index.ts', () => ({
   CONFIG: { outputDir: 'lib' },
   PKG: { name: '@test/pkg', version: '1.0.0' },
 }))
 
-vi.mock('../rolldown/index.js', () => ({
+vi.mock('../rolldown/index.ts', () => ({
   createBuildPipeline: mockCreateBuildPipeline,
   config: mockRolldownConfig,
   buildAllDts: mockBuildAllDts,

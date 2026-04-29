@@ -1,5 +1,5 @@
 import { VL_CONFIG as loadConfig, TS_CONFIG } from '@vitus-labs/tools-core'
-import baseConfig from './baseConfig.js'
+import baseConfig from './baseConfig.ts'
 
 const { config } = loadConfig('stories').merge(baseConfig)
 
@@ -14,5 +14,5 @@ const updatedConfig = {
   storiesDir: storiesPatterns.map((item: string) => `${process.cwd()}${item}`),
 }
 
-export type { StoriesConfig, VLToolsConfig } from '../types.js'
+export type { StoriesConfig, VLToolsConfig } from '../types.ts'
 export { TS_CONFIG, updatedConfig as CONFIG }

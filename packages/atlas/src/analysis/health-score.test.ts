@@ -6,8 +6,8 @@ import type {
   DepthResult,
   ImpactResult,
   VersionDriftResult,
-} from '../types'
-import { computeHealthScores } from './health-score'
+} from '../types.ts'
+import { computeHealthScores } from './health-score.ts'
 
 const node = (name: string) => ({
   name,

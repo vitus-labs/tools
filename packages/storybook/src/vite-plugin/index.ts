@@ -1,8 +1,8 @@
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import type { Plugin } from 'vite'
-import { VIRTUAL_STORY_PREFIX } from '../indexer/index.js'
-import { detectComponentKind, extractDimensionNames } from '../indexer/utils.js'
+import { VIRTUAL_STORY_PREFIX } from '../indexer/index.ts'
+import { detectComponentKind, extractDimensionNames } from '../indexer/utils.ts'
 
 const RESOLVE_PREFIX = VIRTUAL_STORY_PREFIX
 const VIRTUAL_PREFIX = `\0${VIRTUAL_STORY_PREFIX}`

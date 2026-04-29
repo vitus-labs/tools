@@ -1,10 +1,13 @@
 import { existsSync } from 'node:fs'
+import { createRequire } from 'node:module'
 import { expandExternal, swapGlobals } from '@vitus-labs/tools-core'
 import type { RolldownPlugin } from 'rolldown'
 import { dts } from 'rolldown-plugin-dts'
-import filesize from 'rollup-plugin-filesize'
 import { visualizer } from 'rollup-plugin-visualizer'
-import { CONFIG, PKG, PLATFORMS } from '../config/index.js'
+import { CONFIG, PKG, PLATFORMS } from '../config/index.ts'
+
+const require = createRequire(import.meta.url)
+const filesize: typeof import('rollup-plugin-filesize').default = require('rollup-plugin-filesize')
 
 const resolveExternals = (): (string | RegExp)[] =>
   CONFIG.bundleAll

@@ -1,7 +1,7 @@
 import { execFileSync } from 'node:child_process'
 import { describe, expect, it, vi } from 'vitest'
-import type { DepGraph, ImpactResult } from '../types'
-import { analyzeChangeFrequency } from './change-frequency'
+import type { DepGraph, ImpactResult } from '../types.ts'
+import { analyzeChangeFrequency } from './change-frequency.ts'
 
 vi.mock('node:child_process', () => ({
   execFileSync: vi.fn(),

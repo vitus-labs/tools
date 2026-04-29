@@ -1,6 +1,6 @@
 import { readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
-import type { BundleSizeResult, DepGraph } from '../types.js'
+import type { BundleSizeResult, DepGraph } from '../types.ts'
 
 const MAX_DIR_DEPTH = 20
 

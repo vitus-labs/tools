@@ -1,4 +1,4 @@
-import type { OptimizedImagesConfig } from '../types'
+import type { OptimizedImagesConfig } from '../types.ts'
 
 /**
  * Build options for the webpack image trace loader.

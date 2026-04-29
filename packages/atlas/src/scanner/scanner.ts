@@ -6,7 +6,7 @@ import type {
   DepGraph,
   DepNode,
   DepType,
-} from '../types.js'
+} from '../types.ts'
 
 interface PackageJson {
   name?: string

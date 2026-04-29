@@ -173,11 +173,11 @@ const checkEsmImports = (directory: string): Issue[] => {
     const content = readFileSync(file, 'utf-8')
     const relativeImports = content.match(/from\s+['"]\..*?['"]/g) || []
     for (const imp of relativeImports) {
-      if (!imp.includes('.js') && !imp.includes('.json')) {
+      if (!/\.(js|jsx|ts|tsx|json)['"]\s*$/.test(imp)) {
         issues.push({
           severity: 'error',
-          message: `Missing .js extension in relative import: ${imp} (${file.replace(directory, '.')})`,
-          fix: 'ESM requires .js extensions on relative imports (e.g., from "./foo.js")',
+          message: `Missing extension in relative import: ${imp} (${file.replace(directory, '.')})`,
+          fix: 'ESM requires explicit extensions on relative imports — use ".ts"/".tsx" with rewriteRelativeImportExtensions, or ".js"',
         })
         break
       }

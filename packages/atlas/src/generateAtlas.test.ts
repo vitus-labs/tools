@@ -10,7 +10,7 @@ vi.mock('./scanner/scanner', () => ({
   })),
 }))
 
-vi.mock('./analysis', () => ({
+vi.mock('./analysis/index.ts', () => ({
   detectCycles: vi.fn(() => ({ cycles: [], hasCycles: false })),
   analyzeImpact: vi.fn(() => ({ impactMap: { '@s/a': [], '@s/b': ['@s/a'] } })),
   analyzeDepth: vi.fn(() => ({
@@ -34,7 +34,7 @@ vi.mock('./analysis', () => ({
   analyzeChangeFrequency: vi.fn(() => null),
 }))
 
-vi.mock('./renderer/renderer', () => ({
+vi.mock('./renderer/renderer.ts', () => ({
   renderGraph: vi.fn(() =>
     Promise.resolve({
       htmlPath: '/out/atlas.html',
@@ -43,11 +43,11 @@ vi.mock('./renderer/renderer', () => ({
   ),
 }))
 
-import { analyzeDepth, analyzeImpact, detectCycles } from './analysis'
-import { generateAtlas } from './generateAtlas'
-import { renderGraph } from './renderer/renderer'
-import { scanWorkspace } from './scanner/scanner'
-import type { AtlasConfig } from './types'
+import { analyzeDepth, analyzeImpact, detectCycles } from './analysis/index.ts'
+import { generateAtlas } from './generateAtlas.ts'
+import { renderGraph } from './renderer/renderer.ts'
+import { scanWorkspace } from './scanner/scanner.ts'
+import type { AtlasConfig } from './types.ts'
 
 const mockConfig: AtlasConfig = {
   workspaces: ['packages/*'],

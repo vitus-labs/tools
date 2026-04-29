@@ -1,4 +1,4 @@
-import type { CycleResult, DepGraph, DepthResult } from '../types.js'
+import type { CycleResult, DepGraph, DepthResult } from '../types.ts'
 
 const collectCycleEdges = (cycles: CycleResult): Set<string> => {
   const cycleEdges = new Set<string>()

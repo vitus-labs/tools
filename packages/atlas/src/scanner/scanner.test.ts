@@ -2,8 +2,8 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import type { AtlasConfig } from '../types'
-import { scanWorkspace } from './scanner'
+import type { AtlasConfig } from '../types.ts'
+import { scanWorkspace } from './scanner.ts'
 
 const baseConfig: AtlasConfig = {
   workspaces: ['packages/*'],

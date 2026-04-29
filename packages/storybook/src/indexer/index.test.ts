@@ -4,7 +4,7 @@ vi.mock('node:fs/promises', () => ({
   readFile: vi.fn(),
 }))
 
-vi.mock('./utils.js', async (importOriginal) => {
+vi.mock('./utils.ts', async (importOriginal) => {
   const actual = await importOriginal<typeof import('./utils.js')>()
   return {
     ...actual,
@@ -17,8 +17,8 @@ import {
   createAutoDiscoveryIndexer,
   manualStoryIndexer,
   VIRTUAL_STORY_PREFIX,
-} from './index.js'
-import { findManualStories } from './utils.js'
+} from './index.ts'
+import { findManualStories } from './utils.ts'
 
 const mockReadFile = vi.mocked(readFile)
 const mockFindManualStories = vi.mocked(findManualStories)

@@ -1,6 +1,6 @@
 import path from 'node:path'
 import { URL } from 'node:url'
-import { CONFIG } from '../config/index.js'
+import { CONFIG } from '../config/index.ts'
 
 const newDirname = new URL('.', import.meta.url).pathname
 

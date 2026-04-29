@@ -18,12 +18,16 @@ describe('lib.json', () => {
     expect(config.compilerOptions.target).toBe('ES2024')
   })
 
-  it('should use module Preserve', () => {
-    expect(config.compilerOptions.module).toBe('Preserve')
+  it('should use module NodeNext', () => {
+    expect(config.compilerOptions.module).toBe('NodeNext')
   })
 
-  it('should use Bundler module resolution', () => {
-    expect(config.compilerOptions.moduleResolution).toBe('Bundler')
+  it('should use NodeNext module resolution', () => {
+    expect(config.compilerOptions.moduleResolution).toBe('NodeNext')
+  })
+
+  it('should rewrite relative import extensions on emit', () => {
+    expect(config.compilerOptions.rewriteRelativeImportExtensions).toBe(true)
   })
 
   it('should have strict mode enabled', () => {

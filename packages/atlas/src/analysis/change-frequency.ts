@@ -1,6 +1,6 @@
 import { execFileSync } from 'node:child_process'
 import { relative } from 'node:path'
-import type { ChangeFrequencyResult, DepGraph, ImpactResult } from '../types.js'
+import type { ChangeFrequencyResult, DepGraph, ImpactResult } from '../types.ts'
 
 const isGitRepo = (): boolean => {
   try {

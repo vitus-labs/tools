@@ -1,16 +1,16 @@
 import { createRequire } from 'node:module'
 import { nodeResolve } from '@rollup/plugin-node-resolve'
-import replace from '@rollup/plugin-replace'
-import terser from '@rollup/plugin-terser'
 import { expandExternal, swapGlobals } from '@vitus-labs/tools-core'
 import { apiExtractor } from 'rollup-plugin-api-extractor'
-import filesize from 'rollup-plugin-filesize'
-import typescript from 'rollup-plugin-typescript2'
 import { visualizer } from 'rollup-plugin-visualizer'
-import { CONFIG, PKG, PLATFORMS } from '../config/index.js'
+import { CONFIG, PKG, PLATFORMS } from '../config/index.ts'
 
 const require = createRequire(import.meta.url)
 const tspCompiler = require('ts-patch/compiler')
+const filesize: typeof import('rollup-plugin-filesize').default = require('rollup-plugin-filesize')
+const typescript: typeof import('rollup-plugin-typescript2').default = require('rollup-plugin-typescript2')
+const replace: typeof import('@rollup/plugin-replace').default = require('@rollup/plugin-replace')
+const terser: typeof import('@rollup/plugin-terser').default = require('@rollup/plugin-terser')
 
 const defineExtensions = (platform: string) => {
   const platformExtensions: string[] = []

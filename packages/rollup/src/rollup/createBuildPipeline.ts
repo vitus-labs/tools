@@ -1,4 +1,4 @@
-import { PKG } from '../config/index.js'
+import { PKG } from '../config/index.ts'
 
 const isESModuleOnly = PKG.type === 'module'
 const typesFilePath = PKG?.exports?.types || PKG.types || PKG.typings

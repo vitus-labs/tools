@@ -19,8 +19,8 @@ vi.mock('./report', () => ({
 
 import { execFile } from 'node:child_process'
 import { writeFileSync } from 'node:fs'
-import type { AnalysisData, AtlasConfig } from '../types'
-import { renderGraph } from './renderer'
+import type { AnalysisData, AtlasConfig } from '../types.ts'
+import { renderGraph } from './renderer.ts'
 
 const mockConfig: AtlasConfig = {
   workspaces: ['packages/*'],

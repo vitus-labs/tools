@@ -8,7 +8,7 @@ vi.mock('vite-tsconfig-paths', () => ({
   default: vi.fn(() => ({ name: 'mock-tsconfig-paths' })),
 }))
 
-vi.mock('../config/index.js', () => ({
+vi.mock('../config/index.ts', () => ({
   CONFIG: {
     storiesDir: ['/src/**/*.stories.tsx'],
     framework: 'vite',
@@ -33,7 +33,7 @@ vi.mock('../config/index.js', () => ({
   },
 }))
 
-import STORYBOOK_CONFIG from './main.js'
+import STORYBOOK_CONFIG from './main.ts'
 
 describe('storybook main config', () => {
   it('should use react-vite framework', () => {
