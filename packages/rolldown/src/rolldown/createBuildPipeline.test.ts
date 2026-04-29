@@ -10,7 +10,7 @@ const { mockPKG } = vi.hoisted(() => ({
   } as Record<string, any>,
 }))
 
-vi.mock('../config/index.js', () => ({
+vi.mock('../config/index.ts', () => ({
   PKG: mockPKG,
   CONFIG: { sourceDir: 'src' },
   PLATFORMS: ['browser', 'node', 'web', 'native'],

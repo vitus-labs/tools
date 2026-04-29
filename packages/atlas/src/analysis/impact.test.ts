@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import type { DepGraph } from '../types'
-import { analyzeImpact } from './impact'
+import type { DepGraph } from '../types.ts'
+import { analyzeImpact } from './impact.ts'
 
 const node = (name: string) => ({
   name,

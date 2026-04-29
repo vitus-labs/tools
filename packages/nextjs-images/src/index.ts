@@ -1,17 +1,17 @@
 import type { Configuration } from 'webpack'
-import getConfig from './config'
+import getConfig from './config.ts'
 import {
   appendLoaders,
   detectLoaders,
   getNumOptimizationLoadersInstalled,
-} from './loaders/index'
-import { showWarning } from './migrater'
+} from './loaders/index.ts'
+import { showWarning } from './migrater.ts'
 import type {
   NextComposePlugins,
   NextConfig,
   OptimizedImagesConfig,
   WebpackOptions,
-} from './types'
+} from './types.ts'
 
 /**
  * Determine whether images should be optimized in the current build phase.
@@ -182,4 +182,4 @@ export type {
   DetectedLoaders,
   NextConfig,
   OptimizedImagesConfig,
-} from './types'
+} from './types.ts'

@@ -2,9 +2,9 @@ import { execFile } from 'node:child_process'
 import { writeFileSync } from 'node:fs'
 import { platform } from 'node:os'
 import { resolve } from 'node:path'
-import type { AnalysisData, AtlasConfig } from '../types.js'
-import { generateJsonReport, generateMarkdownReport } from './report.js'
-import { buildHtml } from './template.js'
+import type { AnalysisData, AtlasConfig } from '../types.ts'
+import { generateJsonReport, generateMarkdownReport } from './report.ts'
+import { buildHtml } from './template.ts'
 
 const openFile = (filePath: string) => {
   const os = platform()

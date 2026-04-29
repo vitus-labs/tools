@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import type { AnalysisData } from '../types'
-import { generateJsonReport, generateMarkdownReport } from './report'
+import type { AnalysisData } from '../types.ts'
+import { generateJsonReport, generateMarkdownReport } from './report.ts'
 
 const mockData: AnalysisData = {
   graph: {

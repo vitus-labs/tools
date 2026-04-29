@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import type { DepGraph, VersionDriftResult } from '../types.js'
+import type { DepGraph, VersionDriftResult } from '../types.ts'
 
 const DEP_FIELDS = [
   'dependencies',

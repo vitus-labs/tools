@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { configuration } from './baseConfig.js'
+import { configuration } from './baseConfig.ts'
 
 describe('favicon baseConfig', () => {
   it('should have correct default display settings', () => {

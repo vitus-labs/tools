@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { diagnose } from './diagnose-config.js'
+import { diagnose } from './diagnose-config.ts'
 
 describe('diagnose', () => {
   let dir: string
@@ -71,7 +71,7 @@ describe('diagnose', () => {
     expect(eslint?.severity).toBe('info')
   })
 
-  it('should detect missing .js extensions in imports', () => {
+  it('should detect missing extensions in relative imports', () => {
     writeFileSync(
       join(dir, 'package.json'),
       JSON.stringify({ name: 'test', type: 'module' }),
@@ -82,9 +82,24 @@ describe('diagnose', () => {
       "import { foo } from './utils'\n",
     )
     const issues = diagnose(dir)
-    const ext = issues.find((i) => i.message.includes('.js extension'))
+    const ext = issues.find((i) => i.message.includes('Missing extension'))
     expect(ext).toBeDefined()
     expect(ext?.severity).toBe('error')
+  })
+
+  it('should not flag imports with .ts extensions (rewriteRelativeImportExtensions)', () => {
+    writeFileSync(
+      join(dir, 'package.json'),
+      JSON.stringify({ name: 'test', type: 'module' }),
+    )
+    mkdirSync(join(dir, 'src'))
+    writeFileSync(
+      join(dir, 'src', 'index.ts'),
+      "import { foo } from './utils.ts'\n",
+    )
+    const issues = diagnose(dir)
+    const ext = issues.find((i) => i.message.includes('Missing extension'))
+    expect(ext).toBeUndefined()
   })
 
   it('should not flag imports with .js extensions', () => {
@@ -98,7 +113,7 @@ describe('diagnose', () => {
       "import { foo } from './utils.js'\n",
     )
     const issues = diagnose(dir)
-    const ext = issues.find((i) => i.message.includes('.js extension'))
+    const ext = issues.find((i) => i.message.includes('Missing extension'))
     expect(ext).toBeUndefined()
   })
 

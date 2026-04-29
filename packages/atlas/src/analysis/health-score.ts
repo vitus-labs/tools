@@ -6,7 +6,7 @@ import type {
   HealthScoreResult,
   ImpactResult,
   VersionDriftResult,
-} from '../types.js'
+} from '../types.ts'
 
 interface HealthInput {
   graph: DepGraph

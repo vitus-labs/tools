@@ -15,11 +15,11 @@ const {
 vi.mock('rollup', () => ({ rollup: mockRollup }))
 vi.mock('rimraf', () => ({ rimraf: { sync: vi.fn() } }))
 
-vi.mock('../config/index.js', () => ({
+vi.mock('../config/index.ts', () => ({
   CONFIG: { outputDir: 'lib' },
 }))
 
-vi.mock('../rollup/index.js', () => ({
+vi.mock('../rollup/index.ts', () => ({
   createBuildPipeline: mockCreateBuildPipeline,
   config: mockRollupConfig,
 }))

@@ -2,8 +2,8 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import type { DepGraph } from '../types'
-import { analyzeBundleSize } from './bundle-size'
+import type { DepGraph } from '../types.ts'
+import { analyzeBundleSize } from './bundle-size.ts'
 
 let tmpDir: string
 

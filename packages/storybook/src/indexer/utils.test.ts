@@ -9,7 +9,7 @@ import {
   isReactComponent,
   isRocketstoriesPattern,
   isRocketstyleComponent,
-} from './utils.js'
+} from './utils.ts'
 
 describe('isRocketstoriesPattern', () => {
   it('should detect stories.init() pattern', () => {

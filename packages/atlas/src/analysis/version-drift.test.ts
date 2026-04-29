@@ -2,8 +2,8 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import type { DepGraph } from '../types'
-import { detectVersionDrift } from './version-drift'
+import type { DepGraph } from '../types.ts'
+import { detectVersionDrift } from './version-drift.ts'
 
 let tmpDir: string
 

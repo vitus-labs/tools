@@ -6,7 +6,7 @@ import {
   scaffoldLibrary,
   scaffoldNextjs,
   scaffoldStorybook,
-} from './scaffold-package.js'
+} from './scaffold-package.ts'
 
 describe('scaffoldLibrary', () => {
   let dir: string

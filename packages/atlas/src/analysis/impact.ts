@@ -1,4 +1,4 @@
-import type { DepGraph, ImpactResult } from '../types.js'
+import type { DepGraph, ImpactResult } from '../types.ts'
 
 export const analyzeImpact = (graph: DepGraph): ImpactResult => {
   // Build reverse adjacency: if A depends on B, then B's change impacts A

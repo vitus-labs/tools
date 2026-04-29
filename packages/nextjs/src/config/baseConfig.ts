@@ -1,4 +1,4 @@
-import type { NextjsToolsConfig } from '../types'
+import type { NextjsToolsConfig } from '../types.ts'
 
 const baseConfig: Required<NextjsToolsConfig> = {
   headers: true,

@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 import { Command } from 'commander'
-import { CONFIG } from '../config/index.js'
-import { generateAtlas } from '../generateAtlas.js'
-import type { AtlasConfig, DepType } from '../types.js'
+import { CONFIG } from '../config/index.ts'
+import { generateAtlas } from '../generateAtlas.ts'
+import type { AtlasConfig, DepType } from '../types.ts'
 
 const program = new Command()
 

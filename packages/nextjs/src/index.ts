@@ -1,13 +1,13 @@
 import type { NextConfig } from 'next'
-import { CONFIG } from './config/index'
-import { securityHeaders } from './headers'
+import { CONFIG } from './config/index.ts'
+import { securityHeaders } from './headers.ts'
 
-export { securityHeaders } from './headers'
+export { securityHeaders } from './headers.ts'
 export type {
   HeadersConfig,
   NextjsToolsConfig,
   SecurityHeader,
-} from './types'
+} from './types.ts'
 
 /**
  * Wrap a Next.js config with vitus-labs defaults.

@@ -1,4 +1,4 @@
-export { generateAtlas } from './generateAtlas.js'
+export { generateAtlas } from './generateAtlas.ts'
 export type {
   AnalysisData,
   AtlasConfig,
@@ -13,4 +13,4 @@ export type {
   HealthScoreResult,
   ImpactResult,
   VersionDriftResult,
-} from './types.js'
+} from './types.ts'

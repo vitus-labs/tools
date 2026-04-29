@@ -1,4 +1,4 @@
-import { CONFIG, PKG } from '../config/index.js'
+import { CONFIG, PKG } from '../config/index.ts'
 
 const isESModuleOnly = PKG.type === 'module'
 

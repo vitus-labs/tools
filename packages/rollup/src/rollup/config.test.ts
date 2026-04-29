@@ -43,17 +43,23 @@ const {
 vi.mock('@rollup/plugin-node-resolve', () => ({
   nodeResolve: mockNodeResolve,
 }))
-vi.mock('@rollup/plugin-replace', () => ({ default: mockReplace }))
-vi.mock('@rollup/plugin-terser', () => ({ default: mockTerser }))
-vi.mock('rollup-plugin-typescript2', () => ({ default: mockTypescript }))
 vi.mock('rollup-plugin-api-extractor', () => ({
   apiExtractor: mockApiExtractor,
 }))
-vi.mock('rollup-plugin-filesize', () => ({ default: mockFilesize }))
 vi.mock('rollup-plugin-visualizer', () => ({ visualizer: mockVisualizer }))
 
+// CJS plugins are loaded via createRequire — dispatch on package name.
 vi.mock('node:module', () => ({
-  createRequire: vi.fn(() => vi.fn(() => ({}))),
+  createRequire: vi.fn(
+    () => (id: string) =>
+      ({
+        'rollup-plugin-filesize': mockFilesize,
+        'rollup-plugin-typescript2': mockTypescript,
+        '@rollup/plugin-replace': mockReplace,
+        '@rollup/plugin-terser': mockTerser,
+        'ts-patch/compiler': {},
+      })[id] ?? {},
+  ),
 }))
 
 vi.mock('@vitus-labs/tools-core', () => ({
@@ -66,13 +72,13 @@ vi.mock('@vitus-labs/tools-core', () => ({
   },
 }))
 
-vi.mock('../config/index.js', () => ({
+vi.mock('../config/index.ts', () => ({
   CONFIG: mockConfig,
   PKG: mockPKG,
   PLATFORMS: ['browser', 'node', 'web', 'native'],
 }))
 
-import rollupConfig from './config.js'
+import rollupConfig from './config.ts'
 
 const defaultConfig = { ...mockConfig }
 const defaultPKG = { ...mockPKG }

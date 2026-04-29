@@ -4,8 +4,8 @@ vi.mock('node:fs', () => ({
   existsSync: vi.fn(() => false),
 }))
 
-import type { NextConfig, OptimizedImagesConfig } from '../types'
-import { getUrlLoaderOptions } from './url-loader'
+import type { NextConfig, OptimizedImagesConfig } from '../types.ts'
+import { getUrlLoaderOptions } from './url-loader.ts'
 
 const defaultOptimized: OptimizedImagesConfig = {
   optimizeImages: true,

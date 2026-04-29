@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import type { NextConfig, OptimizedImagesConfig } from '../types'
-import { getFileLoaderOptions } from './file-loader'
+import type { NextConfig, OptimizedImagesConfig } from '../types.ts'
+import { getFileLoaderOptions } from './file-loader.ts'
 
 const defaultOptimized: Pick<
   OptimizedImagesConfig,

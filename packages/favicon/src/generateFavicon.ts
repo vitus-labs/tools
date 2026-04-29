@@ -1,7 +1,7 @@
 import fs from 'node:fs'
 import { VL_CONFIG } from '@vitus-labs/tools-core'
 import favicons from 'favicons'
-import { configuration } from './baseConfig.js'
+import { configuration } from './baseConfig.ts'
 
 const { icons, path, ...restConfig } =
   VL_CONFIG('favicon').merge(configuration).config

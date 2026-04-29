@@ -1,4 +1,4 @@
-import type { AtlasConfig } from '../types.js'
+import type { AtlasConfig } from '../types.ts'
 
 const baseConfig: Required<AtlasConfig> = {
   workspaces: ['packages/*'],

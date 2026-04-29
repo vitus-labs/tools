@@ -6,11 +6,11 @@ import type {
   NextConfig,
   OptimizedImagesConfig,
   WebpackConfig,
-} from '../types'
-import { getResourceQueries } from './resource-queries'
-import { getSvgSpriteLoaderResourceQuery } from './svg-sprite-loader/index'
-import { getUrlLoaderOptions } from './url-loader'
-import { getWebpResourceQuery } from './webp-loader'
+} from '../types.ts'
+import { getResourceQueries } from './resource-queries.ts'
+import { getSvgSpriteLoaderResourceQuery } from './svg-sprite-loader/index.ts'
+import { getUrlLoaderOptions } from './url-loader.ts'
+import { getWebpResourceQuery } from './webp-loader.ts'
 
 // Wrapper that hides the import() from webpack's static analysis
 // using the official webpackIgnore magic comment, avoiding

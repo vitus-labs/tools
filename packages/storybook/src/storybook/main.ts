@@ -2,13 +2,13 @@ import { readFile } from 'node:fs/promises'
 import type { StorybookConfig } from '@storybook/react-vite'
 import type { Indexer } from 'storybook/internal/types'
 import tsconfigPaths from 'vite-tsconfig-paths'
-import { CONFIG } from '../config/index.js'
+import { CONFIG } from '../config/index.ts'
 import {
   createAutoDiscoveryIndexer,
   manualStoryIndexer,
-} from '../indexer/index.js'
-import { isRocketstoriesPattern } from '../indexer/utils.js'
-import { rocketstoriesVitePlugin } from '../vite-plugin/index.js'
+} from '../indexer/index.ts'
+import { isRocketstoriesPattern } from '../indexer/utils.ts'
+import { rocketstoriesVitePlugin } from '../vite-plugin/index.ts'
 
 // --------------------------------------------------------
 // STORYBOOK ADDONS LIST

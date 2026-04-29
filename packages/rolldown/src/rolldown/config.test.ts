@@ -3,11 +3,18 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 vi.mock('rolldown-plugin-dts', () => ({
   dts: vi.fn(() => [{ name: 'mock-dts' }]),
 }))
-vi.mock('rollup-plugin-filesize', () => ({
-  default: vi.fn(() => ({ name: 'mock-filesize' })),
-}))
 vi.mock('rollup-plugin-visualizer', () => ({
   visualizer: vi.fn(() => ({ name: 'mock-visualizer' })),
+}))
+
+// CJS plugin loaded via createRequire
+vi.mock('node:module', () => ({
+  createRequire: vi.fn(
+    () => (id: string) =>
+      ({
+        'rollup-plugin-filesize': vi.fn(() => ({ name: 'mock-filesize' })),
+      })[id] ?? {},
+  ),
 }))
 vi.mock('@vitus-labs/tools-core', () => ({
   swapGlobals: (globals: Record<string, string>) =>
@@ -41,13 +48,13 @@ const { mockConfig, mockPKG } = vi.hoisted(() => ({
   } as Record<string, any>,
 }))
 
-vi.mock('../config/index.js', () => ({
+vi.mock('../config/index.ts', () => ({
   CONFIG: mockConfig,
   PKG: mockPKG,
   PLATFORMS: ['browser', 'node', 'web', 'native'],
 }))
 
-import rolldownConfig, { buildDts } from './config.js'
+import rolldownConfig, { buildDts } from './config.ts'
 
 const defaultConfig = { ...mockConfig }
 const defaultPKG = { ...mockPKG }

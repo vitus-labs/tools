@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 import chalk from 'chalk'
 import { watch } from 'rolldown'
-import { PKG } from '../config/index.js'
+import { PKG } from '../config/index.ts'
 import {
   createBuildPipeline,
   config as rolldownConfig,
-} from '../rolldown/index.js'
+} from '../rolldown/index.ts'
 
 const { log } = console
 const allBuilds = createBuildPipeline()
