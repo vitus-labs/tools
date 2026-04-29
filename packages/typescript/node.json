@@ -2,18 +2,17 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
     "target": "ES2024",
-    "module": "Preserve",
-    "moduleResolution": "Bundler",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "rewriteRelativeImportExtensions": true,
     "moduleDetection": "force",
     "verbatimModuleSyntax": true,
-    "jsx": "react-jsx",
-    "lib": ["ES2024", "dom"],
+    "lib": ["ES2024"],
     "types": ["node"],
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "allowJs": true,
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "declaration": true,
@@ -23,5 +22,5 @@
     "noEmit": true
   },
   "include": ["src"],
-  "exclude": ["node_modules", "__stories__", "lib"]
+  "exclude": ["node_modules", "lib"]
 }

@@ -1,5 +1,5 @@
 {
-  "extends": "@vitus-labs/tools-typescript/lib",
+  "extends": "@vitus-labs/tools-typescript/node",
   "compilerOptions": {
     "noEmit": false,
     "outDir": "lib",

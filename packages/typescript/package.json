@@ -14,11 +14,13 @@
   "type": "module",
   "exports": {
     "./lib": "./lib.json",
+    "./node": "./node.json",
     "./nextjs": "./nextjs.json",
     "./package.json": "./package.json"
   },
   "files": [
     "lib.json",
+    "node.json",
     "nextjs.json"
   ],
   "engines": {
