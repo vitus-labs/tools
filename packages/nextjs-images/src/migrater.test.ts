@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { showWarning } from './migrater'
+import { showWarning } from './migrater.js'
 
 describe('showWarning', () => {
   it('should log a warning message to console', () => {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { runtimeGenerator } from './svg-runtime-generator'
+import { runtimeGenerator } from './svg-runtime-generator.js'
 
 const mockContext = {
   context: '/project/src',

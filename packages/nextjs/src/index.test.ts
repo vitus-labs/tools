@@ -9,7 +9,7 @@ vi.mock('./config/index', () => ({
   },
 }))
 
-import { withVitusLabs } from './index'
+import { withVitusLabs } from './index.js'
 
 describe('withVitusLabs', () => {
   it('should return a config object', () => {

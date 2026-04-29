@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { securityHeaders } from './headers'
+import { securityHeaders } from './headers.js'
 
 describe('securityHeaders', () => {
   it('should return headers for all routes', () => {

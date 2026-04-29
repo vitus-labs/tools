@@ -6,11 +6,11 @@ import type {
   NextConfig,
   OptimizedImagesConfig,
   WebpackConfig,
-} from '../types'
-import { applyFileLoader } from './file-loader'
-import { applyImgLoader } from './img-loader'
-import { applyResponsiveLoader } from './responsive-loader'
-import { applyWebpLoader } from './webp-loader'
+} from '../types.js'
+import { applyFileLoader } from './file-loader.js'
+import { applyImgLoader } from './img-loader.js'
+import { applyResponsiveLoader } from './responsive-loader.js'
+import { applyWebpLoader } from './webp-loader.js'
 
 /**
  * Resolve a module specifier, optionally from a custom directory.

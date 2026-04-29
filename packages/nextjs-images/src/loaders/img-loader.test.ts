@@ -9,12 +9,12 @@ import type {
   HandledImageTypes,
   OptimizedImagesConfig,
   WebpackConfig,
-} from '../types'
+} from '../types.js'
 import {
   applyImgLoader,
   getHandledFilesRegex,
   getImgLoaderOptions,
-} from './img-loader'
+} from './img-loader.js'
 
 const defaultOptimized: OptimizedImagesConfig = {
   optimizeImages: true,

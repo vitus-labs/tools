@@ -16,11 +16,11 @@ import type {
   DetectedLoaders,
   OptimizedImagesConfig,
   WebpackConfig,
-} from '../types'
+} from '../types.js'
 import {
   applyResponsiveLoader,
   getResponsiveLoaderOptions,
-} from './responsive-loader'
+} from './responsive-loader.js'
 
 const defaultOptimized: OptimizedImagesConfig = {
   optimizeImages: true,

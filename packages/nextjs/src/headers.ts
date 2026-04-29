@@ -1,4 +1,4 @@
-import type { HeadersConfig, SecurityHeader } from './types'
+import type { HeadersConfig, SecurityHeader } from './types.js'
 
 const DEFAULT_HEADERS: SecurityHeader[] = [
   { key: 'X-DNS-Prefetch-Control', value: 'on' },

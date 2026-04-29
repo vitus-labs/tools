@@ -3,9 +3,9 @@ import type {
   NextConfig,
   OptimizedImagesConfig,
   WebpackConfig,
-} from '../types'
-import { getResourceQueries } from './resource-queries'
-import { getUrlLoaderOptions } from './url-loader'
+} from '../types.js'
+import { getResourceQueries } from './resource-queries.js'
+import { getUrlLoaderOptions } from './url-loader.js'
 
 /**
  * Build options for the webp loader.

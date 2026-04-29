@@ -16,8 +16,8 @@ import type {
   DetectedLoaders,
   NextConfig,
   OptimizedImagesConfig,
-} from '../types'
-import { getResourceQueries } from './resource-queries'
+} from '../types.js'
+import { getResourceQueries } from './resource-queries.js'
 
 const defaultOptimized: OptimizedImagesConfig = {
   optimizeImages: true,
