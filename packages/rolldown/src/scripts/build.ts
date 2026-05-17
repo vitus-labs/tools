@@ -1,7 +1,13 @@
-import { cpSync, mkdirSync, readdirSync, renameSync, statSync } from 'node:fs'
+import {
+  cpSync,
+  mkdirSync,
+  readdirSync,
+  renameSync,
+  rmSync,
+  statSync,
+} from 'node:fs'
 import { join } from 'node:path'
 import chalk from 'chalk'
-import { rimraf } from 'rimraf'
 import { rolldown } from 'rolldown'
 import { CONFIG, PKG } from '../config/index.ts'
 import {
@@ -94,40 +100,46 @@ const buildDtsIsolated = async (
   const finalDir = output.dir as string
   const entryName = output.entryFileNames as string
   const tempDir = join(finalDir, `__dts_tmp_${entryName.replace(/\W/g, '_')}`)
-
-  // Build into isolated temp directory
-  const tempOutput = { ...output, dir: tempDir }
-  await build({ inputOptions: input, outputOptions: tempOutput })
-
-  // Find the largest .d.ts file — that's the real declarations
   const absTempDir = join(process.cwd(), tempDir)
-  const dtsFiles = readdirSync(absTempDir).filter((f) => f.endsWith('.d.ts'))
 
-  let bestFile = dtsFiles[0] || entryName
-  let bestSize = 0
-  for (const f of dtsFiles) {
-    const size = statSync(join(absTempDir, f)).size
-    if (size > bestSize) {
-      bestSize = size
-      bestFile = f
-    }
-  }
-
-  // Move the best file to the final location
-  const absFinalDir = join(process.cwd(), finalDir)
-  mkdirSync(absFinalDir, { recursive: true })
-  renameSync(join(absTempDir, bestFile), join(absFinalDir, entryName))
-
-  // Move sourcemap if it exists
-  const mapName = `${bestFile}.map`
   try {
-    renameSync(join(absTempDir, mapName), join(absFinalDir, `${entryName}.map`))
-  } catch {
-    // sourcemap may not exist
-  }
+    // Build into isolated temp directory
+    const tempOutput = { ...output, dir: tempDir }
+    await build({ inputOptions: input, outputOptions: tempOutput })
 
-  // Clean up temp directory
-  rimraf.sync(absTempDir)
+    // Find the largest .d.ts file — that's the real declarations
+    const dtsFiles = readdirSync(absTempDir).filter((f) => f.endsWith('.d.ts'))
+
+    let bestFile = dtsFiles[0] || entryName
+    let bestSize = 0
+    for (const f of dtsFiles) {
+      const size = statSync(join(absTempDir, f)).size
+      if (size > bestSize) {
+        bestSize = size
+        bestFile = f
+      }
+    }
+
+    // Move the best file to the final location
+    const absFinalDir = join(process.cwd(), finalDir)
+    mkdirSync(absFinalDir, { recursive: true })
+    renameSync(join(absTempDir, bestFile), join(absFinalDir, entryName))
+
+    // Move sourcemap if it exists
+    const mapName = `${bestFile}.map`
+    try {
+      renameSync(
+        join(absTempDir, mapName),
+        join(absFinalDir, `${entryName}.map`),
+      )
+    } catch {
+      // sourcemap may not exist
+    }
+  } finally {
+    // Always remove the temp dir — even if the build or a post-step
+    // throws — so a partial failure can't leak __dts_tmp_* into lib/.
+    rmSync(absTempDir, { recursive: true, force: true })
+  }
 }
 
 const generateDeclarations = async () => {
@@ -155,7 +167,10 @@ const runBuild = async () => {
   )
 
   log(`${dim('Cleaning')} ${CONFIG.outputDir}/`)
-  rimraf.sync(`${process.cwd()}/${CONFIG.outputDir}`)
+  rmSync(`${process.cwd()}/${CONFIG.outputDir}`, {
+    recursive: true,
+    force: true,
+  })
 
   log(
     `${dim('Building')} ${bold(String(allBuildsCount))} bundle${allBuildsCount > 1 ? 's' : ''}...\n`,

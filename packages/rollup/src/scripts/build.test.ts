@@ -13,7 +13,7 @@ const {
 }))
 
 vi.mock('rollup', () => ({ rollup: mockRollup }))
-vi.mock('rimraf', () => ({ rimraf: { sync: vi.fn() } }))
+vi.mock('node:fs', () => ({ rmSync: vi.fn() }))
 
 vi.mock('../config/index.ts', () => ({
   CONFIG: { outputDir: 'lib' },

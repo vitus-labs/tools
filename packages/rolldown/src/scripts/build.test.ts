@@ -27,6 +27,7 @@ vi.mock('node:fs', () => ({
   unlinkSync: vi.fn(),
   cpSync: vi.fn(),
   mkdirSync: vi.fn(),
+  rmSync: vi.fn(),
 }))
 
 vi.mock('../config/index.ts', () => ({
@@ -217,6 +218,48 @@ describe('build', () => {
     mockBuildAllDts.mockReturnValue([])
 
     await expect(runBuild()).rejects.toThrow('rolldown failed')
+  })
+
+  it('cleans up the isolated temp dir even when DTS post-processing throws', async () => {
+    vi.resetModules()
+    const { runBuild } = await import('./build.js')
+    const { rmSync } = await import('node:fs')
+    vi.clearAllMocks()
+
+    mockRolldown.mockResolvedValue({
+      write: mockBundleWrite,
+      close: mockBundleClose,
+    })
+    mockBundleWrite.mockResolvedValue(undefined)
+    mockBundleClose.mockResolvedValue(undefined)
+    mockRolldownConfig.mockImplementation((item: any) => ({
+      input: 'src',
+      output: {
+        dir: 'lib',
+        entryFileNames: 'index.js',
+        format: item.format,
+      },
+    }))
+    mockBuildAllDts.mockReturnValue([
+      {
+        file: './lib/index.d.ts',
+        input: 'src/index.ts',
+        output: { dir: 'lib', entryFileNames: 'index.d.ts', format: 'es' },
+      },
+    ])
+    // DTS bundle build succeeds, but reading the temp dir afterward throws —
+    // simulating any failure in the window after the temp dir is created.
+    mockReaddirSync.mockImplementation(() => {
+      throw new Error('readdir blew up mid-DTS')
+    })
+
+    await expect(runBuild()).rejects.toThrow('readdir blew up mid-DTS')
+
+    // The temp dir MUST still be removed despite the throw (finally cleanup).
+    expect(rmSync).toHaveBeenCalledWith(
+      expect.stringContaining('__dts_tmp_'),
+      expect.objectContaining({ recursive: true, force: true }),
+    )
   })
 
   it('should handle multiple builds in sequence', async () => {
