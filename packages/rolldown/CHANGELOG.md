@@ -1,5 +1,34 @@
 # Change Log
 
+## 2.3.1
+
+### Patch Changes
+
+- [#132](https://github.com/vitus-labs/tools/pull/132) [`fd69af8`](https://github.com/vitus-labs/tools/commit/fd69af88a779007c4697ad77620d7d6dfed18b81) Thanks [@vitbokisch](https://github.com/vitbokisch)! - Audit fixes — three proven issues, each measured and regression-tested.
+
+  **1. atlas: scanner N+1 `statSync` (perf)** — `listDirectories` called `statSync` once per directory entry. Now uses `readdirSync(base, { withFileTypes: true })` and only falls back to `statSync` for symbolic links (which `Dirent.isDirectory()` can't resolve). Measured on a 65-entry workspace: **65 → 5 syscalls (92% fewer)**, identical directory output including symlinked package dirs (regression-tested).
+
+  **2. rolldown: temp-dir leak on error path (resource leak)** — `buildDtsIsolated` removed its `__dts_tmp_*` directory only on the success path. If the DTS build or any post-processing step threw, the temp dir leaked into `lib/` and shipped in the published package (`files: ["lib"]`). Cleanup is now in a `finally` block. Proven by a test that fails on the old code (0 cleanup calls) and passes after.
+
+  **3. rolldown + rollup: drop the `rimraf` dependency** — both packages require Node ≥ 22, where the built-in `fs.rmSync(path, { recursive: true, force: true })` does exactly what `rimraf.sync` did. Removed `rimraf` as a direct dependency from both packages — one fewer runtime dependency and supply-chain surface, zero behavior change.
+
+  No memory leaks were found. Four separately-reported correctness concerns (depth-map inversion, cycle self-loop handling, bundle-size I/O, transitive-size dedup) were investigated and disproven by tracing the actual code — no changes made there.
+
+- [#134](https://github.com/vitus-labs/tools/pull/134) [`0a8a65b`](https://github.com/vitus-labs/tools/commit/0a8a65bf010aed4944317fa2c6617ca30118769c) Thanks [@vitbokisch](https://github.com/vitbokisch)! - Update all dependencies to latest and bump CI actions.
+
+  **Runtime/dev deps**: rolldown 1.0.0-rc.17 → 1.0.1, rolldown-plugin-dts 0.23.2 → 0.25.1, rollup 4.60.2 → 4.60.4, ts-patch 3.3.0 → 4.0.1 (major — verified, no code changes needed), storybook 10.3.5 → 10.4, vite 8.0.10 → 8.0.13, next 16.2.4 → 16.2.6, @types/node 25.6 → 25.8, biome 2.4.13 → 2.4.15, vitest 4.1.5 → 4.1.6, react 19.2.5 → 19.2.6, `@vitus-labs/tools-lint` 1.15.5 → 2.3.0.
+
+  **zod held at `~4.3.6`** (was `^4.4.3` candidate): zod 4.4.x changed `ZodString`/`ZodEnum` internals so they no longer satisfy the MCP SDK's `AnySchema` type. `@modelcontextprotocol/sdk` is already at its latest (1.29.0) and its published types were built against zod 4.3.x. Pinned to `~4.3.6` (4.3.x patches allowed, 4.4 blocked) until the SDK ships zod-4.4-compatible types. Not a fixable-on-our-side rewrite — the incompatibility is entirely between two third-party packages' type definitions.
+
+  **Storybook peer ranges restored**: `bun update --latest` again narrowed `react`/`react-dom`/`react-native`/`react-native-web` peers; reverted to the intended wide ranges (`>=19`, `>=0.74`, `>=0.19`).
+
+  **CI actions**: setup-node v6.3.0 → v6.4.0, changesets/action v1.7.0 → v1.8.0, step-security/harden-runner v2.17.0 → v2.19.3, github/codeql-action v4.35.1 → v4.35.5 (all SHA-pinned).
+
+  Verified e2e: 565 tests pass, typecheck + lint clean across all 10 packages, all 10 packages build.
+
+- Updated dependencies []:
+  - @vitus-labs/tools-core@2.3.1
+
 ## 2.3.0
 
 ### Patch Changes
