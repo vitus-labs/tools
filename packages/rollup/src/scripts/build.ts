@@ -1,5 +1,5 @@
+import { rmSync } from 'node:fs'
 import chalk from 'chalk'
-import { rimraf } from 'rimraf'
 import { rollup } from 'rollup'
 import { CONFIG } from '../config/index.ts'
 import { createBuildPipeline, config as rollupConfig } from '../rollup/index.ts'
@@ -75,7 +75,10 @@ const runBuild = async () => {
     )}`,
   )
 
-  rimraf.sync(`${process.cwd()}/${CONFIG.outputDir}`)
+  rmSync(`${process.cwd()}/${CONFIG.outputDir}`, {
+    recursive: true,
+    force: true,
+  })
 
   log(
     `${chalk.bold.bgBlue.black('[2/4]')} ${chalk.blue('☑️  Old build removed')}`,

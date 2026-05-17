@@ -1,4 +1,10 @@
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import {
+  mkdirSync,
+  mkdtempSync,
+  rmSync,
+  symlinkSync,
+  writeFileSync,
+} from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -170,5 +176,22 @@ describe('scanWorkspace', () => {
 
     const graph = scanWorkspace(baseConfig)
     expect(graph.nodes[0]?.private).toBe(true)
+  })
+
+  // Regression guard for the withFileTypes optimization: a package
+  // directory reached via a symlink must still be discovered. statSync
+  // follows symlinks; Dirent.isDirectory() does not — so the optimized
+  // listDirectories must special-case symlinked entries.
+  it('should discover a package dir reached via a symlink', () => {
+    const realDir = join(tmpDir, 'real-pkg')
+    mkdirSync(realDir, { recursive: true })
+    writeFileSync(
+      join(realDir, 'package.json'),
+      JSON.stringify({ name: '@scope/linked', version: '1.0.0' }),
+    )
+    symlinkSync(realDir, join(tmpDir, 'packages', 'linked'), 'dir')
+
+    const graph = scanWorkspace(baseConfig)
+    expect(graph.nodes.map((n) => n.name)).toContain('@scope/linked')
   })
 })

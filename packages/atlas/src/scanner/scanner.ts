@@ -47,15 +47,22 @@ const stripTrailingSlashes = (s: string): string => {
 
 const listDirectories = (base: string): string[] => {
   try {
-    return readdirSync(base)
-      .map((entry) => join(base, entry))
-      .filter((p) => {
+    const result: string[] = []
+    for (const entry of readdirSync(base, { withFileTypes: true })) {
+      const p = join(base, entry.name)
+      if (entry.isDirectory()) {
+        result.push(p)
+      } else if (entry.isSymbolicLink()) {
+        // Dirent.isDirectory() is false for symlinks; statSync follows
+        // the link. Monorepos symlink package dirs, so resolve those.
         try {
-          return statSync(p).isDirectory()
+          if (statSync(p).isDirectory()) result.push(p)
         } catch {
-          return false
+          // broken symlink — skip
         }
-      })
+      }
+    }
+    return result
   } catch {
     return []
   }
