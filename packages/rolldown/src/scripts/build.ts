@@ -43,32 +43,130 @@ async function build({
   await bundle.close()
 }
 
-const createBuilds = async () => {
-  let p = Promise.resolve()
-
-  allBuilds.forEach((item: Record<string, any>) => {
-    const { output, ...input } = rolldownConfig(item)
-    const format = FORMAT_LABEL[output.format] || output.format
-    p = p.then(() => {
-      const start = performance.now()
-
-      return build({ inputOptions: input, outputOptions: output })
-        .then(() => {
-          const duration = Math.round(performance.now() - start)
-          log(
-            `  ${chalk.green('+')} ${bold(format)} ${dim('->')} ${dim(`${output.dir}/${output.entryFileNames}`)} ${dim(`(${duration}ms)`)}`,
-          )
-        })
-        .catch((e) => {
-          log(`\n${chalk.bold.red('Build failed')}`)
-          log(chalk.gray(`  Format: ${format}`))
-          log(chalk.gray(`  File:   ${output.dir}/${output.entryFileNames}`))
-          log(e)
-          throw e
-        })
-    })
+/**
+ * Longest common parent directory of a list of file paths.
+ * '/lib/index.js' + '/lib/component.js' -> '/lib'
+ * '/lib/index.js' + '/lib/sub/foo.js'   -> '/lib'
+ */
+const commonParent = (files: string[]): string => {
+  if (files.length === 0) return '.'
+  const split = files.map((f) => {
+    const i = f.lastIndexOf('/')
+    return i >= 0 ? f.substring(0, i).split('/') : ['.']
   })
+  const head = split[0] as string[]
+  let common: string[] = head
+  for (const s of split.slice(1)) {
+    const next: string[] = []
+    for (let i = 0; i < Math.min(common.length, s.length); i++) {
+      if (common[i] === s[i]) next.push(common[i] as string)
+      else break
+    }
+    common = next
+  }
+  return common.length === 0 ? '.' : common.join('/')
+}
 
+const stripJsExt = (s: string): string => s.replace(/\.(m?js|cjs)$/, '')
+
+/**
+ * Partition variants into groups eligible for multi-entry shared-chunk
+ * builds, and singletons that keep the per-entry path.
+ *
+ * Eligible: same (format, env, platform), explicit `input` set, and a
+ * format that supports code-splitting (i.e. not umd/iife — those are
+ * inherently standalone bundles).
+ */
+const partitionForSharedChunks = (variants: Record<string, any>[]) => {
+  const buckets = new Map<string, Record<string, any>[]>()
+  const singles: Record<string, any>[] = []
+  for (const v of variants) {
+    if (!v.input || ['umd', 'iife'].includes(v.format)) {
+      singles.push(v)
+      continue
+    }
+    const key = `${v.format}|${v.env}|${v.platform}`
+    const bucket = buckets.get(key) ?? []
+    bucket.push(v)
+    buckets.set(key, bucket)
+  }
+  const groups: Record<string, any>[][] = []
+  for (const bucket of buckets.values()) {
+    if (bucket.length <= 1) singles.push(...bucket)
+    else groups.push(bucket)
+  }
+  return { groups, singles }
+}
+
+/** Build one group of multi-entry variants as a single rolldown invocation. */
+const buildGroup = async (group: Record<string, any>[]) => {
+  // Use the first variant as the representative for format/env/platform —
+  // they're identical across the group by construction.
+  const head = group[0] as Record<string, any>
+  const dir = commonParent(group.map((v) => v.file as string))
+  // Entry name = file relative to common parent, with .js/.cjs/.mjs stripped.
+  // rolldown preserves '/' in input keys, so nested entries map cleanly to
+  // nested output paths via [name] in entryFileNames.
+  const inputMap: Record<string, string> = {}
+  for (const v of group) {
+    const rel = (v.file as string).startsWith(`${dir}/`)
+      ? (v.file as string).substring(dir.length + 1)
+      : (v.file as string)
+    inputMap[stripJsExt(rel)] = v.input as string
+  }
+
+  // Build via the per-variant config to inherit plugins/externals/etc.,
+  // then override input + output for the group.
+  const { output, ...inputOptions } = rolldownConfig(head)
+  inputOptions.input = inputMap
+  const outputOptions = {
+    ...output,
+    dir,
+    entryFileNames: '[name].js',
+    chunkFileNames: '_chunks/[name]-[hash].js',
+  }
+
+  const format = FORMAT_LABEL[head.format] || head.format
+  const start = performance.now()
+  try {
+    await build({ inputOptions, outputOptions })
+  } catch (e) {
+    log(`\n${chalk.bold.red('Build failed')}`)
+    log(chalk.gray(`  Format:  ${format}`))
+    log(chalk.gray(`  Entries: ${Object.keys(inputMap).join(', ')}`))
+    log(e)
+    throw e
+  }
+  const duration = Math.round(performance.now() - start)
+  log(
+    `  ${chalk.green('+')} ${bold(format)} ${dim('->')} ${dim(`${dir}/{${Object.keys(inputMap).join(',')}}.js`)} ${dim(`(${duration}ms, shared chunks)`)}`,
+  )
+}
+
+const buildSingle = async (item: Record<string, any>) => {
+  const { output, ...inputOptions } = rolldownConfig(item)
+  const format = FORMAT_LABEL[output.format] || output.format
+  const start = performance.now()
+  try {
+    await build({ inputOptions, outputOptions: output })
+  } catch (e) {
+    log(`\n${chalk.bold.red('Build failed')}`)
+    log(chalk.gray(`  Format: ${format}`))
+    log(chalk.gray(`  File:   ${output.dir}/${output.entryFileNames}`))
+    log(e)
+    throw e
+  }
+  const duration = Math.round(performance.now() - start)
+  log(
+    `  ${chalk.green('+')} ${bold(format)} ${dim('->')} ${dim(`${output.dir}/${output.entryFileNames}`)} ${dim(`(${duration}ms)`)}`,
+  )
+}
+
+const createBuilds = async () => {
+  const { groups, singles } = partitionForSharedChunks(allBuilds)
+  let p = Promise.resolve()
+  for (const item of singles) p = p.then(() => buildSingle(item))
+  for (const group of groups) p = p.then(() => buildGroup(group))
   return p
 }
 
