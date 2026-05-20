@@ -1,5 +1,12 @@
 # Change Log
 
+## 2.4.0
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @vitus-labs/tools-core@2.4.0
+
 ## 2.3.1
 
 ### Patch Changes
