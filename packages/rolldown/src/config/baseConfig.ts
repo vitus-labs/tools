@@ -11,6 +11,13 @@ export default {
     outputDir: 'analysis',
   },
   filesize: true,
+  // JS-bundle sourcemap. Mirrors rolldown's native output.sourcemap:
+  //   true     — separate .js.map file + sourceMappingURL comment (default)
+  //   'hidden' — separate .js.map file, NO comment (debugging without leak)
+  //   'inline' — base64 map embedded in the .js file
+  //   false    — no map emitted
+  // DTS output does not include sourcemaps (declarations don't need them).
+  sourcemap: true as boolean | 'inline' | 'hidden',
   extensions: ['.json', '.js', '.jsx', '.ts', '.tsx', '.es6', '.es', '.mjs'],
   include: ['src'],
   external: ['react/jsx-runtime'],

@@ -12,6 +12,10 @@ describe('baseConfig', () => {
     expect(baseConfig.typescript).toBe(true)
   })
 
+  it('should default sourcemap to true (backward-compatible)', () => {
+    expect(baseConfig.sourcemap).toBe(true)
+  })
+
   it('should include all expected file extensions', () => {
     const expectedExtensions = [
       '.json',
