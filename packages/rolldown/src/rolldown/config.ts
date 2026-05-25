@@ -114,7 +114,7 @@ const rolldownConfig = ({
       entryFileNames: entryFileName,
       format,
       globals: swapGlobals(CONFIG.globals),
-      sourcemap: true,
+      sourcemap: CONFIG.sourcemap,
       sourcemapIgnoreList: (relativeSourcePath: string) =>
         relativeSourcePath.includes('node_modules'),
       exports: ['cjs', 'umd', 'iife'].includes(format)

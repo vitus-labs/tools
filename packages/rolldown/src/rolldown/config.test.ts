@@ -36,6 +36,7 @@ const { mockConfig, mockPKG } = vi.hoisted(() => ({
     replaceGlobals: true,
     visualise: { template: 'network', gzipSize: true, outputDir: 'analysis' },
     filesize: true,
+    sourcemap: true,
     external: ['react/jsx-runtime'],
     globals: { react: 'React' },
   } as Record<string, any>,
@@ -296,6 +297,34 @@ describe('rolldownConfig', () => {
 
     expect(config.output.dir).toBe('.')
     expect(config.output.entryFileNames).toBe('bundle.js')
+  })
+
+  describe('sourcemap is configurable (mirrors rolldown native API)', () => {
+    const buildWith = (sourcemap: unknown) => {
+      mockConfig.sourcemap = sourcemap
+      return rolldownConfig({
+        file: 'lib/index.js',
+        format: 'es',
+        env: 'development',
+        platform: 'universal',
+      })
+    }
+
+    it('threads true (default) into output', () => {
+      expect(buildWith(true).output.sourcemap).toBe(true)
+    })
+
+    it('threads false (no map emitted)', () => {
+      expect(buildWith(false).output.sourcemap).toBe(false)
+    })
+
+    it("threads 'hidden' (map file without sourceMappingURL comment)", () => {
+      expect(buildWith('hidden').output.sourcemap).toBe('hidden')
+    })
+
+    it("threads 'inline' (map embedded in bundle)", () => {
+      expect(buildWith('inline').output.sourcemap).toBe('inline')
+    })
   })
 })
 
