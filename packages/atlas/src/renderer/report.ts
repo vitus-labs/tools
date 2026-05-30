@@ -34,7 +34,7 @@ const formatBytes = (bytes: number): string => {
   return `${(bytes / k ** i).toFixed(1)} ${sizes[i]}`
 }
 
-const buildReportData = (data: AnalysisData): ReportJson => {
+export const buildReportData = (data: AnalysisData): ReportJson => {
   const {
     graph,
     cycles,
@@ -134,8 +134,14 @@ const buildReportData = (data: AnalysisData): ReportJson => {
   }
 }
 
+/** Serialize an already-built report. Use this when you already hold a
+ *  `ReportJson` (e.g. when also generating the markdown report from the
+ *  same source) to avoid rebuilding the report data twice. */
+export const serializeJsonReport = (report: ReportJson): string =>
+  JSON.stringify(report, null, 2)
+
 export const generateJsonReport = (data: AnalysisData): string =>
-  JSON.stringify(buildReportData(data), null, 2)
+  serializeJsonReport(buildReportData(data))
 
 const renderSummarySection = (
   report: ReportJson,
@@ -277,12 +283,16 @@ const renderHotspotsSection = (report: ReportJson): string[] => {
   return lines
 }
 
-export const generateMarkdownReport = (data: AnalysisData): string => {
-  const report = buildReportData(data)
-
+/** Format an already-built report as markdown. Pair with `buildReportData`
+ *  + `serializeJsonReport` when emitting both formats so the report data
+ *  structure is built exactly once. */
+export const formatMarkdownReport = (
+  report: ReportJson,
+  criticalPath: string[],
+): string => {
   const sections = [
     ['# Atlas — Dependency Analysis Report', ''],
-    ...renderSummarySection(report, data.depth.criticalPath),
+    ...renderSummarySection(report, criticalPath),
     ...renderCyclesSection(report),
     ...renderHighImpactSection(report),
     ...renderDeepChainsSection(report),
@@ -296,3 +306,6 @@ export const generateMarkdownReport = (data: AnalysisData): string => {
 
   return sections.join('\n')
 }
+
+export const generateMarkdownReport = (data: AnalysisData): string =>
+  formatMarkdownReport(buildReportData(data), data.depth.criticalPath)
