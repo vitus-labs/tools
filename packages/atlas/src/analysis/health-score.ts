@@ -17,14 +17,24 @@ interface HealthInput {
   changeFrequency: ChangeFrequencyResult | null
 }
 
-const collectCyclePackages = (cycles: CycleResult): Set<string> => {
-  const cyclePackages = new Set<string>()
+/**
+ * Precompute `pkg -> number of cycles that include it` once, so the
+ * per-node cycle penalty is an O(1) lookup instead of an O(cycles ×
+ * cycleLen) filter per node. Net work: O(C × L + N) instead of O(N × C × L).
+ */
+const collectCycleCounts = (cycles: CycleResult): Map<string, number> => {
+  const counts = new Map<string, number>()
   for (const cycle of cycles.cycles) {
+    // A package can appear multiple times within a single recorded cycle path
+    // (e.g. when normalization yields duplicates) — count it once per cycle.
+    const seen = new Set<string>()
     for (const pkg of cycle) {
-      cyclePackages.add(pkg)
+      if (seen.has(pkg)) continue
+      seen.add(pkg)
+      counts.set(pkg, (counts.get(pkg) ?? 0) + 1)
     }
   }
-  return cyclePackages
+  return counts
 }
 
 const collectDriftPackages = (
@@ -51,11 +61,10 @@ const collectDependentSet = (graph: DepGraph): Set<string> => {
 
 const applyCyclePenalty = (
   name: string,
-  cycles: CycleResult,
-  cyclePackages: Set<string>,
+  cycleCounts: Map<string, number>,
 ): { penalty: number; factor: string | null } => {
-  if (!cyclePackages.has(name)) return { penalty: 0, factor: null }
-  const cycleCount = cycles.cycles.filter((c) => c.includes(name)).length
+  const cycleCount = cycleCounts.get(name) ?? 0
+  if (cycleCount === 0) return { penalty: 0, factor: null }
   const penalty = Math.min(cycleCount * 20, 40)
   return { penalty, factor: `in ${cycleCount} cycle(s)` }
 }
@@ -120,7 +129,7 @@ const applyBonuses = (
 export const computeHealthScores = (input: HealthInput): HealthScoreResult => {
   const { graph, cycles, impact, depth, versionDrift, changeFrequency } = input
 
-  const cyclePackages = collectCyclePackages(cycles)
+  const cycleCounts = collectCycleCounts(cycles)
   const driftPackages = collectDriftPackages(versionDrift)
   const hasDependent = collectDependentSet(graph)
 
@@ -131,7 +140,7 @@ export const computeHealthScores = (input: HealthInput): HealthScoreResult => {
     const factors: string[] = []
 
     const penalties = [
-      applyCyclePenalty(node.name, cycles, cyclePackages),
+      applyCyclePenalty(node.name, cycleCounts),
       applyOrphanPenalty(node.name, hasDependent, graph.nodes.length),
       applyDepthPenalty(node.name, depth),
       applyDriftPenalty(node.name, driftPackages),

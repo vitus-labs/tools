@@ -15,6 +15,11 @@ vi.mock('./template', () => ({
 vi.mock('./report', () => ({
   generateMarkdownReport: vi.fn(() => '# Report'),
   generateJsonReport: vi.fn(() => '{}'),
+  // When both formats are requested, renderer builds the report once
+  // and passes it to the pre-built variants — mock that path too.
+  buildReportData: vi.fn(() => ({})),
+  serializeJsonReport: vi.fn(() => '{}'),
+  formatMarkdownReport: vi.fn(() => '# Report'),
 }))
 
 import { execFile } from 'node:child_process'
@@ -130,6 +135,22 @@ describe('renderGraph', () => {
     expect(result.htmlPath).toContain('atlas.html')
     // When report=true, both are written; reportPath is the last one assigned (md)
     expect(result.reportPath).toContain('atlas-report.md')
+  })
+
+  it('builds the report data exactly once when emitting both formats (perf regression lock)', async () => {
+    const report = await import('./report.ts')
+    vi.mocked(report.buildReportData).mockClear()
+    vi.mocked(report.generateJsonReport).mockClear()
+    vi.mocked(report.generateMarkdownReport).mockClear()
+
+    await renderGraph(mockData, { ...mockConfig, report: true })
+
+    // Was 2 in the old code path (one per convenience wrapper) — now 1.
+    expect(vi.mocked(report.buildReportData)).toHaveBeenCalledTimes(1)
+    // Convenience wrappers (each of which internally builds) must NOT be
+    // used when both formats are requested — they'd double the work.
+    expect(vi.mocked(report.generateJsonReport)).not.toHaveBeenCalled()
+    expect(vi.mocked(report.generateMarkdownReport)).not.toHaveBeenCalled()
   })
 
   it('should return undefined reportPath when report is disabled', async () => {
