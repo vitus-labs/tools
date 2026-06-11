@@ -37,11 +37,11 @@
   },
   "dependencies": {
     "@vitus-labs/tools-core": "workspace:^",
-    "commander": "^14.0.3",
-    "tinyglobby": "^0.2.16"
+    "commander": "^15.0.0",
+    "tinyglobby": "^0.2.17"
   },
   "devDependencies": {
-    "@types/node": "^25.8.0",
+    "@types/node": "^25.9.3",
     "@vitus-labs/tools-typescript": "workspace:^",
     "@vitus-labs/tools-vitest": "workspace:^",
     "typescript": "^6.0.3"

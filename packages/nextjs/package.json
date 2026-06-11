@@ -43,7 +43,7 @@
   "devDependencies": {
     "@vitus-labs/tools-typescript": "workspace:^",
     "@vitus-labs/tools-vitest": "workspace:^",
-    "next": "^16.2.6",
+    "next": "^16.2.9",
     "typescript": "^6.0.3"
   }
 }
