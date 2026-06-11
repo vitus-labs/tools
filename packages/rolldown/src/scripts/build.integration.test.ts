@@ -65,4 +65,41 @@ describe('rolldown DTS integration', () => {
       .filter((e) => e.name.startsWith('__dts_tmp'))
     expect(tmpDirs).toHaveLength(0)
   })
+
+  // Strictest correctness check: typecheck the produced .d.ts files as a
+  // real consumer would (skipLibCheck: false). If any internal import
+  // references a non-existent path (e.g. `./component2.js` after the
+  // post-process renamed `component2.d.ts -> component.d.ts`), tsc fails
+  // with TS2307. Without this check, "file exists" and content-pattern
+  // tests pass while we ship broken type declarations to npm.
+  // This fixture exercises the case: index.ts re-exports from both
+  // component.tsx and utils.ts, so the plugin code-splits and produces
+  // stub + numbered-real pairs that the post-process must wire up
+  // correctly.
+  it('produced .d.ts files typecheck strictly as a consumer would (skipLibCheck: false)', () => {
+    const probeDir = join(LIB, '__typecheck_probe')
+    rmSync(probeDir, { recursive: true, force: true })
+    const fs = require('node:fs') as typeof import('node:fs')
+    fs.mkdirSync(probeDir, { recursive: true })
+    fs.writeFileSync(
+      join(probeDir, 'tsconfig.json'),
+      JSON.stringify({
+        compilerOptions: {
+          target: 'ES2024',
+          module: 'Preserve',
+          moduleResolution: 'Bundler',
+          strict: true,
+          noEmit: true,
+          skipLibCheck: false,
+        },
+        include: ['../types/*.d.ts'],
+      }),
+    )
+    expect(() =>
+      execFileSync('bunx', ['tsc', '-p', join(probeDir, 'tsconfig.json')], {
+        stdio: 'pipe',
+      }),
+    ).not.toThrow()
+    rmSync(probeDir, { recursive: true, force: true })
+  }, 30_000)
 })
