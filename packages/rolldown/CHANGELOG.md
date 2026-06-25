@@ -1,5 +1,67 @@
 # Change Log
 
+## 2.6.0
+
+### Minor Changes
+
+- [#151](https://github.com/vitus-labs/tools/pull/151) [`36a2374`](https://github.com/vitus-labs/tools/commit/36a2374e9b9f18d01b0310a6910d08d75f8c8481) Thanks [@vitbokisch](https://github.com/vitbokisch)! - Generate declarations for all sub-entries in a single `rolldown()` call instead of one call per entry.
+
+  Each per-entry call instantiates the slow `rolldown-plugin-dts:generate` (the TS compiler + plugin state) from scratch — that's the `[PLUGIN_TIMINGS]` warning rolldown itself surfaces. Doing it in one call amortizes that setup AND lets common imports (e.g. a shared `types.ts`) emit as a single `_chunks/*.d.ts` instead of being inlined into every entry's stub.
+
+  **Measured on the repo's own DTS fixtures:**
+
+  | Fixture                                                 | Before (per-entry) | After (single-pass) | Speedup   |
+  | ------------------------------------------------------- | ------------------ | ------------------- | --------- |
+  | `dts-pipeline` (3 entries, `.tsx` + `.ts`)              | 675ms              | 380ms               | **1.78×** |
+  | `multi-entry-sharing` (3 entries, shared `sentinel.ts`) | 551ms              | 348ms               | **1.58×** |
+
+  Scales further with entry count — the per-call plugin instantiation cost is the dominant overhead, now amortized.
+
+  **Same architecture as PR [#139](https://github.com/vitus-labs/tools/issues/139)'s JS multi-entry fix**: partition DTS configs by output dir, run groups of ≥2 entries in one call, keep single-entry packages on the existing `buildDtsIsolated` path. The temp-dir / "find largest `.d.ts`" trick that handles the plugin's `<name>.d.ts` stub + `<name>2.d.ts` real pair is preserved, just batched across all entries.
+
+  **Regression-locked** in the integration test: the build output is asserted to contain the `single-pass` log marker AND to NOT contain the per-entry timing lines for grouped entries. A silent fallback to the old path would fail the test.
+
+### Patch Changes
+
+- [#157](https://github.com/vitus-labs/tools/pull/157) [`8067cf2`](https://github.com/vitus-labs/tools/commit/8067cf222b6cec7d1b8e000ed382999a9e43e411) Thanks [@vitbokisch](https://github.com/vitbokisch)! - Default-externalize Node builtins (`node:*` imports) in the base config.
+
+  Without this, every package that imports `node:fs`, `node:path`, etc. — which is most of them — triggers an `[UNRESOLVED_IMPORT] Could not resolve 'node:fs'` warning on every build. Rolldown is treating them as external implicitly anyway (so output is correct), but the warnings are noise and obscure real unresolved imports.
+
+  Single-line change in `packages/rolldown/src/config/baseConfig.ts` — adds `/^node:/` (a RegExp) to the default `external` list. `expandExternal` in `@vitus-labs/tools-core` passes RegExps through unchanged (proven shape; PR [#112](https://github.com/vitus-labs/tools/issues/112)), so this composes with the per-package string list with no per-package changes needed.
+
+  Verified on this monorepo's own packages (atlas, mcp, favicon, rolldown, rollup all import `node:*`): **0 `UNRESOLVED_IMPORT` warnings during build**, builds produce identical output (the imports were already being externalized — only the warning is silenced).
+
+  **Side note on the related `SOURCEMAP_BROKEN` fix that was proposed:** verified — it doesn't reproduce in our current code. The warning fires only when DTS sourcemap is enabled (`output.sourcemap: true`), and our DTS config hardcodes `sourcemap: false`. Adding an `onwarn` handler would be a defensive no-op. Skipped for now; can revisit if DTS sourcemap ever becomes configurable.
+
+- [#156](https://github.com/vitus-labs/tools/pull/156) [`afa223f`](https://github.com/vitus-labs/tools/commit/afa223f7d3ac8f9b41f4f5b547acb2ab14c9e6e1) Thanks [@vitbokisch](https://github.com/vitbokisch)! - Routine dep refresh + CI action bumps.
+
+  **Notable**: rolldown 1.1.1 → 1.1.3, rolldown-plugin-dts 0.25.2 → 0.26.0 (verified — integration tests for single-pass DTS still green), rollup 4.61.1 → 4.62.2, @microsoft/api-extractor 7.58.8 → 7.58.9, storybook 10.4.4 → 10.4.6, vite 8.0.16 → 8.1.0, vitest 4.1.8 → 4.1.9, @types/node 25.9 → 26.0 (major; no consumer rewrite needed).
+
+  **zod held at `~4.3.6`** (recurring): `--latest` again tried to bump to 4.4.x; still breaks `@modelcontextprotocol/sdk` 1.29.0's `AnySchema` type. SDK hasn't shipped zod-4.4-compatible types yet.
+
+  **Storybook peer ranges restored to wide** (recurring): `react`/`react-dom` → `>=19`, `react-native` → `>=0.74`, `react-native-web` → `>=0.19`.
+
+  **Biome held at `~2.4.16`** — 2.5.1 introduced breaking config-schema changes (`linter.rules.recommended` → `preset`, `nursery.noShadow` rule removed/relocated, root-mode default flipped). The `biome migrate` command applied a partial migration that produced a worse-broken config (1,658 lint errors due to expanded include scope). Pinning to 2.4.x for this PR; biome 2.5 migration is its own scoped change.
+
+  **CI actions** (SHA-pinned): actions/cache v5.0.5 → **v6.0.0** (major), actions/checkout v6.0.3 → **v7.0.0** (major).
+
+  Verified e2e: 579 tests pass, typecheck + lint clean, all 10 packages build, `bun audit --audit-level=critical` clean, zero leaked `__dts_tmp*` dirs.
+
+- [#150](https://github.com/vitus-labs/tools/pull/150) [`028fef7`](https://github.com/vitus-labs/tools/commit/028fef7200973141fc47fc57bffc73db1855bcad) Thanks [@vitbokisch](https://github.com/vitbokisch)! - Routine dep refresh + CI action bumps.
+
+  **Notable runtime/dev**: rolldown 1.0.3 → 1.1.1, rolldown-plugin-dts 0.25.1 → 0.25.2, rollup 4.60.4 → 4.61.1, ts-patch 4 (already on), commander 14 → 15 (major, no rewrite needed), favicons 7.2 → 7.3, typescript-transform-paths 3.5 → 4.0 (major, no rewrite needed), storybook 10.4.0 → 10.4.4, vite 8.0.13 → 8.0.16, next 16.2.6 → 16.2.9, vitest 4.1.6 → 4.1.8, biome 2.4.15 → 2.4.16, @types/node 25.8 → 25.9, react 19.2.6 → 19.2.7.
+
+  **zod held at `~4.3.6`** — `bun update --latest` again tried to bump to 4.4.x, which still breaks `@modelcontextprotocol/sdk` 1.29.0's `AnySchema` type (the SDK has not yet shipped zod-4.4-compatible types).
+
+  **Storybook peer ranges restored to wide** (recurring `--latest` regression): `react`/`react-dom` → `>=19`, `react-native` → `>=0.74`, `react-native-web` → `>=0.19`.
+
+  **CI actions** (SHA-pinned): checkout v6.0.2 → v6.0.3, changesets/action v1.8.0 → v1.9.0, codecov/codecov-action v6.0.0 → v7.0.0 (major), step-security/harden-runner v2.19.3 → v2.19.4, github/codeql-action v4.35.5 → v4.36.2.
+
+  Verified e2e: 576 tests pass, typecheck + lint clean, all 10 packages build.
+
+- Updated dependencies [[`afa223f`](https://github.com/vitus-labs/tools/commit/afa223f7d3ac8f9b41f4f5b547acb2ab14c9e6e1)]:
+  - @vitus-labs/tools-core@2.6.0
+
 ## 2.5.0
 
 ### Minor Changes
