@@ -1,5 +1,7 @@
 # @vitus-labs/tools-vitest
 
+## 2.6.1
+
 ## 2.6.0
 
 ### Patch Changes
