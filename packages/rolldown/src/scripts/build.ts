@@ -288,7 +288,13 @@ const pickRealDtsFor = (
   let bestSize = -1
   for (const f of tempFiles) {
     if (!re.test(f)) continue
-    const size = statSync(join(absTempDir, f)).size
+    // `tempFiles` is a snapshot from `readdirSync`. A prior promoteEntries
+    // iteration may have moved this file out of `absTempDir`. Skip silently
+    // instead of throwing ENOENT — defends against any future overlap in
+    // candidate sets even with the stem-dedup in place.
+    const p = join(absTempDir, f)
+    if (!existsSync(p)) continue
+    const size = statSync(p).size
     if (size > bestSize) {
       bestSize = size
       best = f
@@ -378,10 +384,16 @@ const buildDtsGrouped = async (
 
   const inputMap: Record<string, string> = {}
   const entryStems: string[] = []
+  // Dedup: two subpath exports can share the same `types` path (e.g.
+  // `./jsx-runtime` and `./jsx-dev-runtime` both pointing at
+  // `./lib/types/jsx-runtime.d.ts`). `inputMap` already dedups by stem;
+  // entryStems must do the same — otherwise promoteEntries iterates
+  // the same stem twice and the second iteration's pickRealDtsFor
+  // statSync's a file the first iteration already renamed away (ENOENT).
   for (const g of group) {
     const stem = (g.output.entryFileNames as string).replace(/\.d\.ts$/, '')
     inputMap[stem] = g.input as string
-    entryStems.push(stem)
+    if (!entryStems.includes(stem)) entryStems.push(stem)
   }
 
   try {
@@ -441,7 +453,9 @@ const generateDeclarations = async () => {
     const tscStart = performance.now()
     await buildDtsGrouped(group)
     const tscDuration = Math.round(performance.now() - tscStart)
-    const names = group.map((g) => g.output.entryFileNames as string).join(', ')
+    const names = [
+      ...new Set(group.map((g) => g.output.entryFileNames as string)),
+    ].join(', ')
     log(
       `  ${chalk.green('+')} ${bold('DTS')} ${dim('->')} ${dim(
         `${group[0]?.output.dir}/{${names}}`,
