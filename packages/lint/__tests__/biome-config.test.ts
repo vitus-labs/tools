@@ -14,9 +14,10 @@ describe('biome.shared.json', () => {
     expect(config.formatter.enabled).toBe(true)
   })
 
-  it('should have linter enabled with recommended rules', () => {
+  it('should have linter enabled with recommended preset', () => {
     expect(config.linter.enabled).toBe(true)
-    expect(config.linter.rules.recommended).toBe(true)
+    // biome 2.5: `recommended: true` was renamed to `preset: "recommended"`
+    expect(config.linter.rules.preset).toBe('recommended')
   })
 
   it('should have javascript formatter with single quotes and no semicolons', () => {
