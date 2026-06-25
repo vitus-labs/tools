@@ -37,7 +37,7 @@
     "favicons": "^7.3.0"
   },
   "devDependencies": {
-    "@types/node": "^25.9.3",
+    "@types/node": "^26.0.1",
     "@vitus-labs/tools-typescript": "workspace:^",
     "typescript": "^6.0.3"
   }
