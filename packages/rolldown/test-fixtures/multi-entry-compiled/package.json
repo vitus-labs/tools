@@ -1,0 +1,11 @@
+{
+  "name": "multi-entry-compiled-fixture",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".":      { "types": "./lib/types/index.d.ts", "import": "./lib/index.js" },
+    "./use":  { "types": "./lib/types/use.d.ts",   "import": "./lib/use.js" },
+    "./peek": { "types": "./lib/types/peek.d.ts",  "import": "./lib/peek.js" }
+  }
+}

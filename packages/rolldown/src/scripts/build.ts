@@ -3,9 +3,11 @@ import {
   existsSync,
   mkdirSync,
   readdirSync,
+  readFileSync,
   renameSync,
   rmSync,
   statSync,
+  writeFileSync,
 } from 'node:fs'
 import { join } from 'node:path'
 import chalk from 'chalk'
@@ -343,8 +345,6 @@ const repairStaleImports = (
   renamed: { oldStem: string; newStem: string }[],
 ) => {
   if (renamed.length === 0) return
-  const { readFileSync, writeFileSync } =
-    require('node:fs') as typeof import('node:fs')
   for (const stem of entryStems) {
     const filePath = join(absFinalDir, `${stem}.d.ts`)
     let content = readFileSync(filePath, 'utf-8')
