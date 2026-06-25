@@ -154,6 +154,12 @@ const createDtsConfig = (typesFilePath: string, inputFile: string) => {
       ...(dts({
         tsconfig: 'tsconfig.json',
         emitDtsOnly: true,
+        // Disable the plugin's internal fake-js sourcemap. The DTS output
+        // also has `output.sourcemap: false` (declarations don't need
+        // maps), but the plugin's fake-js transform emits a SOURCEMAP_BROKEN
+        // warning when its internal map isn't chained through — even though
+        // nothing consumes a .d.ts.map. Off both layers, no warning.
+        sourcemap: false,
       }) as RolldownPlugin[]),
     ],
     output: {
