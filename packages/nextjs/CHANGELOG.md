@@ -1,5 +1,12 @@
 # @vitus-labs/tools-nextjs
 
+## 2.6.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @vitus-labs/tools-core@2.6.1
+
 ## 2.6.0
 
 ### Patch Changes
