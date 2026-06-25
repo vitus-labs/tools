@@ -1,5 +1,6 @@
 import {
   cpSync,
+  existsSync,
   mkdirSync,
   readdirSync,
   renameSync,
@@ -240,19 +241,211 @@ const buildDtsIsolated = async (
   }
 }
 
+/**
+ * Build N DTS entries that share an output dir as a SINGLE rolldown call.
+ *
+ * Each per-entry rolldown call instantiates the slow rolldown-plugin-dts
+ * (and its embedded TS compiler) from scratch — that's the
+ * `[PLUGIN_TIMINGS] rolldown-plugin-dts:generate` warning rolldown
+ * itself surfaces. Doing the work in one call amortizes plugin/compiler
+ * setup AND lets common imports (e.g. a shared `types.ts`) emit as one
+ * `_chunks/*.d.ts` instead of being inlined into every entry's stub.
+ *
+ * Caveat the per-entry path also handles: rolldown-plugin-dts (0.25.2)
+ * emits `<name>.d.ts` (empty re-export stub) AND `<name>2.d.ts` (the real
+ * declarations). We pick the larger file per entry and move it to the
+ * intended path — same shape as `buildDtsIsolated`, batched.
+ */
+const escapeRe = (s: string): string => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+/** Build the rolldown invocation options for a grouped DTS build. */
+const buildGroupedDtsInvocation = (
+  head: ReturnType<typeof buildAllDts>[number],
+  inputMap: Record<string, string>,
+  tempDir: string,
+) => {
+  const inputOptions = { ...head, input: inputMap }
+  delete (inputOptions as { file?: unknown }).file
+  const outputOptions = {
+    ...head.output,
+    dir: tempDir,
+    entryFileNames: '[name].d.ts',
+    chunkFileNames: '_chunks/[name]-[hash].d.ts',
+  }
+  return { inputOptions, outputOptions }
+}
+
+/** Pick the largest `<stem>NUMBER?.d.ts` file in `tempFiles` for an entry. */
+const pickRealDtsFor = (
+  stem: string,
+  tempFiles: string[],
+  absTempDir: string,
+): string | undefined => {
+  const re = new RegExp(`^${escapeRe(stem)}\\d*\\.d\\.ts$`)
+  let best: string | undefined
+  let bestSize = -1
+  for (const f of tempFiles) {
+    if (!re.test(f)) continue
+    const size = statSync(join(absTempDir, f)).size
+    if (size > bestSize) {
+      bestSize = size
+      best = f
+    }
+  }
+  return best
+}
+
+/**
+ * Move each entry's "real" .d.ts out of the temp dir to its final path.
+ * Returns the list of `oldStem -> newStem` renames the import-path
+ * repair step needs to know about.
+ */
+const promoteEntries = (
+  entryStems: string[],
+  absTempDir: string,
+  absFinalDir: string,
+): { oldStem: string; newStem: string }[] => {
+  const tempFiles = readdirSync(absTempDir)
+  const renamed: { oldStem: string; newStem: string }[] = []
+  for (const stem of entryStems) {
+    const best = pickRealDtsFor(stem, tempFiles, absTempDir)
+    if (!best) continue
+    const oldStem = best.replace(/\.d\.ts$/, '')
+    renameSync(join(absTempDir, best), join(absFinalDir, `${stem}.d.ts`))
+    if (oldStem !== stem) renamed.push({ oldStem, newStem: stem })
+  }
+  return renamed
+}
+
+/**
+ * Move the plugin's `_chunks/` dir (shared types) alongside the entries.
+ * The `import "./_chunks/shared-X.js"` references in entry files resolve
+ * to `_chunks/shared-X.d.ts` via TS's adjacent-`.d.ts`-to-`.js` rule.
+ */
+const promoteChunksDir = (absTempDir: string, absFinalDir: string) => {
+  const tempChunksDir = join(absTempDir, '_chunks')
+  if (!existsSync(tempChunksDir)) return
+  const finalChunksDir = join(absFinalDir, '_chunks')
+  rmSync(finalChunksDir, { recursive: true, force: true })
+  renameSync(tempChunksDir, finalChunksDir)
+}
+
+/**
+ * Repair stale import paths. When the plugin code-splits across entries,
+ * one entry's .d.ts may reference `./otherEntry2.js` — but after we rename
+ * `otherEntry2.d.ts -> otherEntry.d.ts`, that reference no longer resolves.
+ * Without this, real consumers fail typechecks with `TS2307: Cannot find
+ * module './otherEntry2.js'` (caught by skipLibCheck:false consumers).
+ */
+const repairStaleImports = (
+  entryStems: string[],
+  absFinalDir: string,
+  renamed: { oldStem: string; newStem: string }[],
+) => {
+  if (renamed.length === 0) return
+  const { readFileSync, writeFileSync } =
+    require('node:fs') as typeof import('node:fs')
+  for (const stem of entryStems) {
+    const filePath = join(absFinalDir, `${stem}.d.ts`)
+    let content = readFileSync(filePath, 'utf-8')
+    let changed = false
+    for (const { oldStem, newStem } of renamed) {
+      const re = new RegExp(
+        `(["'\\s/])\\./${escapeRe(oldStem)}\\.js(["'])`,
+        'g',
+      )
+      if (re.test(content)) {
+        content = content.replace(re, `$1./${newStem}.js$2`)
+        changed = true
+      }
+    }
+    if (changed) writeFileSync(filePath, content)
+  }
+}
+
+const buildDtsGrouped = async (
+  group: ReturnType<typeof buildAllDts>,
+): Promise<void> => {
+  const head = group[0]
+  if (!head) return
+  const finalDir = head.output.dir as string
+
+  const groupTag = group
+    .map((g) => (g.output.entryFileNames as string).replace(/\W/g, '_'))
+    .join('_')
+  const tempDir = join(finalDir, `__dts_tmp_grp_${groupTag.substring(0, 60)}`)
+  const absTempDir = join(process.cwd(), tempDir)
+
+  const inputMap: Record<string, string> = {}
+  const entryStems: string[] = []
+  for (const g of group) {
+    const stem = (g.output.entryFileNames as string).replace(/\.d\.ts$/, '')
+    inputMap[stem] = g.input as string
+    entryStems.push(stem)
+  }
+
+  try {
+    await build(buildGroupedDtsInvocation(head, inputMap, tempDir))
+
+    const absFinalDir = join(process.cwd(), finalDir)
+    mkdirSync(absFinalDir, { recursive: true })
+
+    const renamed = promoteEntries(entryStems, absTempDir, absFinalDir)
+    promoteChunksDir(absTempDir, absFinalDir)
+    repairStaleImports(entryStems, absFinalDir, renamed)
+  } finally {
+    rmSync(absTempDir, { recursive: true, force: true })
+  }
+}
+
+/**
+ * Partition DTS configs into groupable buckets by output dir. A bucket
+ * of ≥2 entries goes through the single-pass `buildDtsGrouped`; singletons
+ * keep `buildDtsIsolated`. Same shape as the JS pipeline in `createBuilds`.
+ */
+const partitionDts = (configs: ReturnType<typeof buildAllDts>) => {
+  const buckets = new Map<string, ReturnType<typeof buildAllDts>>()
+  for (const c of configs) {
+    const k = c.output.dir as string
+    const b = buckets.get(k) ?? []
+    b.push(c)
+    buckets.set(k, b)
+  }
+  const groups: ReturnType<typeof buildAllDts>[] = []
+  const singles: ReturnType<typeof buildAllDts> = []
+  for (const b of buckets.values()) {
+    if (b.length <= 1) singles.push(...b)
+    else groups.push(b)
+  }
+  return { groups, singles }
+}
+
 const generateDeclarations = async () => {
   const dtsConfigs = buildAllDts()
   if (dtsConfigs.length === 0) return
 
   log(`\n${dim('Generating')} declarations...`)
 
-  for (const dtsFile of dtsConfigs) {
+  const { groups, singles } = partitionDts(dtsConfigs)
+
+  for (const dtsFile of singles) {
     const tscStart = performance.now()
     await buildDtsIsolated(dtsFile)
-
     const tscDuration = Math.round(performance.now() - tscStart)
     log(
       `  ${chalk.green('+')} ${bold('DTS')} ${dim('->')} ${dim(dtsFile.file)} ${dim(`(${tscDuration}ms)`)}`,
+    )
+  }
+
+  for (const group of groups) {
+    const tscStart = performance.now()
+    await buildDtsGrouped(group)
+    const tscDuration = Math.round(performance.now() - tscStart)
+    const names = group.map((g) => g.output.entryFileNames as string).join(', ')
+    log(
+      `  ${chalk.green('+')} ${bold('DTS')} ${dim('->')} ${dim(
+        `${group[0]?.output.dir}/{${names}}`,
+      )} ${dim(`(${tscDuration}ms, single-pass)`)}`,
     )
   }
 }
