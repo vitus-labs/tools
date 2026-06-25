@@ -9,10 +9,20 @@ import { CONFIG, PKG, PLATFORMS } from '../config/index.ts'
 const require = createRequire(import.meta.url)
 const filesize: typeof import('rollup-plugin-filesize').default = require('rollup-plugin-filesize')
 
+// Externals that ALWAYS apply, independent of the user-overridable
+// `CONFIG.external`. A `node:*` import is never a real module a library
+// could bundle, so a per-package `external` override must not be able to
+// drop it — otherwise any package that sets its own `external` (e.g. to
+// add echarts subpaths) silently loses node-builtin externalization and
+// starts emitting UNRESOLVED_IMPORT warnings again.
+const ALWAYS_EXTERNAL: (string | RegExp)[] = [/^node:/]
+
 const resolveExternals = (): (string | RegExp)[] =>
   CONFIG.bundleAll
     ? []
-    : [...PKG.externalDependencies, ...CONFIG.external].map(expandExternal)
+    : [...PKG.externalDependencies, ...ALWAYS_EXTERNAL, ...CONFIG.external].map(
+        expandExternal,
+      )
 
 const defineExtensions = (platform: string) => {
   const platformExtensions: string[] = []

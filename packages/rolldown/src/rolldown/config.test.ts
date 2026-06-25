@@ -431,4 +431,40 @@ describe('rolldownConfig external deep imports', () => {
 
     expect(config.external).toEqual([])
   })
+
+  it('keeps node:* external even when a package overrides CONFIG.external', () => {
+    // A package setting its own `external` (e.g. for echarts subpaths)
+    // must NOT lose node-builtin externalization — node:* lives in
+    // ALWAYS_EXTERNAL, applied independently of CONFIG.external.
+    mockConfig.bundleAll = false
+    mockPKG.externalDependencies = []
+    mockConfig.external = [/^echarts/]
+
+    const config = rolldownConfig({
+      file: 'lib/index.js',
+      format: 'es',
+      env: 'development',
+      platform: 'universal',
+    })
+
+    expect(matchesExternal(config.external, 'node:fs')).toBe(true)
+    expect(matchesExternal(config.external, 'node:path')).toBe(true)
+    // The package's own override is still honored.
+    expect(matchesExternal(config.external, 'echarts/core')).toBe(true)
+  })
+
+  it('keeps node:* external even when CONFIG.external is empty', () => {
+    mockConfig.bundleAll = false
+    mockPKG.externalDependencies = []
+    mockConfig.external = []
+
+    const config = rolldownConfig({
+      file: 'lib/index.js',
+      format: 'es',
+      env: 'development',
+      platform: 'universal',
+    })
+
+    expect(matchesExternal(config.external, 'node:crypto')).toBe(true)
+  })
 })
