@@ -20,7 +20,11 @@ export default {
   sourcemap: true as boolean | 'inline' | 'hidden',
   extensions: ['.json', '.js', '.jsx', '.ts', '.tsx', '.es6', '.es', '.mjs'],
   include: ['src'],
-  external: ['react/jsx-runtime'],
+  // node:* builtins are external by default — emits an UNRESOLVED_IMPORT
+  // warning on every package that imports `node:fs`, `node:path`, etc.
+  // without this. expandExternal in tools-core passes RegExp through
+  // unchanged, so this composes with the per-package string list.
+  external: ['react/jsx-runtime', /^node:/] as (string | RegExp)[],
   exclude: [
     'lib',
     'node_modules/**',
