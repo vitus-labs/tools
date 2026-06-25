@@ -20,11 +20,11 @@ export default {
   sourcemap: true as boolean | 'inline' | 'hidden',
   extensions: ['.json', '.js', '.jsx', '.ts', '.tsx', '.es6', '.es', '.mjs'],
   include: ['src'],
-  // node:* builtins are external by default — emits an UNRESOLVED_IMPORT
-  // warning on every package that imports `node:fs`, `node:path`, etc.
-  // without this. expandExternal in tools-core passes RegExp through
-  // unchanged, so this composes with the per-package string list.
-  external: ['react/jsx-runtime', /^node:/] as (string | RegExp)[],
+  // User-overridable default externals. node:* builtins are NOT here —
+  // they live in ALWAYS_EXTERNAL (rolldown/config.ts) so a per-package
+  // `external` override can't drop them. This list IS replaced wholesale
+  // when a package sets its own `external` in vl-tools.config.mjs.
+  external: ['react/jsx-runtime'] as (string | RegExp)[],
   exclude: [
     'lib',
     'node_modules/**',
