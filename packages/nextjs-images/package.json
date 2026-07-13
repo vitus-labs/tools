@@ -43,6 +43,6 @@
     "@types/webpack": "^5.28.5",
     "@vitus-labs/tools-typescript": "workspace:^",
     "next": "^16.2.9",
-    "typescript": "^6.0.3"
+    "typescript": "^7.0.2"
   }
 }
