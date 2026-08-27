@@ -54,13 +54,25 @@ jobs:
 
       - name: Create Release PR or Publish
         id: changesets
-        uses: changesets/action@a45c4d594aa4e2c509dc14a9f2b3b67ba3780d0d # v1.9.0
+        uses: changesets/action@8488615a623b1b9c987934bb89eae8af6a946ac1 # v2.1.1
         with:
-          version: bun run version-packages
-          publish: bun run release
-          title: 'chore: version packages'
-          commit: 'chore: version packages'
+          version-script: bun run version-packages
+          publish-script: bun run release
+          pr-title: 'chore: version packages'
+          commit-message: 'chore: version packages'
+          # v2 stopped reading GITHUB_TOKEN from the environment.
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          # v2 defaults to pushing release commits and tags through the
+          # GitHub API. Keep the v1 git-CLI behaviour so this migration
+          # changes input names only; switching push modes can be its own
+          # change, verified against a real release.
+          push-with-git-cli: true
         env:
+          # Still required, and NOT redundant with `github-token` above: the
+          # version script spawns `changeset version`, whose
+          # @changesets/changelog-github reads process.env.GITHUB_TOKEN to
+          # resolve PR and author links. The input authenticates the action;
+          # this authenticates the child process.
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # ── Prerelease (feature/release branches) ───────────────────────
