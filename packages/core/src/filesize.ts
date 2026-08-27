@@ -1,4 +1,4 @@
-import { brotliCompressSync, gzipSync } from 'node:zlib'
+import { gzipSync } from 'node:zlib'
 
 /** Wraps one piece of the report, e.g. `chalk.dim`. */
 type Formatter = (text: string) => string
@@ -10,8 +10,6 @@ export type FilesizeOptions = {
   name?: Formatter
   /** Styles the size column. Default: unstyled. */
   value?: Formatter
-  /** Also report the brotli-compressed size. Default: false. */
-  brotli?: boolean
   /** Sink for each reported line. Default: `console.log`. */
   log?: (message: string) => void
 }
@@ -69,7 +67,6 @@ const filesize = (options: FilesizeOptions = {}) => {
   const {
     name = identity,
     value = identity,
-    brotli = false,
     log = (message: string) => console.log(message),
   } = options
 
@@ -84,18 +81,11 @@ const filesize = (options: FilesizeOptions = {}) => {
         if (isAsset(entry) || typeof entry.code !== 'string') continue
 
         const raw = Buffer.from(entry.code, 'utf8')
-        const sizes = [
-          formatBytes(raw.byteLength),
-          `${formatBytes(gzipSync(raw).byteLength)} gzip`,
-        ]
+        const sizes = `${formatBytes(raw.byteLength)} · ${formatBytes(
+          gzipSync(raw).byteLength,
+        )} gzip`
 
-        if (brotli) {
-          sizes.push(`${formatBytes(brotliCompressSync(raw).byteLength)} br`)
-        }
-
-        log(
-          `  ${name(entry.fileName ?? '<unknown>')} ${value(sizes.join(' · '))}`,
-        )
+        log(`  ${name(entry.fileName ?? '<unknown>')} ${value(sizes)}`)
       }
     },
   }

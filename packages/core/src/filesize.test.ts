@@ -1,4 +1,4 @@
-import { brotliCompressSync, gzipSync } from 'node:zlib'
+import { gzipSync } from 'node:zlib'
 import { describe, expect, it, vi } from 'vitest'
 import { filesize, formatBytes } from './filesize.ts'
 
@@ -54,19 +54,6 @@ describe('filesize', () => {
         gzipSync(raw).byteLength,
       )} gzip`,
     ])
-  })
-
-  it('adds brotli only when asked', () => {
-    const code = 'const x = 1'
-    const raw = Buffer.from(code, 'utf8')
-
-    const [withoutBrotli] = run({ 'a.js': chunk('a.js', code) })
-    expect(withoutBrotli).not.toContain(' br')
-
-    const [withBrotli] = run({ 'a.js': chunk('a.js', code) }, { brotli: true })
-    expect(withBrotli).toContain(
-      `${formatBytes(brotliCompressSync(raw).byteLength)} br`,
-    )
   })
 
   it('reports every chunk in the bundle', () => {
