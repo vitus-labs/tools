@@ -1,5 +1,12 @@
 # @vitus-labs/tools-atlas
 
+## 2.7.0
+
+### Patch Changes
+
+- Updated dependencies [[`170e907`](https://github.com/vitus-labs/tools/commit/170e907c87385965f191cd13074f2922319dfc23)]:
+  - @vitus-labs/tools-core@2.7.0
+
 ## 2.6.3
 
 ### Patch Changes

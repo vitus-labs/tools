@@ -1,5 +1,55 @@
 # Change Log
 
+## 2.7.0
+
+### Minor Changes
+
+- [#188](https://github.com/vitus-labs/tools/pull/188) [`170e907`](https://github.com/vitus-labs/tools/commit/170e907c87385965f191cd13074f2922319dfc23) Thanks [@vitbokisch](https://github.com/vitbokisch)! - Replace `rollup-plugin-filesize` with a built-in size reporter
+  
+  `rollup-plugin-filesize` was a runtime dependency of both build packages and
+  pulled 186 transitive packages into every consumer's tree — including a full
+  npm client (`pacote` -> `cacache` -> `tar`, plus `node-gyp`) and
+  `colors@1.4.0` — solely to print bundle sizes. Six advisories reached
+  consumers through that chain, among them the critical `tar` DoS
+  (GHSA-23hp-3jrh-7fpw). The plugin is unmaintained at 10.0.0, so there was no
+  upgrade path.
+  
+  `@vitus-labs/tools-core` now exports a dependency-free `filesize` plugin
+  built on `node:zlib`, used by both packages. The `filesize` config flag is
+  unchanged.
+  
+  Two differences in the reported numbers:
+  
+  - The **minified size** column is gone. It was produced by running the chunk
+    through terser regardless of whether the build minifies.
+  - **Gzip is now measured on the bytes actually emitted.** The old plugin
+    gzipped terser-minified code, so its figure described a hypothetical build
+    rather than the real output. Expect a larger, truthful number for
+    unminified builds.
+  
+  Output is now a compact line per chunk that matches the surrounding build
+  log, instead of a separate boxed panel.
+
+### Patch Changes
+
+- [#185](https://github.com/vitus-labs/tools/pull/185) [`67126df`](https://github.com/vitus-labs/tools/commit/67126dfb01e4e3e9e475096547a1ea2026884290) Thanks [@vitbokisch](https://github.com/vitbokisch)! - Update dependencies to their latest versions
+  
+  - `chalk` 5 -> 6 (Node >= 22, already the minimum for these packages)
+  - `rolldown` 1.1 -> 1.2, `rolldown-plugin-dts` 0.26 -> 0.28
+  - `rollup` 4.62 -> 4.63, `@microsoft/api-extractor` 7.58 -> 7.59, `rollup-plugin-visualizer` 7.0 -> 7.1
+  - `@biomejs/biome` 2.5.1 -> 2.5.10
+  - Storybook 10.4 -> 10.5 and related addons
+  - `@modelcontextprotocol/sdk` 1.29 -> 1.30, `zod` 4.3 -> 4.4
+  - `favicons` 7.3.0 -> 7.3.1
+
+- [#189](https://github.com/vitus-labs/tools/pull/189) [`faba9f6`](https://github.com/vitus-labs/tools/commit/faba9f6316045f58f7d6f0e839964dc60201826b) Thanks [@vitbokisch](https://github.com/vitbokisch)! - Move `@types/node` to `devDependencies`
+  
+  It was declared as a runtime dependency, so every consumer installed a
+  types-only package they never load at runtime. Every other package in the
+  repo already had it in `devDependencies`.
+- Updated dependencies [[`170e907`](https://github.com/vitus-labs/tools/commit/170e907c87385965f191cd13074f2922319dfc23)]:
+  - @vitus-labs/tools-core@2.7.0
+
 ## 2.6.3
 
 ### Patch Changes
