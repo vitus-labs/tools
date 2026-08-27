@@ -36,10 +36,10 @@
   "devDependencies": {
     "@vitus-labs/tools-typescript": "workspace:^",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.9"
+    "vitest": "^4.1.11"
   },
   "peerDependencies": {
-    "vite": "^8.1.0",
+    "vite": "^8.2.2",
     "vitest": ">=4"
   }
 }
