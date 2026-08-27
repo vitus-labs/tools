@@ -1,13 +1,10 @@
 import { existsSync } from 'node:fs'
-import { createRequire } from 'node:module'
-import { expandExternal, swapGlobals } from '@vitus-labs/tools-core'
+import { expandExternal, filesize, swapGlobals } from '@vitus-labs/tools-core'
+import chalk from 'chalk'
 import type { RolldownPlugin } from 'rolldown'
 import { dts } from 'rolldown-plugin-dts'
 import { visualizer } from 'rollup-plugin-visualizer'
 import { CONFIG, PKG, PLATFORMS } from '../config/index.ts'
-
-const require = createRequire(import.meta.url)
-const filesize: typeof import('rollup-plugin-filesize').default = require('rollup-plugin-filesize')
 
 // Externals that ALWAYS apply, independent of the user-overridable
 // `CONFIG.external`. A `node:*` import is never a real module a library
@@ -65,7 +62,9 @@ const loadPlugins = ({ file }: { file: string }) => {
   }
 
   if (CONFIG.filesize) {
-    plugins.push(filesize() as RolldownPlugin)
+    plugins.push(
+      filesize({ name: chalk.bold, value: chalk.dim }) as RolldownPlugin,
+    )
   }
 
   return plugins
