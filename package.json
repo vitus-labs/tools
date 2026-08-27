@@ -19,6 +19,7 @@
     "changeset": "changeset",
     "version-packages": "changeset version && bun install",
     "release": "node scripts/publish.js",
+    "release:approve": "node scripts/approve-release-runs.js",
     "pkgs:clean": "rm -rf node_modules/ bun.lock && bun install",
     "pkgs:build": "bun run --filter '*' build",
     "test": "vitest run",
