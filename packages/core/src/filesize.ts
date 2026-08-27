@@ -21,6 +21,9 @@ const UNITS = ['B', 'kB', 'MB', 'GB'] as const
 /**
  * Human-readable byte count in base 1000, matching how registries and CDNs
  * report bundle sizes.
+ *
+ * Exported for this module's own tests only — deliberately not re-exported
+ * from the package index, so it stays out of the public API.
  */
 const formatBytes = (bytes: number): string => {
   if (bytes < 1000) return `${bytes} B`
