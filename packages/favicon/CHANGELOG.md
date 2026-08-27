@@ -1,5 +1,24 @@
 # Change Log
 
+## 2.7.1
+
+### Patch Changes
+
+- [#191](https://github.com/vitus-labs/tools/pull/191) [`0f34da5`](https://github.com/vitus-labs/tools/commit/0f34da53478d885731e82a9e0f750be2b5f115df) Thanks [@vitbokisch](https://github.com/vitbokisch)! - Pin internal dependencies to the exact version being released
+  
+  Published packages referenced each other by a range resolved from
+  `bun.lock`, whose recorded workspace versions are only refreshed when the
+  lockfile is regenerated from scratch. `bun install` leaves them alone, even
+  with `--force`, so after `changeset version` they still held the previous
+  release's numbers — `@vitus-labs/tools-rolldown@2.6.3` shipped depending on
+  `@vitus-labs/tools-core@^2.5.0`, two releases behind.
+  
+  Internal dependencies are now resolved from the versions on disk and pinned
+  exactly, so every package in a release references exactly its siblings from
+  that same release.
+- Updated dependencies [[`0f34da5`](https://github.com/vitus-labs/tools/commit/0f34da53478d885731e82a9e0f750be2b5f115df)]:
+  - @vitus-labs/tools-core@2.7.1
+
 ## 2.7.0
 
 ### Patch Changes
