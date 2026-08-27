@@ -5,6 +5,13 @@ updates:
     schedule:
       interval: weekly
       day: monday
+    ignore:
+      # TypeScript 7 is deferred deliberately; without this Dependabot
+      # reproposes it every time a 7.x patch lands. Remove this entry when
+      # the repo is ready to move off the 6.x line.
+      - dependency-name: 'typescript'
+        update-types:
+          - version-update:semver-major
     groups:
       storybook:
         patterns:
