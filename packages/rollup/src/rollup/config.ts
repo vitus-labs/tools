@@ -1,13 +1,13 @@
 import { createRequire } from 'node:module'
 import { nodeResolve } from '@rollup/plugin-node-resolve'
-import { expandExternal, swapGlobals } from '@vitus-labs/tools-core'
+import { expandExternal, filesize, swapGlobals } from '@vitus-labs/tools-core'
+import chalk from 'chalk'
 import { apiExtractor } from 'rollup-plugin-api-extractor'
 import { visualizer } from 'rollup-plugin-visualizer'
 import { CONFIG, PKG, PLATFORMS } from '../config/index.ts'
 
 const require = createRequire(import.meta.url)
 const tspCompiler = require('ts-patch/compiler')
-const filesize: typeof import('rollup-plugin-filesize').default = require('rollup-plugin-filesize')
 const typescript: typeof import('rollup-plugin-typescript2').default = require('rollup-plugin-typescript2')
 const replace: typeof import('@rollup/plugin-replace').default = require('@rollup/plugin-replace')
 const terser: typeof import('@rollup/plugin-terser').default = require('@rollup/plugin-terser')
@@ -133,7 +133,7 @@ const loadPlugins = ({
   }
 
   if (CONFIG.filesize) {
-    plugins.push(filesize())
+    plugins.push(filesize({ name: chalk.bold, value: chalk.dim }))
   }
 
   return plugins

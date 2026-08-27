@@ -7,16 +7,8 @@ vi.mock('rollup-plugin-visualizer', () => ({
   visualizer: vi.fn(() => ({ name: 'mock-visualizer' })),
 }))
 
-// CJS plugin loaded via createRequire
-vi.mock('node:module', () => ({
-  createRequire: vi.fn(
-    () => (id: string) =>
-      ({
-        'rollup-plugin-filesize': vi.fn(() => ({ name: 'mock-filesize' })),
-      })[id] ?? {},
-  ),
-}))
 vi.mock('@vitus-labs/tools-core', () => ({
+  filesize: vi.fn(() => ({ name: 'mock-filesize' })),
   swapGlobals: (globals: Record<string, string>) =>
     Object.fromEntries(Object.entries(globals).map(([k, v]) => [v, k])),
   expandExternal: (id: string | RegExp): string | RegExp => {

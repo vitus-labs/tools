@@ -250,6 +250,8 @@ const PKG = getPkgData()
 const VL_CONFIG = await loadVLToolsConfig()
 const TS_CONFIG = loadFileToJSON(TYPESCRIPT_FILE_NAME)
 
+export type { FilesizeOptions } from './filesize.ts'
+export { filesize } from './filesize.ts'
 export {
   defineConfig,
   expandExternal,

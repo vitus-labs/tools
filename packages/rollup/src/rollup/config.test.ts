@@ -53,7 +53,6 @@ vi.mock('node:module', () => ({
   createRequire: vi.fn(
     () => (id: string) =>
       ({
-        'rollup-plugin-filesize': mockFilesize,
         'rollup-plugin-typescript2': mockTypescript,
         '@rollup/plugin-replace': mockReplace,
         '@rollup/plugin-terser': mockTerser,
@@ -63,6 +62,7 @@ vi.mock('node:module', () => ({
 }))
 
 vi.mock('@vitus-labs/tools-core', () => ({
+  filesize: mockFilesize,
   swapGlobals: (globals: Record<string, string>) =>
     Object.fromEntries(Object.entries(globals).map(([k, v]) => [v, k])),
   expandExternal: (id: string | RegExp): string | RegExp => {
