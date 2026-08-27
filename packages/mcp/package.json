@@ -41,8 +41,8 @@
   },
   "devDependencies": {
     "@types/node": "^26.4.0",
-    "@vitus-labs/tools-typescript": "workspace:^",
-    "@vitus-labs/tools-vitest": "workspace:^",
+    "@vitus-labs/tools-typescript": "workspace:*",
+    "@vitus-labs/tools-vitest": "workspace:*",
     "typescript": "^6.0.3"
   }
 }

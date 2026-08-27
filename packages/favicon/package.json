@@ -33,12 +33,12 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@vitus-labs/tools-core": "workspace:^",
+    "@vitus-labs/tools-core": "workspace:*",
     "favicons": "^7.3.1"
   },
   "devDependencies": {
     "@types/node": "^26.4.0",
-    "@vitus-labs/tools-typescript": "workspace:^",
+    "@vitus-labs/tools-typescript": "workspace:*",
     "typescript": "^6.0.3"
   }
 }
