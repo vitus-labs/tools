@@ -35,14 +35,14 @@
     "lint": "biome check src/"
   },
   "dependencies": {
-    "@vitus-labs/tools-core": "workspace:^"
+    "@vitus-labs/tools-core": "workspace:*"
   },
   "peerDependencies": {
     "next": ">=14"
   },
   "devDependencies": {
-    "@vitus-labs/tools-typescript": "workspace:^",
-    "@vitus-labs/tools-vitest": "workspace:^",
+    "@vitus-labs/tools-typescript": "workspace:*",
+    "@vitus-labs/tools-vitest": "workspace:*",
     "next": "^16.3.3",
     "typescript": "^6.0.3"
   }
