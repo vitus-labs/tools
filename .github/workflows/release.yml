@@ -35,9 +35,11 @@ jobs:
       # PR is authored by a real account instead — no approval gate, and CI
       # triggers on it normally. See CONTRIBUTING.md > Publishing.
       #
-      # Without the secret this falls back to GITHUB_TOKEN, i.e. exactly the
-      # current behaviour, so the release still works — it just keeps needing
-      # the manual approval.
+      # Falls back to GITHUB_TOKEN only when the secret is UNSET. An expired
+      # or revoked RELEASE_TOKEN is still a non-empty string, so it wins the
+      # `||` and the job fails at checkout instead of falling back. That fails
+      # loudly before anything is published; to recover, delete the secret or
+      # replace the token. See CONTRIBUTING.md > Publishing.
       RELEASE_TOKEN: ${{ secrets.RELEASE_TOKEN || secrets.GITHUB_TOKEN }}
     steps:
       - name: Harden runner
