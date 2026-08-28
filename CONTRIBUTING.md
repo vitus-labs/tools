@@ -107,10 +107,23 @@ scoped to this repository with:
 Add it as the repository secret **`RELEASE_TOKEN`**. The version PR is then
 authored by that account, CI triggers on it normally, and no approval is needed.
 
-If the secret is absent or its token expires, the workflow falls back to
-`GITHUB_TOKEN` and releases keep working — they just need the manual approval
-again, rather than failing. To approve from the terminal instead of the Actions
-tab:
+Fine-grained tokens expire. Set a calendar reminder for the expiry date, and
+note what the fallback does and does not cover:
+
+- **Secret unset** — the workflow falls back to `GITHUB_TOKEN`, and releases
+  keep working; they just need the manual approval again.
+- **Secret set but the token is expired or revoked** — there is *no* fallback.
+  An invalid token is still a non-empty string, so `secrets.RELEASE_TOKEN ||
+  secrets.GITHUB_TOKEN` selects it, and the release job fails at the checkout
+  step with an authentication error.
+
+The failure is loud and happens before anything is published, so a dead token
+delays a release rather than corrupting one. To recover, either delete the
+`RELEASE_TOKEN` secret to fall back to the gated-but-working path, or replace
+it with a fresh token.
+
+While the secret is unset, approve a stalled version PR from the terminal
+instead of the Actions tab:
 
 ```sh
 bun run release:approve
