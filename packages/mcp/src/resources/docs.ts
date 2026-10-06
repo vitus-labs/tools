@@ -65,7 +65,7 @@ Note: PKG, VL_CONFIG, TS_CONFIG use top-level await (side effects at import time
     description: 'Shared TypeScript configuration presets (lib, node, nextjs)',
     content: `# @vitus-labs/tools-typescript
 
-Shared TypeScript configuration presets. Peer dep: typescript 6.x or 7.x.
+Shared TypeScript configuration presets. Peer dep: typescript 6.x or 7.x. TypeScript 7 works with @vitus-labs/tools-rolldown; @vitus-labs/tools-rollup requires TypeScript 5 or 6.
 
 ## Presets
 
@@ -97,7 +97,7 @@ Shared Biome configuration. Ships @biomejs/biome as a dependency.
 ## Usage
 \`\`\`json
 {
-  "$schema": "https://biomejs.dev/schemas/2.5.10/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.5.15/schema.json",
   "extends": ["@vitus-labs/tools-lint/biome"]
 }
 \`\`\`

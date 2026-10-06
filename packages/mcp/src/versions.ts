@@ -7,17 +7,17 @@ const VERSIONS = {
   vitusLabs: '^2.0.0',
   /** Matches the `@vitus-labs/tools-typescript` peer range (rollup cannot run on TS 7) */
   typescript: '^6.0.3',
-  vitest: '^4.1.11',
-  vitestCoverage: '^4.1.11',
+  vitest: '^5.0.3',
+  vitestCoverage: '^5.0.3',
   /** Peer of `@vitus-labs/tools-vitest` */
-  vite: '^8.2.2',
-  biome: '^2.5.10',
+  vite: '^8.3.3',
+  biome: '^2.5.15',
   react: '^19.0.0',
   reactDom: '^19.0.0',
   typesReact: '^19.0.0',
-  next: '^16.0.0',
+  next: '^16.3.8',
 } as const
 
-const BIOME_SCHEMA = 'https://biomejs.dev/schemas/2.5.10/schema.json'
+const BIOME_SCHEMA = 'https://biomejs.dev/schemas/2.5.15/schema.json'
 
 export { BIOME_SCHEMA, VERSIONS }
