@@ -1,5 +1,31 @@
 # Change Log
 
+## 2.8.0
+
+### Patch Changes
+
+- [#210](https://github.com/vitus-labs/tools/pull/210) [`fc427ac`](https://github.com/vitus-labs/tools/commit/fc427aca7b0d0c75f28e0dba36dd76de10e099b4) Thanks [@vitbokisch](https://github.com/vitbokisch)! - Update dependencies to their latest minor/patch versions
+  
+  - `rolldown` 1.2.6 -> 1.2.12, `rolldown-plugin-dts` 0.28.2 -> 0.28.6
+  - `rollup` 4.63 -> 4.64, `@microsoft/api-extractor` 7.59.0 -> 7.59.4
+  - `chalk` 6.0.0 -> 6.0.1
+  - `@biomejs/biome` 2.5.10 -> 2.5.15
+  - Storybook 10.5 -> 10.6 and related addons, `vite` 8.2 -> 8.3
+  - `@modelcontextprotocol/sdk` 1.30 -> 1.32, `zod` 4.4 -> 4.6
+
+- [#215](https://github.com/vitus-labs/tools/pull/215) [`8a82ca5`](https://github.com/vitus-labs/tools/commit/8a82ca5ae2cd78adbf49a32be450b9c355d21cfe) Thanks [@vitbokisch](https://github.com/vitbokisch)! - Fix rollup build correctness: working `vl_build-watch`, CJS `exports.require` output in ESM-only packages, crash on `browser` maps with `false`/string values, bogus typings entry without variants, api-extractor `./` path, visualizer path for bare files, duplicate builds; publish only `lib` and `global`; lazy-load heavy plugins; drop unused dependencies.
+
+- [#225](https://github.com/vitus-labs/tools/pull/225) [`3ac9efa`](https://github.com/vitus-labs/tools/commit/3ac9efaceba55dadcf204b9e2eb83a55125f6eed) Thanks [@vitbokisch](https://github.com/vitbokisch)! - Support the standard `exports["."]` subpath-map form. Previously only top-level conditions (`exports.import` / `exports.require`) were read, so a package declaring `exports: { ".": { import, require, types } }` got no CommonJS build for `require` and no declaration path from `exports`. Nested conditions such as `import: { types, default }` are resolved as well.
+
+- [#211](https://github.com/vitus-labs/tools/pull/211) [`d9f98a8`](https://github.com/vitus-labs/tools/commit/d9f98a8ca6147ae94196b53c1a382fd9944e2646) Thanks [@vitbokisch](https://github.com/vitbokisch)! - TypeScript 7 support
+  
+  - `tools-typescript`: peer range widened to `^6.0.3 || ^7.0.0`; the presets work unchanged with the native TypeScript 7 compiler.
+  - `tools-rolldown` works with TypeScript 7 out of the box — `rolldown-plugin-dts` switches to its `tsgo` generator automatically.
+  - `tools-rollup`: now declares its `typescript` peer (`^5.0.0 || ^6.0.0`). Its TypeScript plugins (`rollup-plugin-typescript2`, `ts-patch`) need the TypeScript JavaScript API, which TypeScript 7 no longer ships — use `tools-rolldown` with TypeScript 7.
+  - The repository itself is now built and type-checked with TypeScript 7.0.2.
+- Updated dependencies [[`1e4cbf1`](https://github.com/vitus-labs/tools/commit/1e4cbf10abd60aa9f1616087dc24204e951113ae)]:
+  - @vitus-labs/tools-core@2.8.0
+
 ## 2.7.1
 
 ### Patch Changes

@@ -1,5 +1,22 @@
 # Change Log
 
+## 2.8.0
+
+### Patch Changes
+
+- [#210](https://github.com/vitus-labs/tools/pull/210) [`fc427ac`](https://github.com/vitus-labs/tools/commit/fc427aca7b0d0c75f28e0dba36dd76de10e099b4) Thanks [@vitbokisch](https://github.com/vitbokisch)! - Update dependencies to their latest minor/patch versions
+  
+  - `rolldown` 1.2.6 -> 1.2.12, `rolldown-plugin-dts` 0.28.2 -> 0.28.6
+  - `rollup` 4.63 -> 4.64, `@microsoft/api-extractor` 7.59.0 -> 7.59.4
+  - `chalk` 6.0.0 -> 6.0.1
+  - `@biomejs/biome` 2.5.10 -> 2.5.15
+  - Storybook 10.5 -> 10.6 and related addons, `vite` 8.2 -> 8.3
+  - `@modelcontextprotocol/sdk` 1.30 -> 1.32, `zod` 4.4 -> 4.6
+
+- [#221](https://github.com/vitus-labs/tools/pull/221) [`38328b1`](https://github.com/vitus-labs/tools/commit/38328b113686718fbc0371256a37092c7a5114b4) Thanks [@vitbokisch](https://github.com/vitbokisch)! - Fix several storybook package bugs: standard CSF stories are no longer dropped by the manual indexer (it now delegates to the default indexers); monorepo mode (`vl_stories-monorepo*`) now actually activates; auto-discovery is an explicit opt-in (`autoDiscovery`) that adds the index globs it needs; `ui.theme` now drives the manager theme; `backgrounds.default` is mapped to the Storybook 10 `backgrounds` global; virtual stories use a `.tsx` id and escape interpolated names; `configDir` uses `fileURLToPath`; the next/font mock uses Vite 8 `optimizeDeps.rolldownOptions`; package `types`/`exports` now resolve typings; unused `@storybook/react-native` dependency removed.
+- Updated dependencies [[`1e4cbf1`](https://github.com/vitus-labs/tools/commit/1e4cbf10abd60aa9f1616087dc24204e951113ae)]:
+  - @vitus-labs/tools-core@2.8.0
+
 ## 2.7.1
 
 ### Patch Changes

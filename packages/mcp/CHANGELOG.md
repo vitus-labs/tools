@@ -1,5 +1,27 @@
 # @vitus-labs/tools-mcp
 
+## 2.8.0
+
+### Patch Changes
+
+- [#210](https://github.com/vitus-labs/tools/pull/210) [`fc427ac`](https://github.com/vitus-labs/tools/commit/fc427aca7b0d0c75f28e0dba36dd76de10e099b4) Thanks [@vitbokisch](https://github.com/vitbokisch)! - Update dependencies to their latest minor/patch versions
+  
+  - `rolldown` 1.2.6 -> 1.2.12, `rolldown-plugin-dts` 0.28.2 -> 0.28.6
+  - `rollup` 4.63 -> 4.64, `@microsoft/api-extractor` 7.59.0 -> 7.59.4
+  - `chalk` 6.0.0 -> 6.0.1
+  - `@biomejs/biome` 2.5.10 -> 2.5.15
+  - Storybook 10.5 -> 10.6 and related addons, `vite` 8.2 -> 8.3
+  - `@modelcontextprotocol/sdk` 1.30 -> 1.32, `zod` 4.4 -> 4.6
+
+- [#220](https://github.com/vitus-labs/tools/pull/220) [`0ecbb70`](https://github.com/vitus-labs/tools/commit/0ecbb706bc2c2405f37bedcebdb5cbe0be2af084) Thanks [@vitbokisch](https://github.com/vitbokisch)! - Fix MCP tool correctness. `add_tooling` and `scaffold_package` no longer overwrite existing files, dependency versions or scripts (skipped items are reported). Scaffolded dependency ranges are current (TypeScript 6, Vitest 4.1, Biome 2.5, tools ^2) and no longer set the deprecated `baseUrl`; scaffolded library names are escaped. Directories must be absolute and failures return `isError`. `diagnose_config` scans all source (including `src/lib`), tolerates JSONC tsconfig files and array `extends`, recognises ESLint flat configs and more `vl_*` scripts. The server reports its real package version and the docs resources are corrected.
+
+- [#211](https://github.com/vitus-labs/tools/pull/211) [`d9f98a8`](https://github.com/vitus-labs/tools/commit/d9f98a8ca6147ae94196b53c1a382fd9944e2646) Thanks [@vitbokisch](https://github.com/vitbokisch)! - TypeScript 7 support
+  
+  - `tools-typescript`: peer range widened to `^6.0.3 || ^7.0.0`; the presets work unchanged with the native TypeScript 7 compiler.
+  - `tools-rolldown` works with TypeScript 7 out of the box — `rolldown-plugin-dts` switches to its `tsgo` generator automatically.
+  - `tools-rollup`: now declares its `typescript` peer (`^5.0.0 || ^6.0.0`). Its TypeScript plugins (`rollup-plugin-typescript2`, `ts-patch`) need the TypeScript JavaScript API, which TypeScript 7 no longer ships — use `tools-rolldown` with TypeScript 7.
+  - The repository itself is now built and type-checked with TypeScript 7.0.2.
+
 ## 2.7.1
 
 ### Patch Changes

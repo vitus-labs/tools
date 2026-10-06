@@ -1,5 +1,17 @@
 # @vitus-labs/tools-vitest
 
+## 2.8.0
+
+### Patch Changes
+
+- [#216](https://github.com/vitus-labs/tools/pull/216) [`9d6cf19`](https://github.com/vitus-labs/tools/commit/9d6cf19b9822a506176a05ab4486d645f8424589) Thanks [@vitbokisch](https://github.com/vitbokisch)! - Config preset fixes.
+  
+  - vitest: resolve `aliases` against the Vite project root (new optional `root` option) instead of `process.cwd()`, so they work with `test.projects`; declare optional peer `@vitest/coverage-v8`; widen `vite` peer to `^6 || ^7 || ^8`; correct `pool`/`css` docs; `types` export condition first plus `default`.
+  - nextjs: `headers` record now matches keys case-insensitively, appends unknown headers and removes defaults set to `false`/`null`; `withVitusLabs` accepts a config function; README uses `cacheComponents`; `types` export condition first plus `default`.
+  - typescript: presets no longer declare `include`/`exclude` (they resolved inside `node_modules` for consumers) - set them in your own tsconfig; README peer range corrected.
+
+- [#211](https://github.com/vitus-labs/tools/pull/211) [`d9f98a8`](https://github.com/vitus-labs/tools/commit/d9f98a8ca6147ae94196b53c1a382fd9944e2646) Thanks [@vitbokisch](https://github.com/vitbokisch)! - Support Vitest 5 and document the `test.projects` monorepo setup (the `vitest.workspace.ts` / `defineWorkspace` approach shown previously no longer works since Vitest 4).
+
 ## 2.7.1
 
 ### Patch Changes

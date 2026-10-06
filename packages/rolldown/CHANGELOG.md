@@ -1,5 +1,31 @@
 # Change Log
 
+## 2.8.0
+
+### Patch Changes
+
+- [#210](https://github.com/vitus-labs/tools/pull/210) [`fc427ac`](https://github.com/vitus-labs/tools/commit/fc427aca7b0d0c75f28e0dba36dd76de10e099b4) Thanks [@vitbokisch](https://github.com/vitbokisch)! - Update dependencies to their latest minor/patch versions
+  
+  - `rolldown` 1.2.6 -> 1.2.12, `rolldown-plugin-dts` 0.28.2 -> 0.28.6
+  - `rollup` 4.63 -> 4.64, `@microsoft/api-extractor` 7.59.0 -> 7.59.4
+  - `chalk` 6.0.0 -> 6.0.1
+  - `@biomejs/biome` 2.5.10 -> 2.5.15
+  - Storybook 10.5 -> 10.6 and related addons, `vite` 8.2 -> 8.3
+  - `@modelcontextprotocol/sdk` 1.30 -> 1.32, `zod` 4.4 -> 4.6
+
+- [#222](https://github.com/vitus-labs/tools/pull/222) [`adf9a89`](https://github.com/vitus-labs/tools/commit/adf9a89638ff23c81bd46fc7ef73f1a0db569a71) Thanks [@vitbokisch](https://github.com/vitbokisch)! - Fix several build-correctness bugs in `@vitus-labs/tools-rolldown`:
+  
+  - Declaration generation now works for directory subpath exports (`./devtools` -> `src/devtools/index.ts`) and for a root `src/index.tsx` entry; previously it failed with `UNRESOLVED_ENTRY`.
+  - `browser` fields no longer crash the build: `"browser": { "fs": false }` and the string form are handled (only string-to-string mappings produce a browser build).
+  - Multi-entry shared-chunk builds keep the output extension from `package.json` (`.mjs` / `.cjs`) instead of always writing `.js`.
+  - Declaration chunks are written to `_dts_chunks/`, so generating types into the same directory as the JS output no longer deletes the JS `_chunks/`.
+  - A file referenced by several fields (e.g. `exports.import` and `module`) is built once instead of twice.
+  - The visualizer report for a bare `file: 'index.js'` is written to `analysis/` instead of the filesystem root.
+  - Wildcard subpath exports (`./features/*`) are skipped with a warning, and nested condition objects (`import: { types, default }`) are flattened.
+  - Removed the documented-but-unused `esModulesOnly`, `include`, `exclude` and `typesDir` options from the rolldown base config.
+- Updated dependencies [[`1e4cbf1`](https://github.com/vitus-labs/tools/commit/1e4cbf10abd60aa9f1616087dc24204e951113ae)]:
+  - @vitus-labs/tools-core@2.8.0
+
 ## 2.7.1
 
 ### Patch Changes

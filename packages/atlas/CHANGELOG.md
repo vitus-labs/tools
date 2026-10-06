@@ -1,5 +1,22 @@
 # @vitus-labs/tools-atlas
 
+## 2.8.0
+
+### Patch Changes
+
+- [#219](https://github.com/vitus-labs/tools/pull/219) [`b2dbeb3`](https://github.com/vitus-labs/tools/commit/b2dbeb3e8a07d2a085d83a2124f9a83d44a1b12e) Thanks [@vitbokisch](https://github.com/vitbokisch)! - Fix correctness and performance issues in atlas.
+  
+  - Change frequency now works when run from a subdirectory (paths resolved against the git toplevel; `core.quotepath=off`).
+  - Workspace patterns are resolved with `tinyglobby`: explicit paths, `packages/*/x`, `**` and `!negated` patterns now work.
+  - Duplicate edges (one per dep type) are merged into a single edge with `depTypes`; edge counts and distributions no longer inflate.
+  - HTML report escapes the title and embedded data (no `</script>` breakout); SRI `integrity` is only emitted for the default echarts URL.
+  - Unknown `--report` / `--dep-types` values are rejected; all report files written are logged.
+  - `bundle-size` no longer zeroes a directory on one bad entry and does not follow symlinks.
+  - BFS queues are O(n); transitive size and version drift reuse cached data.
+  - Behavior change: `--include` / `--exclude` patterns without `*` are now exact package-name matches (previously substring matches, so `--exclude core` removed every package containing "core").
+- Updated dependencies [[`1e4cbf1`](https://github.com/vitus-labs/tools/commit/1e4cbf10abd60aa9f1616087dc24204e951113ae)]:
+  - @vitus-labs/tools-core@2.8.0
+
 ## 2.7.1
 
 ### Patch Changes

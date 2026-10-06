@@ -1,5 +1,20 @@
 # @vitus-labs/tools-nextjs-images
 
+## 2.8.0
+
+### Patch Changes
+
+- [#210](https://github.com/vitus-labs/tools/pull/210) [`fc427ac`](https://github.com/vitus-labs/tools/commit/fc427aca7b0d0c75f28e0dba36dd76de10e099b4) Thanks [@vitbokisch](https://github.com/vitbokisch)! - Update dependencies to their latest minor/patch versions
+  
+  - `rolldown` 1.2.6 -> 1.2.12, `rolldown-plugin-dts` 0.28.2 -> 0.28.6
+  - `rollup` 4.63 -> 4.64, `@microsoft/api-extractor` 7.59.0 -> 7.59.4
+  - `chalk` 6.0.0 -> 6.0.1
+  - `@biomejs/biome` 2.5.10 -> 2.5.15
+  - Storybook 10.5 -> 10.6 and related addons, `vite` 8.2 -> 8.3
+  - `@modelcontextprotocol/sdk` 1.30 -> 1.32, `zod` 4.4 -> 4.6
+
+- [#223](https://github.com/vitus-labs/tools/pull/223) [`bd2a5ed`](https://github.com/vitus-labs/tools/commit/bd2a5ed2cf671dc6bcec0b1c0de2c8cd2ad58ac5) Thanks [@vitbokisch](https://github.com/vitbokisch)! - Fix image optimization and loader resolution: imagemin plugins are now actually applied (img-loader received an unawaited Promise), use the `withOptimizedImages` options and defaults, are detected from the user's project / `overwriteImageLoaderPaths`, own loaders resolve to absolute paths for isolated installs, resource queries are anchored to parameter boundaries, loader detection is memoized, a one-time Turbopack warning is emitted, and the published tarball only ships `lib/`. Requires Node >= 22.12.
+
 ## 2.7.1
 
 ### Patch Changes
