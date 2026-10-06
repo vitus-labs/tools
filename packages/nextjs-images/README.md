@@ -10,14 +10,39 @@ Supports WebP conversion, LQIP (Low Quality Image Placeholders), responsive imag
 bun add @vitus-labs/tools-nextjs-images
 ```
 
-**Peer dependency:** `next >= 14`
+**Peer dependency:** `next >= 14`, **Node:** `>= 22.12` (imagemin plugins are ESM-only and loaded synchronously via `require(esm)`)
 
-### Optional optimizers
+### Webpack only (Turbopack is not supported)
 
-Install any combination for automatic image compression:
+Next.js 16 uses **Turbopack by default** for `next dev` and `next build`. Turbopack ignores the `webpack` config function this plugin relies on, so images would be silently left unprocessed. Run Next with webpack:
+
+```json
+{
+  "scripts": {
+    "dev": "next dev --webpack",
+    "build": "next build --webpack"
+  }
+}
+```
+
+If Turbopack is detected (`TURBOPACK` is set by Next.js), the plugin prints a one-time warning.
+
+### Optional packages
+
+Install the packages for the features you use, in your own project (they are detected from your project, or from `overwriteImageLoaderPaths`):
+
+| Feature | Packages |
+|---|---|
+| Compression of JPEG / PNG / GIF / SVG | `imagemin-mozjpeg`, `imagemin-optipng` or `imagemin-pngquant`, `imagemin-gifsicle`, `imagemin-svgo` |
+| `?webp` and `.webp` optimization | `webp-loader` |
+| `?lqip`, `?lqip-colors` | `lqip-loader` |
+| `?resize`, `?size`, `?sizes[]` | `responsive-loader` and `sharp` (or `jimp`) |
+| `?sprite` | `svg-sprite-loader` |
+| `?trace` | `image-trace-loader` |
 
 ```bash
 bun add -d imagemin-mozjpeg imagemin-optipng imagemin-pngquant imagemin-gifsicle imagemin-svgo webp-loader
+bun add -d lqip-loader responsive-loader sharp svg-sprite-loader image-trace-loader
 ```
 
 ## Usage

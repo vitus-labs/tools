@@ -77,7 +77,10 @@ export interface UrlLoaderOptions extends FileLoaderOptions {
 }
 
 export interface ResourceQueryConfig {
+  /** query parameter name (regex fragment) the query is matched by */
   test: string
+  /** all of these parameters must be present (any order), replaces `test` */
+  requires?: string[]
   loaders: string[]
   options?: Record<string, unknown>[]
   optimize: boolean

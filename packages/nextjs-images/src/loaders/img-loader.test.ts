@@ -154,40 +154,55 @@ describe('getHandledFilesRegex', () => {
 
 describe('getImgLoaderOptions', () => {
   it('should return empty plugins array when optimize is false', () => {
-    const result = getImgLoaderOptions({}, defaultDetectedLoaders, false)
+    const result = getImgLoaderOptions(
+      defaultOptimized,
+      {},
+      defaultDetectedLoaders,
+      false,
+    )
 
     expect(result).toEqual({ plugins: [] })
   })
 
-  it('should return synchronously when optimize is false', () => {
-    const result = getImgLoaderOptions({}, defaultDetectedLoaders, false)
-
-    // Should not be a Promise
-    expect(result).toEqual({ plugins: [] })
-    expect(typeof (result as Record<string, unknown>).then).toBe('undefined')
-  })
-
-  it('should return a promise when optimize is true and loaders are detected', async () => {
+  it('should never return a promise (webpack does not await options)', () => {
     const loaders: DetectedLoaders = {
       ...defaultDetectedLoaders,
       jpeg: 'imagemin-mozjpeg',
     }
 
-    const result = getImgLoaderOptions({}, loaders, true)
-
-    // It returns a Promise because it calls importImageminPlugin
-    expect(typeof (result as Promise<unknown>).then).toBe('function')
-
-    // Catch the expected rejection (dynamicImport via new Function not available in vitest VM)
-    await expect(result).rejects.toThrow()
+    for (const optimize of [true, false]) {
+      const result = getImgLoaderOptions(
+        defaultOptimized,
+        {},
+        loaders,
+        optimize,
+      )
+      expect(typeof (result as unknown as { then?: unknown }).then).toBe(
+        'undefined',
+      )
+    }
   })
 
-  it('should return a promise resolving with empty plugins when no loaders detected', async () => {
-    // All loaders are false, so all Promise.all entries are undefined
-    const result = getImgLoaderOptions({}, defaultDetectedLoaders, true)
+  it('should return a lazy plugins function that img-loader can call synchronously', () => {
+    const result = getImgLoaderOptions(
+      defaultOptimized,
+      {},
+      defaultDetectedLoaders,
+      true,
+    )
 
-    const resolved = await result
-    expect(resolved).toEqual({ plugins: [] })
+    expect(typeof result.plugins).toBe('function')
+    expect((result.plugins as () => unknown[])()).toEqual([])
+  })
+
+  it('should throw a clear error when a detected plugin cannot be resolved', () => {
+    const loaders: DetectedLoaders = {
+      ...defaultDetectedLoaders,
+      jpeg: 'imagemin-does-not-exist-xyz',
+    }
+    const { plugins } = getImgLoaderOptions(defaultOptimized, {}, loaders, true)
+
+    expect(() => (plugins as () => unknown[])()).toThrow(/Cannot find module/)
   })
 })
 
@@ -247,8 +262,8 @@ describe('applyImgLoader', () => {
     const defaultEntry = oneOf[oneOf.length - 1]
     const loaders = defaultEntry.use as Array<{ loader: string }>
 
-    expect(loaders[0].loader).toBe('url-loader')
-    expect(loaders[1].loader).toBe('img-loader')
+    expect(loaders[0].loader).toContain('url-loader')
+    expect(loaders[1].loader).toContain('img-loader')
   })
 
   it('should include webp resource query when webp is handled', () => {
@@ -268,7 +283,7 @@ describe('applyImgLoader', () => {
 
     const webpQuery = oneOf.find((entry) => {
       const rq = entry.resourceQuery as RegExp | undefined
-      return rq?.toString() === '/webp/'
+      return rq?.test('?webp') === true
     })
 
     expect(webpQuery).toBeDefined()
@@ -296,7 +311,7 @@ describe('applyImgLoader', () => {
 
     const webpQuery = oneOf.find((entry) => {
       const rq = entry.resourceQuery as RegExp | undefined
-      return rq?.toString() === '/webp/'
+      return rq?.test('?webp') === true
     })
 
     expect(webpQuery).toBeUndefined()
@@ -324,7 +339,7 @@ describe('applyImgLoader', () => {
 
     const spriteQuery = oneOf.find((entry) => {
       const rq = entry.resourceQuery as RegExp | undefined
-      return rq?.toString() === '/sprite/'
+      return rq?.test('?sprite') === true
     })
 
     expect(spriteQuery).toBeDefined()

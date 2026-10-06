@@ -8,9 +8,19 @@ const { mockRequire } = vi.hoisted(() => ({
   mockRequire: vi.fn(),
 }))
 
-vi.mock('node:module', () => ({
-  createRequire: vi.fn(() => mockRequire),
-}))
+// Only `require()` itself is mocked (sharp adapter); `require.resolve` stays real
+vi.mock('node:module', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('node:module')>()
+
+  return {
+    ...actual,
+    createRequire: vi.fn((from: string | URL) =>
+      Object.assign((...args: unknown[]) => mockRequire(...args), {
+        resolve: actual.createRequire(from).resolve,
+      }),
+    ),
+  }
+})
 
 import type {
   DetectedLoaders,

@@ -1,5 +1,4 @@
 import path from 'node:path'
-import { fileURLToPath, pathToFileURL } from 'node:url'
 import type {
   DetectedLoaders,
   HandledImageTypes,
@@ -9,43 +8,20 @@ import type {
 } from '../types.ts'
 import { applyFileLoader } from './file-loader.ts'
 import { applyImgLoader } from './img-loader.ts'
+import { resolveFromProject } from './resolve.ts'
 import { applyResponsiveLoader } from './responsive-loader.ts'
 import { applyWebpLoader } from './webp-loader.ts'
 
 /**
- * Resolve a module specifier, optionally from a custom directory.
- * When resolvePath is provided it is normalized with path.resolve()
- * to prevent directory-traversal attacks.
- */
-const resolveModule = (name: string, resolvePath?: string): string => {
-  const normalizedPath = resolvePath ? path.resolve(resolvePath) : undefined
-
-  return fileURLToPath(
-    import.meta.resolve(
-      name,
-      normalizedPath
-        ? pathToFileURL(path.join(normalizedPath, '_')).href
-        : undefined,
-    ),
-  )
-}
-
-/**
  * Checks if a node module is installed in the current context.
  */
-const isModuleInstalled = (name: string, resolvePath?: string): boolean => {
-  try {
-    resolveModule(name, resolvePath)
-    return true
-  } catch {
-    return false
-  }
-}
+const isModuleInstalled = (name: string, resolvePath?: string): boolean =>
+  resolveFromProject(name, resolvePath) !== undefined
 
 /**
  * Detects all currently installed image optimization loaders.
  */
-const detectLoaders = (resolvePath?: string): DetectedLoaders => {
+const detectLoadersUncached = (resolvePath?: string): DetectedLoaders => {
   const jpeg = isModuleInstalled('imagemin-mozjpeg', resolvePath)
     ? 'imagemin-mozjpeg'
     : false
@@ -76,10 +52,9 @@ const detectLoaders = (resolvePath?: string): DetectedLoaders => {
   }
 
   if (isModuleInstalled('responsive-loader', resolvePath)) {
-    responsive = resolveModule('responsive-loader', resolvePath).replace(
-      /(\/|\\)lib(\/|\\)index.js$/g,
-      '',
-    )
+    responsive = (
+      resolveFromProject('responsive-loader', resolvePath) as string
+    ).replace(/(\/|\\)lib(\/|\\)index.js$/g, '')
 
     if (isModuleInstalled('sharp', resolvePath)) {
       responsiveAdapter = 'sharp'
@@ -100,6 +75,29 @@ const detectLoaders = (resolvePath?: string): DetectedLoaders => {
     responsiveAdapter,
   }
 }
+
+const detectedLoadersCache = new Map<string, DetectedLoaders>()
+
+/**
+ * Detects installed loaders. Webpack invokes the config function once per
+ * compiler (client/server/edge), so results are memoized per base path.
+ */
+const detectLoaders = (resolvePath?: string): DetectedLoaders => {
+  const key = path.resolve(resolvePath ?? process.cwd())
+  let detected = detectedLoadersCache.get(key)
+
+  if (!detected) {
+    detected = detectLoadersUncached(resolvePath)
+    detectedLoadersCache.set(key, detected)
+  }
+
+  return detected
+}
+
+/**
+ * Clears the memoized loader detection (mainly useful for tests).
+ */
+const clearDetectedLoadersCache = (): void => detectedLoadersCache.clear()
 
 /**
  * Checks which image types should be handled by this plugin.
@@ -238,6 +236,7 @@ const appendLoaders = (
 
 export {
   appendLoaders,
+  clearDetectedLoadersCache,
   detectLoaders,
   getHandledImageTypes,
   getNumOptimizationLoadersInstalled,
