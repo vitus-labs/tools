@@ -1,7 +1,46 @@
 import { PKG } from '../config/index.ts'
 
 const isESModuleOnly = PKG.type === 'module'
-const typesFilePath = PKG?.exports?.types || PKG.types || PKG.typings
+
+/**
+ * Conditions of the package root entry. `exports` may be a string, a
+ * conditions object (`{ import, require }`) or a subpath map whose root
+ * entry is `exports["."]` — the latter being the most common shape.
+ */
+const getRootExports = (): string | Record<string, unknown> | undefined => {
+  const exportsField = PKG.exports
+  if (!exportsField || typeof exportsField !== 'object') return exportsField
+  const isSubpathMap = Object.keys(exportsField).some((key) =>
+    key.startsWith('.'),
+  )
+  return isSubpathMap ? exportsField['.'] : exportsField
+}
+
+/** Resolve a condition value; nested conditions (`{ types, default }`) collapse to `default`. */
+const resolveCondition = (value: unknown): string | undefined => {
+  if (typeof value === 'string') return value
+  if (value && typeof value === 'object') {
+    return resolveCondition((value as Record<string, unknown>).default)
+  }
+  return undefined
+}
+
+/** `types` of the root entry, also when nested under `import`/`require`. */
+const getExportsTypes = (): string | undefined => {
+  const root = getRootExports()
+  if (!root || typeof root !== 'object') return undefined
+  if (typeof root.types === 'string') return root.types
+  for (const condition of ['import', 'require', 'default']) {
+    const nested = root[condition]
+    if (nested && typeof nested === 'object') {
+      const types = (nested as Record<string, unknown>).types
+      if (typeof types === 'string') return types
+    }
+  }
+  return undefined
+}
+
+const typesFilePath = getExportsTypes() || PKG.types || PKG.typings
 
 const hasDifferentNativeBuild = () => {
   return PKG['react-native'] !== PKG.module
@@ -52,49 +91,53 @@ const BUILD_VARIANTS: Record<
 }
 
 const getExportsOptions = () => {
-  const exportsOptions = PKG.exports
+  const root = getRootExports()
 
-  if (!exportsOptions) return []
+  if (!root) return []
 
-  if (typeof exportsOptions === 'string') {
+  if (typeof root === 'string') {
     return [
       {
-        file: PKG.exports,
+        file: root,
         ...BUILD_VARIANTS.module,
       },
     ]
   }
 
-  if (typeof exportsOptions === 'object') {
+  if (typeof root === 'object') {
     const result: Record<string, any>[] = []
+    const importFile = resolveCondition(root.import)
+    const requireFile = resolveCondition(root.require)
+    const nodeFile = resolveCondition(root.node)
+    const defaultFile = resolveCondition(root.default)
 
-    if (exportsOptions.import) {
+    if (importFile) {
       result.push({
-        file: exportsOptions.import,
+        file: importFile,
         ...BUILD_VARIANTS.module,
       })
     }
 
-    if (exportsOptions.require) {
+    if (requireFile) {
       result.push({
-        file: exportsOptions.require,
+        file: requireFile,
         ...BUILD_VARIANTS.main,
         // the `require` entry must always be CommonJS, even in ESM-only packages
         format: 'cjs',
       })
     }
 
-    if (exportsOptions.node) {
+    if (nodeFile) {
       result.push({
-        file: exportsOptions.node,
+        file: nodeFile,
         ...BUILD_VARIANTS.module,
         platform: 'node',
       })
     }
 
-    if (exportsOptions.default) {
+    if (defaultFile) {
       result.push({
-        file: exportsOptions.default,
+        file: defaultFile,
         ...BUILD_VARIANTS.module,
       })
     }
