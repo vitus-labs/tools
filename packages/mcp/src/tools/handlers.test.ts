@@ -1,4 +1,4 @@
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { Client } from '@modelcontextprotocol/sdk/client/index.js'
@@ -65,6 +65,27 @@ describe('tool handlers', () => {
     })
     expect(res.isError).toBe(true)
     expect(res.content[0]?.text).toContain('absolute')
+  })
+
+  it('rejects names that are not valid npm package names', async () => {
+    const res = await call('scaffold_package', {
+      name: "x'); process.exit(1); ('",
+      directory: dir,
+      preset: 'library',
+    })
+    expect(res.isError).toBe(true)
+    expect(res.content[0]?.text).toContain('valid npm package name')
+  })
+
+  it('embeds the package name as a safe string literal', async () => {
+    const res = await call('scaffold_package', {
+      name: '@my-org/my-lib',
+      directory: dir,
+      preset: 'library',
+    })
+    expect(res.isError).toBeFalsy()
+    const source = readFileSync(join(dir, 'src', 'index.ts'), 'utf8')
+    expect(source).toContain('"Hello from @my-org\\u002Fmy-lib!"')
   })
 
   it('add_tooling errors without package.json', async () => {

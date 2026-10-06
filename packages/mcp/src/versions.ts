@@ -5,16 +5,16 @@
 const VERSIONS = {
   /** Range for every `@vitus-labs/tools-*` package (current published major) */
   vitusLabs: '^2.0.0',
-  /** Matches the `@vitus-labs/tools-typescript` peer range (rollup cannot run on TS 7) */
-  typescript: '^6.0.3',
+  /** Scaffolds build with tools-rolldown / Next, both TS 7 compatible (tools-rollup needs TS 5/6) */
+  typescript: '^7.0.2',
   vitest: '^5.0.3',
   vitestCoverage: '^5.0.3',
   /** Peer of `@vitus-labs/tools-vitest` */
   vite: '^8.3.3',
   biome: '^2.5.15',
-  react: '^19.0.0',
-  reactDom: '^19.0.0',
-  typesReact: '^19.0.0',
+  react: '^19.3.0',
+  reactDom: '^19.3.0',
+  typesReact: '^19.3.0',
   next: '^16.3.8',
 } as const
 

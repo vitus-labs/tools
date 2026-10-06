@@ -34,6 +34,25 @@ const biomeConfig = () =>
     extends: ['@vitus-labs/tools-lint/biome'],
   })
 
+// npm package name rules: optional scope, lowercase URL-safe characters.
+const PACKAGE_NAME_RE =
+  /^(?:@[a-z0-9-~][a-z0-9-._~]*\/)?[a-z0-9-~][a-z0-9-._~]*$/
+
+const UNSAFE_CHARS: Record<string, string> = {
+  '<': '\\u003C',
+  '>': '\\u003E',
+  '/': '\\u002F',
+  '\u2028': '\\u2028',
+  '\u2029': '\\u2029',
+}
+
+/** A string literal that is safe to embed in generated source code. */
+const toJsString = (value: string) =>
+  JSON.stringify(value).replace(
+    /[<>/\u2028\u2029]/g,
+    (c) => UNSAFE_CHARS[c] ?? c,
+  )
+
 const scaffoldLibrary = (dir: string, name: string): ScaffoldResult => {
   const pkgJson = {
     name,
@@ -91,7 +110,7 @@ export default createVitestConfig()
 }
 `
 
-  const indexTs = `export const hello = () => ${JSON.stringify(`Hello from ${name}!`)}
+  const indexTs = `export const hello = () => ${toJsString(`Hello from ${name}!`)}
 `
 
   return writeFiles(dir, [
@@ -218,7 +237,12 @@ const registerScaffoldPackage = (server: McpServer) => {
       description:
         'Scaffold a new project pre-configured with @vitus-labs/tools. Creates all config files (package.json, tsconfig, biome, vitest, vl-tools.config.mjs) for the selected preset. Existing files are never overwritten.',
       inputSchema: {
-        name: z.string().min(1).describe('Package name (e.g. @my-org/my-lib)'),
+        name: z
+          .string()
+          .min(1)
+          .max(214)
+          .regex(PACKAGE_NAME_RE, 'Must be a valid npm package name')
+          .describe('Package name (e.g. @my-org/my-lib)'),
         directory: absolutePath('Absolute path to create the project in'),
         preset: z
           .enum(PRESETS)
