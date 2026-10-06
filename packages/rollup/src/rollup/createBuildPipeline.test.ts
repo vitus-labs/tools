@@ -140,6 +140,69 @@ describe('createBuildPipeline', () => {
     })
   })
 
+  describe('with a subpath exports map (exports["."])', () => {
+    let createBuildPipeline: () => any[]
+
+    beforeEach(async () => {
+      vi.resetModules()
+      mockPKG.type = 'module'
+      delete mockPKG.main
+      delete mockPKG.module
+      mockPKG.exports = {
+        '.': {
+          types: './lib/types/index.d.ts',
+          import: './lib/index.js',
+          require: './lib/index.cjs',
+        },
+        './package.json': './package.json',
+      }
+      const mod = await import('./createBuildPipeline.js')
+      createBuildPipeline = mod.default
+    })
+
+    it('builds the root entry import (es) and require (cjs) files', () => {
+      const builds = createBuildPipeline()
+      expect(builds.find((b) => b.file === './lib/index.js')?.format).toBe('es')
+      expect(builds.find((b) => b.file === './lib/index.cjs')?.format).toBe(
+        'cjs',
+      )
+    })
+
+    it('takes the types path from the root entry', () => {
+      const builds = createBuildPipeline()
+      expect(builds[0].typesFilePath).toBe('./lib/types/index.d.ts')
+    })
+  })
+
+  describe('with nested conditions in exports["."]', () => {
+    let createBuildPipeline: () => any[]
+
+    beforeEach(async () => {
+      vi.resetModules()
+      mockPKG.type = 'module'
+      delete mockPKG.main
+      delete mockPKG.module
+      mockPKG.exports = {
+        '.': {
+          import: { types: './lib/index.d.ts', default: './lib/index.js' },
+          require: { types: './lib/index.d.cts', default: './lib/index.cjs' },
+        },
+      }
+      const mod = await import('./createBuildPipeline.js')
+      createBuildPipeline = mod.default
+    })
+
+    it('collapses nested conditions to their default file', () => {
+      const files = createBuildPipeline().map((b) => `${b.file}:${b.format}`)
+      expect(files).toContain('./lib/index.js:es')
+      expect(files).toContain('./lib/index.cjs:cjs')
+    })
+
+    it('reads types nested under import', () => {
+      expect(createBuildPipeline()[0].typesFilePath).toBe('./lib/index.d.ts')
+    })
+  })
+
   describe('with no exports', () => {
     let createBuildPipeline: () => any[]
 
