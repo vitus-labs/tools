@@ -76,6 +76,7 @@
   },
   "devDependencies": {
     "@vitus-labs/tools-typescript": "workspace:*",
-    "typescript": "^6.0.3"
+    "@vitus-labs/tools-vitest": "workspace:*",
+    "typescript": "^7.0.2"
   }
 }
