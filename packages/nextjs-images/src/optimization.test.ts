@@ -28,17 +28,21 @@ describe('image optimization wiring', () => {
 
   beforeAll(() => {
     dir = mkdtempSync(path.join(tmpdir(), 'optimized-images-'))
-    for (const name of ['imagemin-mozjpeg', 'imagemin-gifsicle']) {
+    // Static fixture sources: each fake plugin echoes its name and options.
+    const fixtures: Record<string, string> = {
+      'imagemin-mozjpeg':
+        "module.exports = (opts) => ({ plugin: 'imagemin-mozjpeg', opts })",
+      'imagemin-gifsicle':
+        "module.exports = (opts) => ({ plugin: 'imagemin-gifsicle', opts })",
+    }
+    for (const [name, source] of Object.entries(fixtures)) {
       const pkg = path.join(dir, 'node_modules', name)
       mkdirSync(pkg, { recursive: true })
       writeFileSync(
         path.join(pkg, 'package.json'),
         JSON.stringify({ name, main: 'index.js' }),
       )
-      writeFileSync(
-        path.join(pkg, 'index.js'),
-        `module.exports = (opts) => ({ plugin: ${JSON.stringify(name)}, opts })`,
-      )
+      writeFileSync(path.join(pkg, 'index.js'), source)
     }
   })
 
