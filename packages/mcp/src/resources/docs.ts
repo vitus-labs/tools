@@ -65,7 +65,7 @@ Note: PKG, VL_CONFIG, TS_CONFIG use top-level await (side effects at import time
     description: 'Shared TypeScript configuration presets (lib + nextjs)',
     content: `# @vitus-labs/tools-typescript
 
-Shared TypeScript configuration presets. Peer dep: typescript >= 5.
+Shared TypeScript configuration presets. Peer dep: typescript 6.x or 7.x.
 
 ## Presets
 

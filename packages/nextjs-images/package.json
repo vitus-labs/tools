@@ -44,6 +44,6 @@
     "@vitus-labs/tools-typescript": "workspace:*",
     "@vitus-labs/tools-vitest": "workspace:*",
     "next": "^16.3.8",
-    "typescript": "^6.0.3"
+    "typescript": "^7.0.2"
   }
 }

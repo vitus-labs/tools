@@ -61,6 +61,9 @@
     "@types/node": "^26.6.4",
     "@vitus-labs/tools-typescript": "workspace:*",
     "@vitus-labs/tools-vitest": "workspace:*",
-    "typescript": "^6.0.3"
+    "typescript": "^7.0.2"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0 || ^6.0.0"
   }
 }
