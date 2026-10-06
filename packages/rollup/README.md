@@ -10,6 +10,11 @@ Supports multi-platform, multi-format builds with TypeScript declaration bundlin
 bun add -d @vitus-labs/tools-rollup
 ```
 
+**Peer dependency:** `typescript` 5.x or 6.x. The TypeScript plugins this package
+uses (`rollup-plugin-typescript2`, `ts-patch`) rely on the TypeScript JavaScript
+API, which TypeScript 7 no longer ships. For TypeScript 7 use
+[`@vitus-labs/tools-rolldown`](../rolldown), which generates declarations with `tsgo`.
+
 ## Usage
 
 Add to your `package.json`:

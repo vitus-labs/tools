@@ -60,6 +60,10 @@
     "@types/lodash-es": "^4.17.12",
     "@types/node": "^26.6.4",
     "@vitus-labs/tools-typescript": "workspace:*",
-    "typescript": "^6.0.3"
+    "@vitus-labs/tools-vitest": "workspace:*",
+    "typescript": "^7.0.2"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0 || ^6.0.0"
   }
 }

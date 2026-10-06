@@ -8,7 +8,7 @@ Shared TypeScript configuration presets.
 bun add -d @vitus-labs/tools-typescript
 ```
 
-**Peer dependency:** `typescript >= 5`
+**Peer dependency:** `typescript` 6.x or 7.x
 
 ## Presets
 

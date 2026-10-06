@@ -72,20 +72,25 @@ export default createVitestConfig(['src/storybook/**', 'src/bin/**'])
 - **Coverage thresholds:** 90% statements, branches, functions, and lines
 - **Coverage excludes:** test files, index re-exports, bin scripts
 
-## Workspace setup
+## Monorepo setup
 
-For monorepos, create a `vitest.workspace.ts` at the root:
+For monorepos, create a root `vitest.config.ts` that lists each package as a
+[project](https://vitest.dev/guide/projects) (the `vitest.workspace.ts` file
+and `defineWorkspace` were removed in Vitest 4):
 
 ```ts
-import { defineWorkspace } from 'vitest/config'
+import { defineConfig } from 'vitest/config'
 
-export default defineWorkspace([
-  'packages/my-lib',
-  'packages/my-app',
-])
+export default defineConfig({
+  test: {
+    projects: ['packages/*'],
+  },
+})
 ```
 
 Each package references the shared config via its own `vitest.config.ts`.
+Note that coverage options are only read from the root config when running
+from the monorepo root.
 
 ## License
 
