@@ -1,5 +1,13 @@
 # Change Log
 
+## 2.8.0
+
+### Patch Changes
+
+- [#214](https://github.com/vitus-labs/tools/pull/214) [`5ca95ce`](https://github.com/vitus-labs/tools/commit/5ca95cee5b7b886988798069a4f123beb9580576) Thanks [@vitbokisch](https://github.com/vitbokisch)! - Fix `vl_favicon` crashing with the default config. `icons` is now the array of `{ input, output, path }` sources (as documented) and the platform toggles moved to `platforms`, which is passed to `favicons` as its `icons` option (the old object shape in `icons` is still accepted with a deprecation warning). The base `path` defaults to `/` (no more `undefined/...` URLs), output directories are created when missing, absolute `input`/`output` paths are respected, and `icons` is validated with a clear error. The package now publishes only `lib/` via a `files` field.
+- Updated dependencies [[`1e4cbf1`](https://github.com/vitus-labs/tools/commit/1e4cbf10abd60aa9f1616087dc24204e951113ae)]:
+  - @vitus-labs/tools-core@2.8.0
+
 ## 2.7.1
 
 ### Patch Changes
