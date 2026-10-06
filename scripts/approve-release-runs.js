@@ -16,7 +16,10 @@ import { execFileSync } from 'node:child_process'
 const BRANCH = 'changeset-release/main'
 
 const gh = (args) =>
-  execFileSync('gh', args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] })
+  execFileSync('gh', args, {
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe'],
+  })
 
 let runs
 try {
@@ -33,7 +36,9 @@ try {
     ]),
   )
 } catch (error) {
-  console.error('Could not list workflow runs. Is the gh CLI installed and authenticated?')
+  console.error(
+    'Could not list workflow runs. Is the gh CLI installed and authenticated?',
+  )
   console.error(error.stderr?.toString().trim() || error.message)
   process.exit(1)
 }
@@ -49,7 +54,16 @@ if (pending.length === 0) {
 // from superseded commits stay `action_required` forever, and approving those
 // would burn CI on commits nobody is going to merge.
 const [versionPr] = JSON.parse(
-  gh(['pr', 'list', '--head', BRANCH, '--state', 'open', '--json', 'number,headRefOid']),
+  gh([
+    'pr',
+    'list',
+    '--head',
+    BRANCH,
+    '--state',
+    'open',
+    '--json',
+    'number,headRefOid',
+  ]),
 )
 
 if (!versionPr) {
@@ -76,10 +90,17 @@ console.log(`Approving runs for #${versionPr.number} (${head.slice(0, 8)})`)
 
 for (const run of current) {
   try {
-    gh(['api', '-X', 'POST', `repos/{owner}/{repo}/actions/runs/${run.databaseId}/approve`])
+    gh([
+      'api',
+      '-X',
+      'POST',
+      `repos/{owner}/{repo}/actions/runs/${run.databaseId}/approve`,
+    ])
     console.log(`✅ approved ${run.workflowName} (${run.databaseId})`)
   } catch (error) {
-    console.error(`❌ could not approve ${run.workflowName} (${run.databaseId})`)
+    console.error(
+      `❌ could not approve ${run.workflowName} (${run.databaseId})`,
+    )
     console.error(`   ${error.stderr?.toString().trim() || error.message}`)
     failed++
   }

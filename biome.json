@@ -11,6 +11,7 @@
   "files": {
     "includes": [
       "packages/*/src/**",
+      "scripts/**",
       "packages/typescript/*.json",
       "biome.json",
       "package.json"
