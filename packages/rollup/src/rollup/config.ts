@@ -1,4 +1,5 @@
 import { createRequire } from 'node:module'
+import { posix } from 'node:path'
 import { nodeResolve } from '@rollup/plugin-node-resolve'
 import { expandExternal, filesize, swapGlobals } from '@vitus-labs/tools-core'
 import chalk from 'chalk'
@@ -7,10 +8,15 @@ import { visualizer } from 'rollup-plugin-visualizer'
 import { CONFIG, PKG, PLATFORMS } from '../config/index.ts'
 
 const require = createRequire(import.meta.url)
-const tspCompiler = require('ts-patch/compiler')
-const typescript: typeof import('rollup-plugin-typescript2').default = require('rollup-plugin-typescript2')
-const replace: typeof import('@rollup/plugin-replace').default = require('@rollup/plugin-replace')
-const terser: typeof import('@rollup/plugin-terser').default = require('@rollup/plugin-terser')
+
+// Heavy CJS plugins are loaded lazily, only when the config shape needs them.
+const loadTypescriptPlugin =
+  (): typeof import('rollup-plugin-typescript2').default =>
+    require('rollup-plugin-typescript2')
+const loadReplacePlugin = (): typeof import('@rollup/plugin-replace').default =>
+  require('@rollup/plugin-replace')
+const loadTerserPlugin = (): typeof import('@rollup/plugin-terser').default =>
+  require('@rollup/plugin-terser')
 
 const defineExtensions = (platform: string) => {
   const platformExtensions: string[] = []
@@ -40,7 +46,7 @@ const loadPlugins = ({
 
   if (CONFIG.typescript) {
     const tsConfig: Record<string, any> = {
-      typescript: tspCompiler,
+      typescript: require('ts-patch/compiler'),
       exclude: CONFIG.exclude,
       useTsconfigDeclarationDir: true,
       clean: true,
@@ -68,7 +74,7 @@ const loadPlugins = ({
       tsConfig.tsconfigDefaults.compilerOptions.declarationDir = CONFIG.typesDir
     }
 
-    plugins.push(typescript(tsConfig))
+    plugins.push(loadTypescriptPlugin()(tsConfig))
 
     if (typesFilePath) {
       plugins.push(
@@ -83,7 +89,7 @@ const loadPlugins = ({
             },
             dtsRollup: {
               enabled: true,
-              untrimmedFilePath: `<projectFolder>${typesFilePath}`,
+              untrimmedFilePath: `<projectFolder>/${typesFilePath.replace(/^\.?\//, '')}`,
             },
           },
         }),
@@ -107,20 +113,23 @@ const loadPlugins = ({
       replaceOptions['process.env.NODE_ENV'] = JSON.stringify(env)
     }
 
-    plugins.push(replace({ preventAssignment: true, values: replaceOptions }))
+    plugins.push(
+      loadReplacePlugin()({ preventAssignment: true, values: replaceOptions }),
+    )
   }
 
   // generate visualised graphs in dist folder
 
   if (CONFIG.visualise) {
-    const filePath = file.split('/')
-    const fileName = filePath.pop()
+    const fileName = posix.basename(file)
 
     const visualiserOptions = {
       title: `${PKG.name} - ${fileName}`,
-      filename: `${filePath.join('/')}/${
-        CONFIG.visualise.outputDir
-      }/${fileName}.html`,
+      filename: posix.join(
+        posix.dirname(file),
+        CONFIG.visualise.outputDir,
+        `${fileName}.html`,
+      ),
       template: CONFIG.visualise.template,
       gzipSize: CONFIG.visualise.gzipSize,
     }
@@ -129,7 +138,7 @@ const loadPlugins = ({
   }
 
   if (env === 'production') {
-    plugins.push(terser())
+    plugins.push(loadTerserPlugin()())
   }
 
   if (CONFIG.filesize) {

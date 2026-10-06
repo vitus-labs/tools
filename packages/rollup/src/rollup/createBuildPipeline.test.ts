@@ -211,4 +211,47 @@ describe('createBuildPipeline', () => {
       expect(nodeBuild).toBeDefined()
     })
   })
+
+  describe('regressions', () => {
+    const load = async () => {
+      vi.resetModules()
+      return (await import('./createBuildPipeline.js')).default as () => any[]
+    }
+
+    it('emits the exports.require build as cjs for ESM-only packages', async () => {
+      mockPKG.type = 'module'
+      const builds = (await load())()
+      expect(builds.find((b) => b.file === './lib/index.cjs')?.format).toBe(
+        'cjs',
+      )
+    })
+
+    it('does not crash on browser map with false values or string form', async () => {
+      mockPKG.browser = { fs: false, './lib/index.js': './lib/browser.js' }
+      const builds = (await load())()
+      expect(builds.some((b) => b.platform === 'browser')).toBe(true)
+
+      mockPKG.browser = './lib/browser.js'
+      expect((await load())().length).toBeGreaterThan(0)
+    })
+
+    it('does not create a bogus entry when types is set without variants', async () => {
+      for (const k of ['main', 'module', 'exports']) delete mockPKG[k]
+      mockPKG.types = './lib/index.d.ts'
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+      expect((await load())()).toEqual([])
+      expect(warn).toHaveBeenCalled()
+      warn.mockRestore()
+    })
+
+    it('dedupes identical file+format builds', async () => {
+      mockPKG.type = 'commonjs'
+      mockPKG.main = 'lib/index.js'
+      mockPKG.module = 'lib/index.js'
+      mockPKG.exports = { import: './lib/index.js' }
+      const builds = (await load())()
+      const keys = builds.map((b) => `${b.file}::${b.format}`)
+      expect(new Set(keys).size).toBe(keys.length)
+    })
+  })
 })

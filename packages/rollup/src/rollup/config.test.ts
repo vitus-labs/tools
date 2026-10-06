@@ -323,4 +323,45 @@ describe('rollupConfig', () => {
 
     expect(config.output.globals).toEqual({ React: 'react' })
   })
+
+  it('resolves api-extractor untrimmed path under the project folder', () => {
+    rollupConfig({
+      file: 'lib/index.js',
+      format: 'es',
+      env: 'development',
+      platform: 'universal',
+      typesFilePath: './lib/index.d.ts',
+    })
+
+    expect(
+      mockApiExtractor.mock.calls[0][0].configuration.dtsRollup
+        .untrimmedFilePath,
+    ).toBe('<projectFolder>/lib/index.d.ts')
+  })
+
+  it('keeps visualizer output relative for bare file names', () => {
+    rollupConfig({
+      file: 'index.js',
+      format: 'es',
+      env: 'development',
+      platform: 'universal',
+    })
+
+    expect(mockVisualizer.mock.calls[0][0].filename).toBe(
+      'analysis/index.js.html',
+    )
+  })
+
+  it('places visualizer output next to nested files', () => {
+    rollupConfig({
+      file: 'lib/index.js',
+      format: 'es',
+      env: 'development',
+      platform: 'universal',
+    })
+
+    expect(mockVisualizer.mock.calls[0][0].filename).toBe(
+      'lib/analysis/index.js.html',
+    )
+  })
 })
