@@ -73,7 +73,7 @@ describe('applyToolAction (existing project safety)', () => {
   it('should use current dependency ranges', () => {
     const ts = getToolActions('typescript').devDependencies
     expect(ts?.typescript).toBe(VERSIONS.typescript)
-    expect(ts?.typescript).toBe('^6.0.3')
+    expect(ts?.typescript).toBe('^7.0.2')
     expect(getToolActions('vitest').devDependencies?.vitest).toBe(
       VERSIONS.vitest,
     )
