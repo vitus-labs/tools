@@ -32,6 +32,9 @@ const deepMerge = (
       continue
 
     const srcVal = source[key]
+    // an explicit `undefined` must not wipe out a default
+    if (srcVal === undefined) continue
+
     const tgtVal = result[key]
 
     if (
@@ -138,18 +141,24 @@ const expandExternal = (id: string | RegExp): string | RegExp => {
 
 // converts package name to umd or iife valid format
 // example: napespace-package-name => namespacePackageName
-const camelspaceBundleName = (name: string) => {
-  const parsedName = name.replace('@', '').replace('/', '-')
-  const toCamelCase = (items: any) =>
-    items.map((item: any, i: any) =>
+// Always returns a valid JS identifier (falls back to `bundle` when the name
+// is missing or has no usable characters).
+const camelspaceBundleName = (name?: unknown) => {
+  if (typeof name !== 'string') return 'bundle'
+
+  // any run of characters that is not valid in an identifier is a separator
+  const parts = name.split(/[^A-Za-z0-9_$]+/).filter(Boolean)
+  const result = parts
+    .map((item, i) =>
       i === 0
         ? item
         : item.charAt(0).toUpperCase() + item.slice(1).toLowerCase(),
     )
-  const parts = parsedName.split('-')
-  const result = toCamelCase(parts).join('')
+    .join('')
 
-  return result
+  if (!result) return 'bundle'
+
+  return /^[0-9]/.test(result) ? `_${result}` : result
 }
 
 // --------------------------------------------------------
@@ -205,10 +214,19 @@ const getExternalConfig = async (): Promise<Record<string, any>> => {
   return config
 }
 
+// parsed JSON per (cwd, filename) - avoids re-reading on every lookup
+const configParamCache = new Map<string, Record<string, any>>()
+
 const loadConfigParam =
   (filename: string) =>
   (key: string, defaultValue = {}) => {
-    const externalConfig = loadFileToJSON(filename)
+    const cacheKey = `${process.cwd()}\0${filename}`
+    let externalConfig = configParamCache.get(cacheKey)
+
+    if (!externalConfig) {
+      externalConfig = loadFileToJSON(filename)
+      configParamCache.set(cacheKey, externalConfig)
+    }
 
     return get(externalConfig, key, defaultValue)
   }
@@ -221,7 +239,7 @@ const loadVLToolsConfig = async () => {
       return object
     },
     get: (param: string, defaultValue?: any) =>
-      get(object, param, defaultValue || {}),
+      get(object, param, defaultValue === undefined ? {} : defaultValue),
     merge: (param: Record<string, any>) =>
       cloneAndEnhance(deepMerge(param, object)),
   })
