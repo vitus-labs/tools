@@ -1,3 +1,23 @@
+export interface IconSource {
+  /** Source image, relative to cwd (or absolute). */
+  input: string
+  /** Output directory, relative to cwd (or absolute). */
+  output: string
+  /** Public URL path appended to the base `path` in generated manifests/HTML. */
+  path?: string
+}
+
+type PlatformOptions =
+  | boolean
+  | {
+      offset?: number
+      background?: boolean | string
+      mask?: boolean
+      overlayGlow?: boolean
+      overlayShadow?: boolean
+    }
+  | unknown[]
+
 const configuration = {
   dir: 'auto', // Primary text direction for name, short_name, and description
   lang: 'en-US', // Primary language for name and short_name
@@ -12,7 +32,12 @@ const configuration = {
   logging: false, // Print logs to console? `boolean`
   pixel_art: false, // Keeps pixels "sharp" when scaling up, for pixel art.  Only supported in offline mode.
   loadManifestWithCredentials: false, // Browsers don't send cookies when fetching a manifest, enable this to fix that. `boolean`
-  icons: {
+  path: '/', // Base public URL path of the generated files. `string`
+  // Source images to generate favicons for: `{ input, output, path }[]`.
+  // Empty by default - set it in `vl-tools.config.mjs`.
+  icons: [] as IconSource[],
+  // Per-platform toggles, passed to `favicons` as its `icons` option.
+  platforms: {
     // Platform Options:
     // - offset - offset in percentage
     // - background:
@@ -34,6 +59,8 @@ const configuration = {
   },
 }
 
-export type Configuration = typeof configuration
+export type Configuration = Omit<typeof configuration, 'platforms'> & {
+  platforms: Record<string, PlatformOptions>
+}
 
 export { configuration }
