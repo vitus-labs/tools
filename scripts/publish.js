@@ -22,13 +22,13 @@
  * use `--tag next`) and skips creating git tags.
  */
 
-import { execSync } from 'node:child_process'
+import { execFileSync } from 'node:child_process'
 import { readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 const tagIndex = process.argv.indexOf('--tag')
 const distTag = tagIndex === -1 ? undefined : process.argv[tagIndex + 1]
-if (tagIndex !== -1 && (!distTag || distTag.startsWith('-'))) {
+if (tagIndex !== -1 && !/^[a-z][a-z0-9._-]*$/i.test(distTag ?? '')) {
   console.error('Usage: node scripts/publish.js [--tag <dist-tag>]')
   process.exit(1)
 }
@@ -100,7 +100,9 @@ const sortTopologically = (dirs) => {
  */
 const isPublished = (name, version) => {
   try {
-    execSync(`npm view ${name}@${version} version`, { stdio: 'pipe' })
+    execFileSync('npm', ['view', `${name}@${version}`, 'version'], {
+      stdio: 'pipe',
+    })
     return true
   } catch (error) {
     const stderr = String(error.stderr ?? '')
@@ -156,7 +158,7 @@ const resolveWorkspaceRanges = (pkg) => {
 /** Fail loudly rather than publish a tarball with unresolved or stale ranges. */
 const assertTarballIsSound = (tarballPath, pkg) => {
   const manifest = JSON.parse(
-    execSync(`tar -xzOf "${tarballPath}" package/package.json`, {
+    execFileSync('tar', ['-xzOf', tarballPath, 'package/package.json'], {
       encoding: 'utf8',
     }),
   )
@@ -217,7 +219,10 @@ for (const dir of sortTopologically(packageDirs)) {
       manifestRewritten = true
     }
 
-    const packOutput = execSync('bun pm pack', { cwd: dir, encoding: 'utf8' })
+    const packOutput = execFileSync('bun', ['pm', 'pack'], {
+      cwd: dir,
+      encoding: 'utf8',
+    })
     const tarball = packOutput
       .trim()
       .split('\n')
@@ -239,9 +244,18 @@ for (const dir of sortTopologically(packageDirs)) {
     }
 
     // Publish tarball with npm (OIDC provenance)
-    const tagFlag = distTag ? ` --tag ${distTag}` : ''
-    execSync(
-      `npm publish "${tarballPath}" --provenance --access public${tagFlag}`,
+    // Arguments are passed without a shell, so `--tag` cannot inject commands.
+    const tagArgs = distTag ? ['--tag', distTag] : []
+    execFileSync(
+      'npm',
+      [
+        'publish',
+        tarballPath,
+        '--provenance',
+        '--access',
+        'public',
+        ...tagArgs,
+      ],
       { cwd: dir, stdio: 'inherit' },
     )
 
@@ -266,7 +280,7 @@ console.log(
 // then. Snapshot (dist-tag) releases are not tagged.
 if (published > 0 && failed === 0 && !distTag) {
   try {
-    execSync('changeset tag', { stdio: 'inherit' })
+    execFileSync('changeset', ['tag'], { stdio: 'inherit' })
   } catch {
     // Tags may already exist
   }
