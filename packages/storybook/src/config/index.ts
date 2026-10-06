@@ -8,10 +8,19 @@ const storiesPatterns = isMonorepo
   ? config.monorepoStoriesDir
   : config.storiesDir
 
+// Storybook only calls indexers for files matched by the `stories` globs,
+// so component index files must be added to them for auto-discovery to run.
+const discoveryPatterns: string[] = config.autoDiscovery
+  ? ((isMonorepo ? config.monorepoAutoDiscoveryDir : config.autoDiscoveryDir) ??
+    [])
+  : []
+
 const updatedConfig = {
   ...config,
   outDir: `${process.cwd()}${config.outDir}`,
-  storiesDir: storiesPatterns.map((item: string) => `${process.cwd()}${item}`),
+  storiesDir: [...storiesPatterns, ...discoveryPatterns].map(
+    (item: string) => `${process.cwd()}${item}`,
+  ),
 }
 
 export type { StoriesConfig, VLToolsConfig } from '../types.ts'

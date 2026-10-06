@@ -1,8 +1,8 @@
 import path from 'node:path'
-import { URL } from 'node:url'
+import { fileURLToPath } from 'node:url'
 import { CONFIG } from '../config/index.ts'
 
-const newDirname = new URL('.', import.meta.url).pathname
+const newDirname = fileURLToPath(new URL('.', import.meta.url))
 
 const storybookConfigDir = path.resolve(newDirname)
 

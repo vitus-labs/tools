@@ -4,6 +4,14 @@ export interface StoriesConfig {
   port?: number
   storiesDir?: string[]
   monorepoStoriesDir?: string[]
+  /**
+   * Index component `index.*` files and generate virtual stories for
+   * components without manual stories. Opt-in (default: false).
+   */
+  autoDiscovery?: boolean
+  /** Globs for component index files, used when `autoDiscovery` is on */
+  autoDiscoveryDir?: string[]
+  monorepoAutoDiscoveryDir?: string[]
   ui?: {
     theme?: 'dark' | 'light'
   }

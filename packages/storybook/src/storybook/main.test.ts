@@ -120,10 +120,11 @@ describe('storybook main config', () => {
     expect(result.define.__BROWSER__).toBe('true')
   })
 
-  it('should wrap existing indexers to skip rocketstories files', async () => {
+  it('should delegate standard CSF files to the existing indexers', async () => {
+    const csfEntries = [{ type: 'story' }]
     const mockCsfIndexer = {
       test: /\.stories\.[jt]sx?$/,
-      createIndex: vi.fn().mockResolvedValue([{ type: 'story' }]),
+      createIndex: vi.fn().mockResolvedValue(csfEntries),
     }
 
     const indexersFn = STORYBOOK_CONFIG.experimental_indexers as (
@@ -131,25 +132,53 @@ describe('storybook main config', () => {
     ) => any[]
     const indexers = indexersFn([mockCsfIndexer])
 
-    // Should have: manualStoryIndexer, autoDiscoveryIndexer, wrapped CSF
-    expect(indexers).toHaveLength(3)
+    // manual indexer first, then the untouched existing indexers
+    // (auto-discovery is opt-in and disabled in this config)
+    expect(indexers).toHaveLength(2)
+    expect(indexers[1]).toBe(mockCsfIndexer)
 
-    // The wrapped CSF indexer should skip rocketstories files
-    const wrappedCsf = indexers[2]
-    const rocketstoriesFile = '/src/Button/__stories__/Button.stories.tsx'
-
-    // Mock readFile to return rocketstories content
+    // Storybook picks the first matching indexer: it must yield CSF entries
+    const file = '/src/Button/__stories__/Button.stories.tsx'
+    const first = indexers.find((i) => i.test.test(file))
     const { readFile } = await import('node:fs/promises')
     vi.mocked(readFile).mockResolvedValueOnce(
-      'export default stories.init()' as any,
+      'export default { component: Button }' as any,
     )
 
-    const result = await wrappedCsf.createIndex(rocketstoriesFile, {})
-    expect(result).toEqual([])
+    const opts = { makeTitle: (t: string) => t }
+    expect(await first.createIndex(file, opts)).toBe(csfEntries)
+    expect(mockCsfIndexer.createIndex).toHaveBeenCalledWith(file, opts)
+  })
+
+  it('should index rocketstories files without calling the CSF indexer', async () => {
+    const mockCsfIndexer = {
+      test: /\.stories\.[jt]sx?$/,
+      createIndex: vi.fn().mockResolvedValue([{ type: 'story' }]),
+    }
+    const indexersFn = STORYBOOK_CONFIG.experimental_indexers as (
+      existing: any[],
+    ) => any[]
+    const [manual] = indexersFn([mockCsfIndexer])
+
+    const { readFile } = await import('node:fs/promises')
+    vi.mocked(readFile).mockResolvedValueOnce(
+      'export default stories.init()\nexport const Default = stories.main()' as any,
+    )
+
+    const result = await manual.createIndex(
+      '/src/Button/__stories__/Button.stories.tsx',
+      { makeTitle: (t: string) => t },
+    )
+    expect(result).toHaveLength(1)
     expect(mockCsfIndexer.createIndex).not.toHaveBeenCalled()
   })
 
-  it('should add esbuild mock plugin for next framework', async () => {
+  it('should expose the ui theme to the manager via env', () => {
+    const env = STORYBOOK_CONFIG.env as (e: any) => any
+    expect(env({ A: '1' })).toEqual({ A: '1', STORYBOOK_VL_UI_THEME: 'dark' })
+  })
+
+  it('should add rolldown font mock plugin for next framework', async () => {
     // Re-import with 'next' framework — need to reset modules first
     vi.resetModules()
     vi.doMock('node:fs/promises', () => ({ readFile: vi.fn() }))
@@ -174,28 +203,20 @@ describe('storybook main config', () => {
 
     await nextConfig.viteFinal?.(viteConfig, {} as any)
 
-    const esbuildPlugins =
-      viteConfig.optimizeDeps?.esbuildOptions?.plugins ?? []
-    expect(esbuildPlugins).toHaveLength(1)
-    expect(esbuildPlugins[0].name).toBe('storybook-next-font-mock')
+    expect(viteConfig.optimizeDeps.esbuildOptions).toBeUndefined()
+    const plugins = viteConfig.optimizeDeps?.rolldownOptions?.plugins ?? []
+    expect(plugins).toHaveLength(1)
+    expect(plugins[0].name).toBe('storybook-next-font-mock')
 
-    // Verify the plugin resolves next/font
-    const resolvers: any[] = []
-    const loaders: any[] = []
-    esbuildPlugins[0].setup({
-      onResolve: (_opts: any, fn: any) => resolvers.push({ ..._opts, fn }),
-      onLoad: (_opts: any, fn: any) => loaders.push({ ..._opts, fn }),
-    })
+    const resolved = plugins[0].resolveId('next/font/local')
+    expect(resolved).toContain('next-font-mock')
+    expect(plugins[0].resolveId('react')).toBeUndefined()
+    expect(plugins[0].resolveId('@next/font/google')).toContain(
+      'next-font-mock',
+    )
 
-    expect(resolvers).toHaveLength(1)
-    expect(loaders).toHaveLength(1)
-
-    const fontResult = resolvers[0].fn({ path: 'next/font/local' })
-    expect(fontResult.namespace).toBe('next-font-mock')
-
-    const loadResult = loaders[0].fn()
-    expect(loadResult.contents).toContain('fontMock')
-    expect(loadResult.loader).toBe('js')
+    expect(plugins[0].load(resolved)).toContain('fontMock')
+    expect(plugins[0].load('/other.js')).toBeUndefined()
   })
 
   it('should alias react-native to react-native-web for react-native framework', async () => {
@@ -242,30 +263,23 @@ describe('storybook main config', () => {
     })
   })
 
-  it('should let wrapped indexers handle standard CSF files', async () => {
-    const mockCsfIndexer = {
-      test: /\.stories\.[jt]sx?$/,
-      createIndex: vi.fn().mockResolvedValue([{ type: 'story' }]),
-    }
+  it('should register auto-discovery indexer only when enabled', async () => {
+    vi.resetModules()
+    vi.doMock('node:fs/promises', () => ({ readFile: vi.fn() }))
+    vi.doMock('vite-tsconfig-paths', () => ({ default: vi.fn() }))
+    vi.doMock('../config/index.js', () => ({
+      CONFIG: {
+        storiesDir: [],
+        framework: 'vite',
+        autoDiscovery: true,
+        addons: {},
+        rocketstories: { module: 'm', export: 'e' },
+        port: 6006,
+      },
+    }))
 
-    const indexersFn = STORYBOOK_CONFIG.experimental_indexers as (
-      existing: any[],
-    ) => any[]
-    const indexers = indexersFn([mockCsfIndexer])
-    const wrappedCsf = indexers[2]
-
-    const csfFile = '/src/Button/__stories__/Button.stories.tsx'
-    const { readFile } = await import('node:fs/promises')
-    vi.mocked(readFile).mockResolvedValueOnce(
-      'export default { component: Button }' as any,
-    )
-
-    const result = await wrappedCsf.createIndex(csfFile, {
-      makeTitle: (t: string) => t,
-    })
-    expect(result).toEqual([{ type: 'story' }])
-    expect(mockCsfIndexer.createIndex).toHaveBeenCalledWith(csfFile, {
-      makeTitle: expect.any(Function),
-    })
+    const { default: cfg } = await import('./main.js')
+    const fn = cfg.experimental_indexers as (e: any[]) => any[]
+    expect(fn([])).toHaveLength(2)
   })
 })

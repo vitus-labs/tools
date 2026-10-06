@@ -14,44 +14,48 @@ import {
 // Virtual module prefix for auto-generated stories
 export const VIRTUAL_STORY_PREFIX = 'virtual:rocketstory:'
 
-/**
- * Index a manual story file (.stories.tsx).
- * Handles rocketstories pattern files — returns empty for
- * standard CSF files so the default indexer handles them.
- */
-const indexManualStoryFile = async (
-  fileName: string,
-  makeTitle: (title?: string) => string,
-): Promise<IndexInput[]> => {
-  const code = await readFile(fileName, 'utf-8')
-
-  // Only handle rocketstories pattern — let default CSF indexer
-  // handle standard story files
-  if (!isRocketstoriesPattern(code)) return []
-
-  const explicitTitle = extractExplicitTitle(code)
-  const title = makeTitle(
-    explicitTitle ?? deriveTitle(fileName, { isStoryFile: true }),
-  )
-  const namedExports = extractNamedExports(code)
-
-  return namedExports.map((exportName) => ({
-    type: 'story' as const,
-    importPath: fileName,
-    exportName,
-    title,
-  }))
-}
+const STORY_FILE_TEST = /\.stories\.([jt]sx?|mdx?)$/
 
 /**
- * The manual story indexer.
- * Indexes .stories.tsx files that use the rocketstories init() pattern.
+ * Create the manual story indexer.
+ *
+ * Storybook uses only the FIRST indexer whose `test` matches a file, so this
+ * indexer (which matches every `*.stories.*` file) must also handle files it
+ * does not own. Rocketstories pattern files are indexed here; everything
+ * else is delegated to the first matching existing indexer (the default CSF
+ * / MDX indexers), otherwise standard stories would produce no entries.
  */
-export const manualStoryIndexer: Indexer = {
-  test: /\.stories\.([jt]sx?|mdx?)$/,
-  createIndex: async (fileName, { makeTitle }) =>
-    indexManualStoryFile(fileName, makeTitle),
-}
+export const createManualStoryIndexer = (
+  delegates: Indexer[] = [],
+): Indexer => ({
+  test: STORY_FILE_TEST,
+  createIndex: async (fileName, opts) => {
+    const code = await readFile(fileName, 'utf-8')
+
+    if (isRocketstoriesPattern(code)) {
+      const explicitTitle = extractExplicitTitle(code)
+      const title = opts.makeTitle(
+        explicitTitle ?? deriveTitle(fileName, { isStoryFile: true }),
+      )
+
+      return extractNamedExports(code).map((exportName) => ({
+        type: 'story' as const,
+        importPath: fileName,
+        exportName,
+        title,
+      }))
+    }
+
+    const delegate = delegates.find((indexer) => indexer.test.test(fileName))
+    return delegate ? delegate.createIndex(fileName, opts) : []
+  },
+})
+
+/**
+ * The manual story indexer without delegates: indexes only rocketstories
+ * pattern files.
+ */
+export const manualStoryIndexer: Indexer = createManualStoryIndexer()
 
 /**
  * Create an auto-discovery indexer that finds components without

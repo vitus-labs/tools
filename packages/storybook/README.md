@@ -63,7 +63,7 @@ export { default } from '@vitus-labs/tools-storybook/storybook/manager'
 
 ### Auto-discovery
 
-Components are automatically discovered and turned into stories without writing manual `.stories.tsx` files. The indexer scans for `index.ts` component files and generates virtual story modules.
+Components can be automatically discovered and turned into stories without writing manual `.stories.tsx` files. Auto-discovery is **opt-in** (`autoDiscovery: true`): it adds `index.*` globs to the stories globs, so the indexer sees component `index.ts` files and generates virtual story modules. Components that already have manual stories are skipped.
 
 - **Rocketstyle components** get stories with dimension exports (states, sizes, variants) and pseudo-state rendering
 - **Plain React components** get a basic story with title and default render
@@ -104,8 +104,9 @@ export default {
       themes: true,
       vitest: true,
     },
+    autoDiscovery: false, // set true to generate stories from component index files
     globals: {},
-    ui: { theme: 'dark' },
+    ui: { theme: 'dark' }, // 'dark' | 'light' (manager UI theme)
   },
 }
 ```
