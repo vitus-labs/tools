@@ -15,4 +15,3 @@ Update dependencies to their latest minor/patch versions
 - `@biomejs/biome` 2.5.10 -> 2.5.15
 - Storybook 10.5 -> 10.6 and related addons, `vite` 8.2 -> 8.3
 - `@modelcontextprotocol/sdk` 1.30 -> 1.32, `zod` 4.4 -> 4.6
-- `tools-mcp`: scaffolded `biome.json` files now reference the current Biome schema (2.5.15) instead of 2.4.7
