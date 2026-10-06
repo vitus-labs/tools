@@ -7,7 +7,7 @@ export interface SecurityHeader {
 
 export type HeadersConfig =
   | boolean
-  | Record<string, string>
+  | Record<string, string | false | null>
   | ((defaults: SecurityHeader[]) => SecurityHeader[])
 
 export interface NextjsToolsConfig {
@@ -15,7 +15,9 @@ export interface NextjsToolsConfig {
    * Security headers configuration (default: true).
    * - `true` — apply all default security headers
    * - `false` — disable security headers
-   * - `Record<string, string>` — override specific header values
+   * - `Record<string, string | false | null>` — override default header values
+   *   (matched case-insensitively), add new headers, or remove a default by
+   *   setting it to `false`/`null`
    * - `(defaults) => headers[]` — full control via callback
    */
   headers?: HeadersConfig

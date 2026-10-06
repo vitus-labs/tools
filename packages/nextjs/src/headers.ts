@@ -21,11 +21,28 @@ const resolveHeaders = (config: HeadersConfig): SecurityHeader[] => {
 
   if (typeof config === 'function') return config(DEFAULT_HEADERS)
 
-  // Record<string, string> — override matching keys, keep the rest
-  return DEFAULT_HEADERS.map((h) => {
-    const override = config[h.key]
-    return override !== undefined ? { ...h, value: override } : h
-  })
+  // Record — override matching keys (case-insensitive), drop keys set to
+  // false/null, append unknown keys as new headers
+  const overrides = new Map(
+    Object.entries(config).map(([key, value]) => [key.toLowerCase(), value]),
+  )
+  const defaultKeys = new Set(DEFAULT_HEADERS.map((h) => h.key.toLowerCase()))
+
+  const result: SecurityHeader[] = []
+  for (const h of DEFAULT_HEADERS) {
+    const override = overrides.get(h.key.toLowerCase())
+    if (override === undefined) result.push(h)
+    else if (typeof override === 'string')
+      result.push({ ...h, value: override })
+  }
+
+  for (const [key, value] of Object.entries(config)) {
+    if (typeof value === 'string' && !defaultKeys.has(key.toLowerCase())) {
+      result.push({ key, value })
+    }
+  }
+
+  return result
 }
 
 export const securityHeaders = (config: HeadersConfig = true) => {

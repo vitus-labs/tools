@@ -42,18 +42,22 @@ export default createVitestConfig({
 })
 ```
 
+Coverage uses the `v8` provider, so install the optional peer `@vitest/coverage-v8` (`>=4`) to run with `--coverage`.
+
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
 | `environment` | `string` | `'node'` | Test environment (`'node'`, `'jsdom'`, `'happy-dom'`, etc.) |
-| `css` | `boolean` | `false` | Enable CSS processing — useful for jsdom/happy-dom |
+| `root` | `string` | project root | Directory relative `aliases` targets resolve against (defaults to the Vite/Vitest project root, then `process.cwd()`) |
+| `css` | `boolean` | `false` | Process CSS imports. When off, CSS files become empty strings and CSS modules use non-scoped class names |
 | `setupFiles` | `string[]` | — | Setup files to run before each test |
 | `aliases` | `Record<string, string>` | — | Path aliases (e.g. `{ '~/': 'src/' }`) |
 | `plugins` | `PluginOption[]` | — | Vite plugins |
 | `testTimeout` | `number` | `5000` | Test timeout in milliseconds |
-| `pool` | `'threads' \| 'forks' \| 'vmThreads' \| 'vmForks'` | `'threads'` | Worker pool |
+| `pool` | `'threads' \| 'forks' \| 'vmThreads' \| 'vmForks'` | `'forks'` | Worker pool (Vitest's default is used when omitted) |
 | `include` | `string[]` | — | Extra glob patterns for test discovery |
 | `exclude` | `string[]` | — | Extra glob patterns to exclude from tests |
 | `coverageExclude` | `string[]` | — | Extra glob patterns to exclude from coverage |
+| `coverageInclude` | `string[]` | — | Extra glob patterns to include in coverage (appended to `src/**/*.ts(x)`) |
 | `coverageThresholds` | `CoverageThresholds` | 90% all | Override default thresholds |
 
 You can also pass a string array as shorthand for `coverageExclude`:

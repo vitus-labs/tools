@@ -1,3 +1,4 @@
+import { resolve } from 'node:path'
 import { configDefaults, defineConfig } from 'vitest/config'
 
 export interface CoverageThresholds {
@@ -20,13 +21,21 @@ export interface VitestConfigOptions {
   setupFiles?: string[]
   /** Test environment — 'node' (default), 'jsdom', 'happy-dom', etc. */
   environment?: string
-  /** Resolve path aliases (e.g. { '~/': 'src/' }) */
+  /**
+   * Resolve path aliases (e.g. { '~/': 'src/' }). Relative targets are
+   * resolved against the project root (see `root`), absolute targets are kept.
+   */
   aliases?: Record<string, string>
-  /** Auto-mock CSS imports — useful for jsdom/happy-dom environments (default: false) */
+  /**
+   * Directory that relative `aliases` targets are resolved against.
+   * Defaults to the Vite/Vitest project root, falling back to `process.cwd()`.
+   */
+  root?: string
+  /** Process CSS imports (default: false — CSS files are replaced with empty strings and CSS modules use non-scoped class names) */
   css?: boolean
   /** Test timeout in milliseconds (default: 5000) */
   testTimeout?: number
-  /** Worker pool — 'threads' (default), 'forks', 'vmThreads', 'vmForks' */
+  /** Worker pool — 'forks' (Vitest default), 'threads', 'vmThreads', 'vmForks' */
   pool?: 'threads' | 'forks' | 'vmThreads' | 'vmForks'
   /** Extra glob patterns to include in test discovery */
   include?: string[]
@@ -54,15 +63,31 @@ export const DEFAULT_COVERAGE_INCLUDE = ['src/**/*.ts', 'src/**/*.tsx']
 
 const buildAliases = (
   aliases: Record<string, string>,
+  root: string,
 ): Record<string, string> =>
   Object.fromEntries(
     Object.entries(aliases).map(([key, value]) => {
       // Convert shorthand like '~/' → regex-style match
       const cleanKey = key.endsWith('/') ? key.slice(0, -1) : key
-      const cleanValue = value.endsWith('/') ? value.slice(0, -1) : value
-      return [cleanKey, `${process.cwd()}/${cleanValue}`]
+      return [cleanKey, resolve(root, value)]
     }),
   )
+
+/**
+ * Plugin that resolves aliases lazily, once the project root is known, so
+ * they work when Vitest runs from a monorepo root (`test.projects`).
+ */
+const aliasPlugin = (aliases: Record<string, string>, root?: string) => ({
+  name: 'vitus-labs:aliases',
+  config: (config: { root?: string }) => ({
+    resolve: {
+      alias: buildAliases(
+        aliases,
+        root ? resolve(root) : resolve(config.root ?? process.cwd()),
+      ),
+    },
+  }),
+})
 
 /**
  * Create a vitest config with sensible defaults.
@@ -75,11 +100,13 @@ export const createVitestConfig = (
 ) => {
   const opts = Array.isArray(options) ? { coverageExclude: options } : options
 
-  const aliases = opts.aliases ? buildAliases(opts.aliases) : undefined
+  const plugins = [
+    ...(opts.aliases ? [aliasPlugin(opts.aliases, opts.root)] : []),
+    ...(opts.plugins ?? []),
+  ]
 
   return defineConfig({
-    plugins: opts.plugins as any,
-    resolve: aliases ? { alias: aliases } : undefined,
+    plugins: plugins.length ? (plugins as any) : undefined,
     test: {
       globals: true,
       environment: opts.environment ?? 'node',

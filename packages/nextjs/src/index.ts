@@ -9,14 +9,12 @@ export type {
   SecurityHeader,
 } from './types.ts'
 
-/**
- * Wrap a Next.js config with vitus-labs defaults.
- *
- * Reads the `next` key from `vl-tools.config.mjs` and merges it
- * with the provided config. Adds security headers, image optimization,
- * and sensible TypeScript/ESLint defaults.
- */
-export const withVitusLabs = (nextConfig: NextConfig = {}): NextConfig => ({
+type NextConfigFunction = (
+  phase: string,
+  context: { defaultConfig: NextConfig },
+) => NextConfig | Promise<NextConfig>
+
+const applyDefaults = (nextConfig: NextConfig): NextConfig => ({
   ...nextConfig,
   images: {
     ...CONFIG.images,
@@ -40,3 +38,30 @@ export const withVitusLabs = (nextConfig: NextConfig = {}): NextConfig => ({
     return userHeaders
   },
 })
+
+/**
+ * Wrap a Next.js config with vitus-labs defaults.
+ *
+ * Reads the `next` key from `vl-tools.config.mjs` and merges it
+ * with the provided config. Adds security headers, image optimization,
+ * and TypeScript build defaults. Accepts either a config object or a
+ * config function `(phase, ctx) => config` (the function form returns a
+ * function).
+ */
+export function withVitusLabs(nextConfig?: NextConfig): NextConfig
+export function withVitusLabs(
+  nextConfig: NextConfigFunction,
+): (
+  phase: string,
+  context: { defaultConfig: NextConfig },
+) => Promise<NextConfig>
+export function withVitusLabs(
+  nextConfig: NextConfig | NextConfigFunction = {},
+): NextConfig | NextConfigFunction {
+  if (typeof nextConfig === 'function') {
+    return async (phase, context) =>
+      applyDefaults(await nextConfig(phase, context))
+  }
+
+  return applyDefaults(nextConfig)
+}

@@ -34,10 +34,6 @@ describe('lib.json', () => {
     expect(config.compilerOptions.strict).toBe(true)
   })
 
-  it('should include src directory', () => {
-    expect(config.include).toContain('src')
-  })
-
   it('should enable declaration and sourceMap', () => {
     expect(config.compilerOptions.declaration).toBe(true)
     expect(config.compilerOptions.sourceMap).toBe(true)
@@ -107,3 +103,15 @@ describe('nextjs.json', () => {
     expect(config.compilerOptions.incremental).toBe(true)
   })
 })
+
+describe.each(['lib.json', 'node.json', 'nextjs.json'])(
+  '%s file-scoped paths',
+  (file) => {
+    it('should not declare include/exclude/files', () => {
+      const config = loadJson(file)
+      expect(config.include).toBeUndefined()
+      expect(config.exclude).toBeUndefined()
+      expect(config.files).toBeUndefined()
+    })
+  },
+)
