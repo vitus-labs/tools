@@ -1,9 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mockWriteFileSync = vi.fn()
+const mockMkdirSync = vi.fn()
 vi.mock('node:fs', () => ({
-  default: { writeFileSync: mockWriteFileSync },
+  default: { writeFileSync: mockWriteFileSync, mkdirSync: mockMkdirSync },
   writeFileSync: mockWriteFileSync,
+  mkdirSync: mockMkdirSync,
 }))
 
 const mockFavicons = vi.fn()
@@ -29,6 +31,7 @@ describe('generateFavicons', () => {
   beforeEach(() => {
     mockWriteFileSync.mockClear()
     mockFavicons.mockClear()
+    mockMkdirSync.mockClear()
   })
 
   it('should generate favicons for each icon config', async () => {
@@ -80,5 +83,35 @@ describe('generateFavicons', () => {
 
     // 2 images + 1 manifest
     expect(mockWriteFileSync).toHaveBeenCalledTimes(3)
+  })
+
+  it('should create the output directory and pass the joined url path', async () => {
+    mockFavicons.mockResolvedValue({
+      images: [{ name: 'a.png', contents: Buffer.from('a') }],
+      files: [],
+    })
+
+    vi.resetModules()
+    const { generateFavicons } = await import('./generateFavicon.js')
+
+    await generateFavicons()
+
+    expect(mockMkdirSync).toHaveBeenCalledWith(
+      expect.stringMatching(/public[\\/]icons$/),
+      { recursive: true },
+    )
+    expect(mockFavicons.mock.calls[0][1].path).toBe('/assets/icons')
+  })
+})
+
+describe('joinUrlPath', () => {
+  it('should never produce undefined segments', async () => {
+    const { joinUrlPath } = await import('./generateFavicon.js')
+    expect(joinUrlPath('/', undefined)).toBe('/')
+    expect(joinUrlPath(undefined, undefined)).toBe('/')
+    expect(joinUrlPath('/assets/', '/icons')).toBe('/assets/icons')
+    expect(joinUrlPath('https://cdn.test/x', 'icons')).toBe(
+      'https://cdn.test/x/icons',
+    )
   })
 })

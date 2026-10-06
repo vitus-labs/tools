@@ -52,7 +52,12 @@ export default {
 | `orientation` | `any` | Screen orientation |
 | `lang` | `en-US` | Language tag |
 | `start_url` | `/?homescreen=1` | PWA start URL |
-| `icons` | — | Array of `{ input, output, path }` entries |
+| `path` | `/` | Base public URL path of the generated files |
+| `icons` | `[]` | Array of `{ input, output, path }` entries (`input`/`output` relative to cwd or absolute; `path` is appended to the base `path`). Output directories are created if missing. |
+| `platforms` | all enabled | Per-platform toggles passed to `favicons` as its `icons` option, e.g. `{ appleStartup: false }` |
+
+> `icons` used to hold the platform toggles object; that shape is still
+> accepted but deprecated - move it to `platforms`.
 
 ### Generated platforms
 

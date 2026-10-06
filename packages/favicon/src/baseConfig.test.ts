@@ -30,7 +30,7 @@ describe('favicon baseConfig', () => {
   })
 
   it('should have all icon platforms enabled', () => {
-    const { icons } = configuration
+    const icons = configuration.platforms
     expect(icons.android).toBe(true)
     expect(icons.appleIcon).toBe(true)
     expect(icons.appleStartup).toBe(true)
@@ -39,6 +39,11 @@ describe('favicon baseConfig', () => {
     expect(icons.firefox).toBe(true)
     expect(icons.windows).toBe(true)
     expect(icons.yandex).toBe(true)
+  })
+
+  it('should default icons to an empty array of sources', () => {
+    expect(configuration.icons).toEqual([])
+    expect(configuration.path).toBe('/')
   })
 
   it('should have version string', () => {
