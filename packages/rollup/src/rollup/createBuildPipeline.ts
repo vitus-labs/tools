@@ -7,17 +7,25 @@ const hasDifferentNativeBuild = () => {
   return PKG['react-native'] !== PKG.module
 }
 
-const hasDifferentBrowserBuild = (type: string) => {
-  if (!PKG.browser) return false
+// only the object form of `browser` maps files; string form and `false`
+// values (e.g. { "fs": false }) carry no build information.
+const getBrowserEntries = (): [string, string][] => {
+  const browser = PKG.browser
+  if (!browser || typeof browser !== 'object') return []
 
-  return Object.entries(PKG.browser as Record<string, string>).some(
-    ([key, value]) => {
-      const source = key.substring(2)
-      const output = value.substring(2)
-
-      return source !== PKG[type] && source !== output
-    },
+  return Object.entries(browser as Record<string, unknown>).filter(
+    (entry): entry is [string, string] =>
+      typeof entry[1] === 'string' && entry[0].startsWith('./'),
   )
+}
+
+const hasDifferentBrowserBuild = (type: string) => {
+  return getBrowserEntries().some(([key, value]) => {
+    const source = key.substring(2)
+    const output = value.substring(2)
+
+    return source !== PKG[type] && source !== output
+  })
 }
 
 const BUILD_VARIANTS: Record<
@@ -71,6 +79,8 @@ const getExportsOptions = () => {
       result.push({
         file: exportsOptions.require,
         ...BUILD_VARIANTS.main,
+        // the `require` entry must always be CommonJS, even in ESM-only packages
+        format: 'cjs',
       })
     }
 
@@ -132,37 +142,47 @@ const createBasicBuildVariants = () => {
 
 const createBrowserBuildVariants = () => {
   const result: Record<string, any>[] = []
-  if (!PKG.browser) return result
 
-  Object.entries(PKG.browser as Record<string, string>).forEach(
-    ([key, value]) => {
-      const source = key.substring(2) // strip './' from the beginning of path
-      const output = value.substring(2) // strip './' from the beginning of path
+  getBrowserEntries().forEach(([key, value]) => {
+    const source = key.substring(2) // strip './' from the beginning of path
+    const output = value.substring(2) // strip './' from the beginning of path
 
-      Object.keys(BUILD_VARIANTS).forEach((item) => {
-        if (PKG[item] === source && source !== output) {
-          result.push({
-            ...BUILD_VARIANTS[item],
-            file: output,
-            platform: 'browser',
-          })
-        }
-      })
-    },
-  )
+    Object.keys(BUILD_VARIANTS).forEach((item) => {
+      if (PKG[item] === source && source !== output) {
+        result.push({
+          ...BUILD_VARIANTS[item],
+          file: output,
+          platform: 'browser',
+        })
+      }
+    })
+  })
 
   return result
 }
 
 const createBuildPipeline = () => {
+  // drop variants that would write the same file in the same format twice
+  const seen = new Set<string>()
   const result = [
     ...createBasicBuildVariants(),
     ...createBrowserBuildVariants(),
-  ]
+  ].filter((item) => {
+    const key = `${item.file}::${item.format}`
+    if (seen.has(key)) return false
+    seen.add(key)
+    return true
+  })
 
   // add generate typings for the first bundle only
   if (typesFilePath) {
-    result[0] = { ...result[0], typesFilePath }
+    if (result.length > 0) {
+      result[0] = { ...result[0], typesFilePath }
+    } else {
+      console.warn(
+        '[vl_build] "types" is set but no build variants were found; skipping typings generation.',
+      )
+    }
   }
 
   return result
