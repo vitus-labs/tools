@@ -22,8 +22,17 @@ import { withVitusLabs } from '@vitus-labs/tools-nextjs'
 
 export default withVitusLabs({
   // standard next.config.ts options still work
-  experimental: { ppr: true },
+  cacheComponents: true,
 })
+```
+
+A config function `(phase, { defaultConfig }) => config` (sync or async) is
+also accepted — `withVitusLabs` then returns a function:
+
+```ts
+export default withVitusLabs((phase) => ({
+  // phase-dependent options
+}))
 ```
 
 ## Configuration
@@ -72,8 +81,14 @@ headers: true
 // Disable security headers entirely
 headers: false
 
-// Override specific header values (others keep their defaults)
-headers: { 'Permissions-Policy': 'camera=(self), microphone=(), geolocation=()' }
+// Override specific header values (others keep their defaults).
+// Keys match case-insensitively; unknown keys are added as new headers;
+// `false`/`null` removes a default header.
+headers: {
+  'Permissions-Policy': 'camera=(self), microphone=(), geolocation=()',
+  'Cross-Origin-Opener-Policy': 'same-origin',
+  'X-Frame-Options': false,
+}
 
 // Full control via callback
 headers: (defaults) => defaults.filter(h => h.key !== 'X-Frame-Options')
@@ -87,7 +102,7 @@ Build errors are not ignored by default — strict type checking is enforced.
 
 | Export | Description |
 |---|---|
-| `withVitusLabs(config?)` | Wraps Next.js config with defaults |
+| `withVitusLabs(config?)` | Wraps a Next.js config object or config function with defaults |
 | `securityHeaders()` | Returns the security headers array (for custom use) |
 | `NextjsToolsConfig` | TypeScript type for the config shape |
 

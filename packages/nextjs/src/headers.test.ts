@@ -69,4 +69,35 @@ describe('securityHeaders', () => {
   it('should return empty array when callback returns empty', () => {
     expect(securityHeaders(() => [])).toEqual([])
   })
+
+  it('should match override keys case-insensitively', () => {
+    const [group] = securityHeaders({ 'x-frame-options': 'DENY' })
+    const h = group?.headers.find((x) => x.key === 'X-Frame-Options')
+    expect(h?.value).toBe('DENY')
+    expect(group?.headers.filter((x) => /x-frame/i.test(x.key))).toHaveLength(1)
+  })
+
+  it('should append unknown header keys', () => {
+    const [group] = securityHeaders({
+      'Cross-Origin-Opener-Policy': 'same-origin',
+    })
+    expect(group?.headers.at(-1)).toEqual({
+      key: 'Cross-Origin-Opener-Policy',
+      value: 'same-origin',
+    })
+    expect(group?.headers).toHaveLength(7)
+  })
+
+  it('should remove default headers set to false or null', () => {
+    const [group] = securityHeaders({
+      'X-Frame-Options': false,
+      'Referrer-Policy': null,
+      'X-Unknown': false,
+    })
+    const keys = group?.headers.map((h) => h.key)
+    expect(keys).not.toContain('X-Frame-Options')
+    expect(keys).not.toContain('Referrer-Policy')
+    expect(keys).not.toContain('X-Unknown')
+    expect(keys).toHaveLength(4)
+  })
 })

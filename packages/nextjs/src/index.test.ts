@@ -112,10 +112,32 @@ describe('withVitusLabs', () => {
     expect(headers?.[0]?.source).toBe('/api/(.*)')
   })
 
+  it('should support a config function', async () => {
+    const fn = withVitusLabs((phase) => ({
+      transpilePackages: [`@my-org/${phase}`],
+    }))
+    expect(typeof fn).toBe('function')
+    const config = await fn('phase-production-build', {
+      defaultConfig: {},
+    })
+    expect(config.transpilePackages).toEqual([
+      '@my-org/shared',
+      '@my-org/phase-production-build',
+    ])
+    expect(config.typescript?.ignoreBuildErrors).toBe(false)
+    expect((await config.headers?.())?.length).toBeGreaterThan(0)
+  })
+
+  it('should support an async config function', async () => {
+    const fn = withVitusLabs(async () => ({ reactStrictMode: true }))
+    const config = await fn('x', { defaultConfig: {} })
+    expect(config.reactStrictMode).toBe(true)
+  })
+
   it('should preserve user config properties', () => {
     const config = withVitusLabs({
-      experimental: { ppr: true },
+      cacheComponents: true,
     })
-    expect((config as any).experimental?.ppr).toBe(true)
+    expect((config as any).cacheComponents).toBe(true)
   })
 })
