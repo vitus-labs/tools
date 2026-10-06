@@ -14,7 +14,7 @@ Create a `biome.json` in your project root:
 
 ```json
 {
-  "$schema": "https://biomejs.dev/schemas/2.3.14/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.5.15/schema.json",
   "extends": ["@vitus-labs/tools-lint/biome"]
 }
 ```
