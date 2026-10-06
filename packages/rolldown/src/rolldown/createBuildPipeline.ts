@@ -1,4 +1,10 @@
+import { posix } from 'node:path'
 import { CONFIG, PKG } from '../config/index.ts'
+import {
+  flattenCondition,
+  isWildcardSubpath,
+  resolveSourceFile,
+} from './resolveEntry.ts'
 
 const isESModuleOnly = PKG.type === 'module'
 
@@ -6,18 +12,24 @@ const hasDifferentNativeBuild = () => {
   return PKG['react-native'] !== PKG.module
 }
 
-const hasDifferentBrowserBuild = (type: string) => {
-  if (!PKG.browser) return false
-
-  return Object.entries(PKG.browser as Record<string, string>).some(
-    ([key, value]) => {
-      const source = key.substring(2)
-      const output = value.substring(2)
-
-      return source !== PKG[type] && source !== output
-    },
+/** Only the object form of `browser` maps files; string form and `false`
+ *  (module ignored) values carry no build output. */
+const getBrowserMap = (): [string, string][] => {
+  const map = PKG.browser
+  if (!map || typeof map !== 'object') return []
+  return Object.entries(map as Record<string, unknown>).filter(
+    (entry): entry is [string, string] =>
+      typeof entry[1] === 'string' && entry[0].startsWith('./'),
   )
 }
+
+const hasDifferentBrowserBuild = (type: string) =>
+  getBrowserMap().some(([key, value]) => {
+    const source = key.substring(2)
+    const output = value.substring(2)
+
+    return source !== PKG[type] && source !== output
+  })
 
 const BUILD_VARIANTS: Record<
   string,
@@ -49,7 +61,7 @@ const isSubpathExports = (obj: Record<string, any>): boolean =>
 /** Resolve the source input file for a subpath export using convention:
  *  "." → "src/index.ts", "./devtools" → "src/devtools" */
 const resolveSubpathInput = (exportPath: string): string => {
-  if (exportPath === '.') return `${CONFIG.sourceDir}/index.ts`
+  if (exportPath === '.') return resolveSourceFile(`${CONFIG.sourceDir}/index`)
   const subpath = exportPath.slice(2) // strip "./"
   return `${CONFIG.sourceDir}/${subpath}`
 }
@@ -61,29 +73,33 @@ const parseConditions = (
 ): Record<string, any>[] => {
   const result: Record<string, any>[] = []
   const base = input ? { input } : {}
+  const importFile = flattenCondition(conditions.import)
+  const requireFile = flattenCondition(conditions.require)
+  const nodeFile = flattenCondition(conditions.node)
+  const defaultFile = flattenCondition(conditions.default)
 
-  if (conditions.import) {
-    result.push({ file: conditions.import, ...BUILD_VARIANTS.module, ...base })
+  if (importFile) {
+    result.push({ file: importFile, ...BUILD_VARIANTS.module, ...base })
   }
-  if (conditions.require) {
+  if (requireFile) {
     result.push({
-      file: conditions.require,
+      file: requireFile,
       format: 'cjs',
       env: 'development',
       platform: 'universal',
       ...base,
     })
   }
-  if (conditions.node) {
+  if (nodeFile) {
     result.push({
-      file: conditions.node,
+      file: nodeFile,
       ...BUILD_VARIANTS.module,
       platform: 'node',
       ...base,
     })
   }
-  if (conditions.default && !conditions.import) {
-    result.push({ file: conditions.default, ...BUILD_VARIANTS.module, ...base })
+  if (defaultFile && !importFile) {
+    result.push({ file: defaultFile, ...BUILD_VARIANTS.module, ...base })
   }
 
   return result
@@ -96,6 +112,12 @@ const parseSubpathExports = (
   const result: Record<string, any>[] = []
 
   for (const [exportPath, exportConfig] of Object.entries(exportsOptions)) {
+    if (isWildcardSubpath(exportPath)) {
+      console.warn(
+        `[rolldown] Skipping wildcard export "${exportPath}" — patterns can't be mapped to a single entry; list the subpaths explicitly.`,
+      )
+      continue
+    }
     if (typeof exportConfig === 'string') {
       // Skip passthrough exports (e.g. "./package.json": "./package.json")
       if (!exportConfig.endsWith('.js') && !exportConfig.endsWith('.mjs')) {
@@ -107,15 +129,7 @@ const parseSubpathExports = (
         ...BUILD_VARIANTS.module,
       })
     } else if (typeof exportConfig === 'object' && exportConfig !== null) {
-      // Skip exports without build conditions (import/require/node/default)
-      if (
-        !exportConfig.import &&
-        !exportConfig.require &&
-        !exportConfig.node &&
-        !exportConfig.default
-      ) {
-        continue
-      }
+      // exports without build conditions yield no variants
       const input = resolveSubpathInput(exportPath)
       result.push(...parseConditions(exportConfig, input))
     }
@@ -179,26 +193,36 @@ const createBasicBuildVariants = () => {
 
 const createBrowserBuildVariants = () => {
   const result: Record<string, any>[] = []
-  if (!PKG.browser) return result
+  getBrowserMap().forEach(([key, value]) => {
+    const source = key.substring(2) // strip './' from the beginning of path
+    const output = value.substring(2) // strip './' from the beginning of path
 
-  Object.entries(PKG.browser as Record<string, string>).forEach(
-    ([key, value]) => {
-      const source = key.substring(2) // strip './' from the beginning of path
-      const output = value.substring(2) // strip './' from the beginning of path
-
-      Object.keys(BUILD_VARIANTS).forEach((item) => {
-        if (PKG[item] === source && source !== output) {
-          result.push({
-            ...BUILD_VARIANTS[item],
-            file: output,
-            platform: 'browser',
-          })
-        }
-      })
-    },
-  )
+    Object.keys(BUILD_VARIANTS).forEach((item) => {
+      if (PKG[item] === source && source !== output) {
+        result.push({
+          ...BUILD_VARIANTS[item],
+          file: output,
+          platform: 'browser',
+        })
+      }
+    })
+  })
 
   return result
+}
+
+/** Drop repeated (file, format, platform, env) variants (paths compared normalised, so
+ *  `./lib/a.js` equals `lib/a.js`) — e.g. `exports.import`
+ *  and `module` pointing at the same file — keeping the first (which carries
+ *  the explicit `input` when it comes from `exports`). */
+const dedupeVariants = (variants: Record<string, any>[]) => {
+  const seen = new Set<string>()
+  return variants.filter((v) => {
+    const key = `${posix.normalize(v.file)}|${v.format}|${v.platform}|${v.env}`
+    if (seen.has(key)) return false
+    seen.add(key)
+    return true
+  })
 }
 
 const createBuildPipeline = () => {
@@ -212,7 +236,10 @@ const createBuildPipeline = () => {
     }))
   }
 
-  return [...createBasicBuildVariants(), ...createBrowserBuildVariants()]
+  return dedupeVariants([
+    ...createBasicBuildVariants(),
+    ...createBrowserBuildVariants(),
+  ])
 }
 
 export default createBuildPipeline

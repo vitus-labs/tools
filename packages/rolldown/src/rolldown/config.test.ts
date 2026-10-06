@@ -47,7 +47,8 @@ vi.mock('../config/index.ts', () => ({
   PLATFORMS: ['browser', 'node', 'web', 'native'],
 }))
 
-import rolldownConfig, { buildDts } from './config.ts'
+import { visualizer } from 'rollup-plugin-visualizer'
+import rolldownConfig, { buildAllDts, buildDts } from './config.ts'
 
 const defaultConfig = { ...mockConfig }
 const defaultPKG = { ...mockPKG }
@@ -198,6 +199,32 @@ describe('rolldownConfig', () => {
     })
 
     expect(config.transform).toBeUndefined()
+  })
+
+  it('should place the visualizer report next to a bare file name', () => {
+    rolldownConfig({
+      file: 'index.js',
+      format: 'es',
+      env: 'development',
+      platform: 'universal',
+    })
+
+    expect(visualizer).toHaveBeenLastCalledWith(
+      expect.objectContaining({ filename: 'analysis/index.js.html' }),
+    )
+  })
+
+  it('should place the visualizer report in the output dir of nested files', () => {
+    rolldownConfig({
+      file: 'lib/index.js',
+      format: 'es',
+      env: 'development',
+      platform: 'universal',
+    })
+
+    expect(visualizer).toHaveBeenLastCalledWith(
+      expect.objectContaining({ filename: 'lib/analysis/index.js.html' }),
+    )
   })
 
   it('should skip visualizer when visualise is false', () => {
@@ -458,5 +485,26 @@ describe('rolldownConfig external deep imports', () => {
     })
 
     expect(matchesExternal(config.external, 'node:crypto')).toBe(true)
+  })
+})
+
+describe('buildAllDts', () => {
+  beforeEach(() => {
+    Object.assign(mockConfig, defaultConfig)
+    Object.assign(mockPKG, defaultPKG)
+  })
+
+  it('should skip wildcard subpaths and read types from nested conditions', () => {
+    mockPKG.exports = {
+      '.': { types: './lib/index.d.ts', import: './lib/index.js' },
+      './features/*': { types: './lib/features/*.d.ts', import: './x/*.js' },
+      './nested': {
+        import: { types: './lib/nested.d.ts', default: './lib/nested.js' },
+      },
+    }
+
+    const files = buildAllDts().map((c) => c.file)
+
+    expect(files).toEqual(['./lib/index.d.ts', './lib/nested.d.ts'])
   })
 })

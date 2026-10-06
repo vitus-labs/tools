@@ -73,7 +73,6 @@ export default {
     sourceDir: 'src',
     outputDir: 'lib',
     typescript: true,
-    esModulesOnly: false,
     replaceGlobals: true,
     external: ['react/jsx-runtime'],
     globals: {

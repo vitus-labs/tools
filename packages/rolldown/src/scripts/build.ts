@@ -70,13 +70,16 @@ const commonParent = (files: string[]): string => {
   return common.length === 0 ? '.' : common.join('/')
 }
 
-const stripJsExt = (s: string): string => s.replace(/\.(m?js|cjs)$/, '')
+const JS_EXT_RE = /\.(m?js|cjs)$/
+const stripJsExt = (s: string): string => s.replace(JS_EXT_RE, '')
+/** Output extension of a variant file ('.js' | '.mjs' | '.cjs'), or ''. */
+const jsExt = (s: string): string => s.match(JS_EXT_RE)?.[0] ?? ''
 
 /**
  * Partition variants into groups eligible for multi-entry shared-chunk
  * builds, and singletons that keep the per-entry path.
  *
- * Eligible: same (format, env, platform), explicit `input` set, and a
+ * Eligible: same (format, env, platform, output extension), explicit `input` set, and a
  * format that supports code-splitting (i.e. not umd/iife — those are
  * inherently standalone bundles).
  */
@@ -88,7 +91,8 @@ const partitionForSharedChunks = (variants: Record<string, any>[]) => {
       singles.push(v)
       continue
     }
-    const key = `${v.format}|${v.env}|${v.platform}`
+    // extension is part of the key so `.mjs`/`.cjs`/`.js` outputs keep their names
+    const key = `${v.format}|${v.env}|${v.platform}|${jsExt(v.file)}`
     const bucket = buckets.get(key) ?? []
     bucket.push(v)
     buckets.set(key, bucket)
@@ -107,6 +111,7 @@ const buildGroup = async (group: Record<string, any>[]) => {
   // they're identical across the group by construction.
   const head = group[0] as Record<string, any>
   const dir = commonParent(group.map((v) => v.file as string))
+  const ext = jsExt(head.file as string)
   // Entry name = file relative to common parent, with .js/.cjs/.mjs stripped.
   // rolldown preserves '/' in input keys, so nested entries map cleanly to
   // nested output paths via [name] in entryFileNames.
@@ -125,8 +130,8 @@ const buildGroup = async (group: Record<string, any>[]) => {
   const outputOptions = {
     ...output,
     dir,
-    entryFileNames: '[name].js',
-    chunkFileNames: '_chunks/[name]-[hash].js',
+    entryFileNames: `[name]${ext}`,
+    chunkFileNames: `_chunks/[name]-[hash]${ext}`,
   }
 
   const format = FORMAT_LABEL[head.format] || head.format
@@ -142,7 +147,7 @@ const buildGroup = async (group: Record<string, any>[]) => {
   }
   const duration = Math.round(performance.now() - start)
   log(
-    `  ${chalk.green('+')} ${bold(format)} ${dim('->')} ${dim(`${dir}/{${Object.keys(inputMap).join(',')}}.js`)} ${dim(`(${duration}ms, shared chunks)`)}`,
+    `  ${chalk.green('+')} ${bold(format)} ${dim('->')} ${dim(`${dir}/{${Object.keys(inputMap).join(',')}}${ext}`)} ${dim(`(${duration}ms, shared chunks)`)}`,
   )
 }
 
@@ -260,6 +265,13 @@ const buildDtsIsolated = async (
  */
 const escapeRe = (s: string): string => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
+/**
+ * Directory for shared declaration chunks. Deliberately NOT `_chunks`: when
+ * the types dir equals the JS output dir, promoting would otherwise delete
+ * the JS shared chunks.
+ */
+const DTS_CHUNKS_DIR = '_dts_chunks'
+
 /** Build the rolldown invocation options for a grouped DTS build. */
 const buildGroupedDtsInvocation = (
   head: ReturnType<typeof buildAllDts>[number],
@@ -272,7 +284,7 @@ const buildGroupedDtsInvocation = (
     ...head.output,
     dir: tempDir,
     entryFileNames: '[name].d.ts',
-    chunkFileNames: '_chunks/[name]-[hash].d.ts',
+    chunkFileNames: `${DTS_CHUNKS_DIR}/[name]-[hash].d.ts`,
   }
   return { inputOptions, outputOptions }
 }
@@ -326,14 +338,14 @@ const promoteEntries = (
 }
 
 /**
- * Move the plugin's `_chunks/` dir (shared types) alongside the entries.
- * The `import "./_chunks/shared-X.js"` references in entry files resolve
- * to `_chunks/shared-X.d.ts` via TS's adjacent-`.d.ts`-to-`.js` rule.
+ * Move the plugin's `_dts_chunks/` dir (shared types) alongside the entries.
+ * The `import "./_dts_chunks/shared-X.js"` references in entry files resolve
+ * to `_dts_chunks/shared-X.d.ts` via TS's adjacent-`.d.ts`-to-`.js` rule.
  */
 const promoteChunksDir = (absTempDir: string, absFinalDir: string) => {
-  const tempChunksDir = join(absTempDir, '_chunks')
+  const tempChunksDir = join(absTempDir, DTS_CHUNKS_DIR)
   if (!existsSync(tempChunksDir)) return
-  const finalChunksDir = join(absFinalDir, '_chunks')
+  const finalChunksDir = join(absFinalDir, DTS_CHUNKS_DIR)
   rmSync(finalChunksDir, { recursive: true, force: true })
   renameSync(tempChunksDir, finalChunksDir)
 }
