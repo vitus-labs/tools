@@ -2,6 +2,8 @@ import { readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { z } from 'zod'
+import { BIOME_SCHEMA, VERSIONS } from '../versions.ts'
+import { absolutePath, errorResult, writeIfMissing } from './utils.ts'
 
 const TOOLS = [
   'typescript',
@@ -30,8 +32,8 @@ const getToolActions = (tool: Tool): ToolAction => {
     case 'typescript':
       return {
         devDependencies: {
-          '@vitus-labs/tools-typescript': 'latest',
-          typescript: '^5.9.0',
+          '@vitus-labs/tools-typescript': VERSIONS.vitusLabs,
+          typescript: VERSIONS.typescript,
         },
         files: [
           {
@@ -56,8 +58,8 @@ const getToolActions = (tool: Tool): ToolAction => {
     case 'lint':
       return {
         devDependencies: {
-          '@vitus-labs/tools-lint': 'latest',
-          '@biomejs/biome': '^2.4.0',
+          '@vitus-labs/tools-lint': VERSIONS.vitusLabs,
+          '@biomejs/biome': VERSIONS.biome,
         },
         scripts: {
           lint: 'biome check .',
@@ -68,7 +70,7 @@ const getToolActions = (tool: Tool): ToolAction => {
             path: 'biome.json',
             content: JSON.stringify(
               {
-                $schema: 'https://biomejs.dev/schemas/2.4.7/schema.json',
+                $schema: BIOME_SCHEMA,
                 extends: ['@vitus-labs/tools-lint/biome'],
               },
               null,
@@ -80,9 +82,10 @@ const getToolActions = (tool: Tool): ToolAction => {
     case 'vitest':
       return {
         devDependencies: {
-          '@vitus-labs/tools-vitest': 'latest',
-          vitest: '^4.0.0',
-          '@vitest/coverage-v8': '^4.0.0',
+          '@vitus-labs/tools-vitest': VERSIONS.vitusLabs,
+          vitest: VERSIONS.vitest,
+          '@vitest/coverage-v8': VERSIONS.vitestCoverage,
+          vite: VERSIONS.vite,
         },
         scripts: {
           test: 'vitest run',
@@ -98,7 +101,7 @@ const getToolActions = (tool: Tool): ToolAction => {
       }
     case 'rolldown':
       return {
-        devDependencies: { '@vitus-labs/tools-rolldown': 'latest' },
+        devDependencies: { '@vitus-labs/tools-rolldown': VERSIONS.vitusLabs },
         scripts: {
           build: 'vl_rolldown_build',
           dev: 'vl_rolldown_build-watch',
@@ -106,12 +109,12 @@ const getToolActions = (tool: Tool): ToolAction => {
       }
     case 'rollup':
       return {
-        devDependencies: { '@vitus-labs/tools-rollup': 'latest' },
+        devDependencies: { '@vitus-labs/tools-rollup': VERSIONS.vitusLabs },
         scripts: { build: 'vl_build', dev: 'vl_build-watch' },
       }
     case 'nextjs':
       return {
-        dependencies: { '@vitus-labs/tools-nextjs': 'latest' },
+        dependencies: { '@vitus-labs/tools-nextjs': VERSIONS.vitusLabs },
         files: [
           {
             path: 'next.config.ts',
@@ -121,11 +124,11 @@ const getToolActions = (tool: Tool): ToolAction => {
       }
     case 'nextjs-images':
       return {
-        dependencies: { '@vitus-labs/tools-nextjs-images': 'latest' },
+        dependencies: { '@vitus-labs/tools-nextjs-images': VERSIONS.vitusLabs },
       }
     case 'storybook':
       return {
-        devDependencies: { '@vitus-labs/tools-storybook': 'latest' },
+        devDependencies: { '@vitus-labs/tools-storybook': VERSIONS.vitusLabs },
         scripts: {
           stories: 'vl_stories',
           'stories:build': 'vl_stories-build',
@@ -133,16 +136,25 @@ const getToolActions = (tool: Tool): ToolAction => {
       }
     case 'favicon':
       return {
-        devDependencies: { '@vitus-labs/tools-favicon': 'latest' },
+        devDependencies: { '@vitus-labs/tools-favicon': VERSIONS.vitusLabs },
         scripts: { favicon: 'vl_favicon' },
       }
     case 'atlas':
       return {
-        devDependencies: { '@vitus-labs/tools-atlas': 'latest' },
+        devDependencies: { '@vitus-labs/tools-atlas': VERSIONS.vitusLabs },
         scripts: { atlas: 'vl_atlas' },
       }
   }
 }
+
+interface SkippedItems {
+  deps: string[]
+  scripts: string[]
+  files: string[]
+}
+
+const hasOwn = (obj: Record<string, unknown>, key: string) =>
+  Object.hasOwn(obj, key)
 
 const applyToolAction = (
   pkg: Record<string, unknown>,
@@ -152,38 +164,75 @@ const applyToolAction = (
   const addedDeps: string[] = []
   const addedScripts: string[] = []
   const createdFiles: string[] = []
+  const skipped: SkippedItems = { deps: [], scripts: [], files: [] }
 
-  if (actions.dependencies) {
-    const existing = (pkg.dependencies ?? {}) as Record<string, string>
-    pkg.dependencies = { ...existing, ...actions.dependencies }
-    addedDeps.push(...Object.keys(actions.dependencies))
+  const asRecord = (value: unknown) => (value ?? {}) as Record<string, string>
+  // A package already declared in either section is never touched, so we don't
+  // downgrade a user's version or duplicate it across sections.
+  const declared = () => ({
+    ...asRecord(pkg.dependencies),
+    ...asRecord(pkg.devDependencies),
+    ...asRecord(pkg.peerDependencies),
+    ...asRecord(pkg.optionalDependencies),
+  })
+
+  const addDeps = (
+    field: 'dependencies' | 'devDependencies',
+    wanted: Record<string, string>,
+  ) => {
+    const target = { ...asRecord(pkg[field]) }
+    for (const [name, range] of Object.entries(wanted)) {
+      if (hasOwn(declared(), name)) {
+        skipped.deps.push(name)
+        continue
+      }
+      target[name] = range
+      pkg[field] = target
+      addedDeps.push(name)
+    }
   }
 
-  if (actions.devDependencies) {
-    const existing = (pkg.devDependencies ?? {}) as Record<string, string>
-    pkg.devDependencies = { ...existing, ...actions.devDependencies }
-    addedDeps.push(...Object.keys(actions.devDependencies))
-  }
+  if (actions.dependencies) addDeps('dependencies', actions.dependencies)
+  if (actions.devDependencies)
+    addDeps('devDependencies', actions.devDependencies)
 
   if (actions.scripts) {
-    const existing = (pkg.scripts ?? {}) as Record<string, string>
-    pkg.scripts = { ...existing, ...actions.scripts }
-    addedScripts.push(...Object.keys(actions.scripts))
+    const existing = asRecord(pkg.scripts)
+    for (const [name, command] of Object.entries(actions.scripts)) {
+      if (hasOwn(existing, name)) {
+        skipped.scripts.push(name)
+        continue
+      }
+      existing[name] = command
+      pkg.scripts = existing
+      addedScripts.push(name)
+    }
   }
 
   if (actions.files) {
     for (const file of actions.files) {
-      const filePath = join(directory, file.path)
-      try {
-        writeFileSync(filePath, file.content, { flag: 'wx' })
+      if (writeIfMissing(join(directory, file.path), file.content)) {
         createdFiles.push(file.path)
-      } catch {
-        // File already exists — skip
+      } else {
+        skipped.files.push(file.path)
       }
     }
   }
 
-  return { addedDeps, addedScripts, createdFiles }
+  return { addedDeps, addedScripts, createdFiles, skipped }
+}
+
+const formatSkipped = (skipped: SkippedItems): string[] => {
+  const lines: string[] = []
+  if (skipped.deps.length > 0)
+    lines.push(`  Dependencies: ${skipped.deps.join(', ')}`)
+  if (skipped.scripts.length > 0)
+    lines.push(`  Scripts: ${skipped.scripts.join(', ')}`)
+  for (const f of skipped.files) lines.push(`  - ${f}`)
+
+  return lines.length > 0
+    ? ['', 'Skipped (already present, left untouched):', ...lines]
+    : []
 }
 
 const formatResult = (
@@ -191,22 +240,32 @@ const formatResult = (
   addedDeps: string[],
   addedScripts: string[],
   createdFiles: string[],
+  skipped: SkippedItems = { deps: [], scripts: [], files: [] },
 ) => {
+  const changed =
+    addedDeps.length + addedScripts.length + createdFiles.length > 0
   const parts: string[] = [
-    `Added tools: ${tools.join(', ')}`,
-    '',
-    'Updated package.json:',
+    changed
+      ? `Added tools: ${tools.join(', ')}`
+      : `No changes made for tools: ${tools.join(', ')} (everything already present)`,
   ]
 
-  if (addedDeps.length > 0)
-    parts.push(`  Dependencies: ${addedDeps.join(', ')}`)
-  if (addedScripts.length > 0)
-    parts.push(`  Scripts: ${addedScripts.join(', ')}`)
+  if (addedDeps.length > 0 || addedScripts.length > 0) {
+    parts.push('', 'Updated package.json:')
+    if (addedDeps.length > 0)
+      parts.push(`  Dependencies: ${addedDeps.join(', ')}`)
+    if (addedScripts.length > 0)
+      parts.push(`  Scripts: ${addedScripts.join(', ')}`)
+  }
   if (createdFiles.length > 0) {
     parts.push('', 'Created files:')
     for (const f of createdFiles) parts.push(`  - ${f}`)
   }
-  parts.push('', 'Next: run `bun install` to install dependencies.')
+
+  parts.push(...formatSkipped(skipped))
+
+  if (addedDeps.length > 0)
+    parts.push('', 'Next: run `bun install` to install dependencies.')
 
   return parts.join('\n')
 }
@@ -218,11 +277,9 @@ const registerAddTooling = (server: McpServer) => {
       description:
         'Add @vitus-labs/tools packages to an existing project. Updates package.json with dependencies and scripts, and creates config files as needed.',
       inputSchema: {
-        directory: z
-          .string()
-          .describe(
-            'Absolute path to the project root (must contain package.json)',
-          ),
+        directory: absolutePath(
+          'Absolute path to the project root (must contain package.json)',
+        ),
         tools: z
           .array(z.enum(TOOLS))
           .describe(
@@ -237,35 +294,46 @@ const registerAddTooling = (server: McpServer) => {
       try {
         pkgRaw = readFileSync(pkgPath, 'utf-8')
       } catch {
-        return {
-          content: [
-            {
-              type: 'text' as const,
-              text: `Error: No package.json found in ${directory}. Use scaffold_package to create a new project.`,
-            },
-          ],
-        }
+        return errorResult(
+          `Error: No package.json found in ${directory}. Use scaffold_package to create a new project.`,
+        )
       }
 
-      const pkg = JSON.parse(pkgRaw)
+      let pkg: Record<string, unknown>
+      try {
+        pkg = JSON.parse(pkgRaw)
+      } catch {
+        return errorResult(`Error: ${pkgPath} is not valid JSON.`)
+      }
+
       const allDeps: string[] = []
       const allScripts: string[] = []
       const allFiles: string[] = []
+      const skipped: SkippedItems = { deps: [], scripts: [], files: [] }
 
-      for (const tool of tools) {
-        const result = applyToolAction(pkg, directory, getToolActions(tool))
-        allDeps.push(...result.addedDeps)
-        allScripts.push(...result.addedScripts)
-        allFiles.push(...result.createdFiles)
+      try {
+        for (const tool of tools) {
+          const result = applyToolAction(pkg, directory, getToolActions(tool))
+          allDeps.push(...result.addedDeps)
+          allScripts.push(...result.addedScripts)
+          allFiles.push(...result.createdFiles)
+          skipped.deps.push(...result.skipped.deps)
+          skipped.scripts.push(...result.skipped.scripts)
+          skipped.files.push(...result.skipped.files)
+        }
+
+        writeFileSync(pkgPath, `${JSON.stringify(pkg, null, 2)}\n`)
+      } catch (error) {
+        return errorResult(
+          `Error: failed to update ${directory}: ${error instanceof Error ? error.message : String(error)}`,
+        )
       }
-
-      writeFileSync(pkgPath, `${JSON.stringify(pkg, null, 2)}\n`)
 
       return {
         content: [
           {
             type: 'text' as const,
-            text: formatResult(tools, allDeps, allScripts, allFiles),
+            text: formatResult(tools, allDeps, allScripts, allFiles, skipped),
           },
         ],
       }
@@ -273,4 +341,5 @@ const registerAddTooling = (server: McpServer) => {
   )
 }
 
+export type { SkippedItems }
 export { applyToolAction, formatResult, getToolActions, registerAddTooling }
