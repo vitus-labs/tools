@@ -343,3 +343,26 @@ describe('generateJsonReport', () => {
     }
   })
 })
+
+describe('depTypeDistribution — merged edges', () => {
+  it('counts each dep type of a merged edge while summary counts it once', () => {
+    const data: AnalysisData = {
+      ...richMockData,
+      graph: {
+        nodes: richMockData.graph.nodes,
+        edges: [
+          {
+            source: '@s/a',
+            target: '@s/b',
+            depType: 'dependencies',
+            depTypes: ['dependencies', 'devDependencies'],
+          },
+        ],
+      },
+    }
+    const report = JSON.parse(generateJsonReport(data))
+    expect(report.summary.edges).toBe(1)
+    expect(report.depTypeDistribution.dependencies).toBe(1)
+    expect(report.depTypeDistribution.devDependencies).toBe(1)
+  })
+})

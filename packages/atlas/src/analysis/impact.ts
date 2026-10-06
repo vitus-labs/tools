@@ -17,8 +17,8 @@ export const analyzeImpact = (graph: DepGraph): ImpactResult => {
     const queue = [node.name]
     visited.add(node.name)
 
-    while (queue.length > 0) {
-      const current = queue.shift() as string
+    for (let head = 0; head < queue.length; head++) {
+      const current = queue[head] as string
       for (const dependent of reverseAdj.get(current) ?? []) {
         if (!visited.has(dependent)) {
           visited.add(dependent)

@@ -71,6 +71,7 @@ describe('scanWorkspace', () => {
       source: '@scope/pkg-a',
       target: '@scope/pkg-b',
       depType: 'dependencies',
+      depTypes: ['dependencies'],
     })
   })
 
@@ -193,5 +194,100 @@ describe('scanWorkspace', () => {
 
     const graph = scanWorkspace(baseConfig)
     expect(graph.nodes.map((n) => n.name)).toContain('@scope/linked')
+  })
+})
+
+describe('scanWorkspace — workspace globs', () => {
+  const writeAt = (rel: string, pkg: Record<string, unknown>) => {
+    const dir = join(tmpDir, rel)
+    mkdirSync(dir, { recursive: true })
+    writeFileSync(join(dir, 'package.json'), JSON.stringify(pkg))
+  }
+  const names = (cfg: Partial<AtlasConfig>) =>
+    scanWorkspace({ ...baseConfig, ...cfg })
+      .nodes.map((n) => n.name)
+      .sort()
+
+  it('treats an explicit path as a package, not a parent of packages', () => {
+    writeAt('packages/core', { name: 'core' })
+    writeAt('packages/core/sub', { name: 'core-sub' })
+    expect(names({ workspaces: ['packages/core'] })).toEqual(['core'])
+  })
+
+  it('supports patterns with a suffix after the wildcard', () => {
+    writeAt('packages/a/x', { name: 'a-x' })
+    writeAt('packages/b/x', { name: 'b-x' })
+    writeAt('packages/b/y', { name: 'b-y' })
+    expect(names({ workspaces: ['packages/*/x'] })).toEqual(['a-x', 'b-x'])
+  })
+
+  it('supports ** patterns', () => {
+    writeAt('packages/a', { name: 'a' })
+    writeAt('packages/deep/b', { name: 'b' })
+    expect(names({ workspaces: ['packages/**'] })).toEqual(['a', 'b'])
+  })
+
+  it('honors negated patterns', () => {
+    writeAt('packages/a', { name: 'a' })
+    writeAt('packages/b', { name: 'b' })
+    expect(names({ workspaces: ['packages/*', '!packages/b'] })).toEqual(['a'])
+  })
+
+  it('ignores node_modules', () => {
+    writeAt('packages/a', { name: 'a' })
+    writeAt('packages/a/node_modules/dep', { name: 'dep' })
+    expect(names({ workspaces: ['packages/**'] })).toEqual(['a'])
+  })
+})
+
+describe('scanWorkspace — edges', () => {
+  it('dedupes edges across dep types and keeps the set of types', () => {
+    writePkg('pkg-a', {
+      name: 'a',
+      dependencies: { b: '1.0.0' },
+      devDependencies: { b: '1.0.0' },
+      peerDependencies: { c: '1.0.0' },
+    })
+    writePkg('pkg-b', { name: 'b' })
+    writePkg('pkg-c', { name: 'c' })
+    const graph = scanWorkspace(baseConfig)
+    expect(graph.edges).toHaveLength(2)
+    const ab = graph.edges.find((e) => e.target === 'b')
+    expect(ab?.depType).toBe('dependencies')
+    expect(ab?.depTypes).toEqual(['dependencies', 'devDependencies'])
+  })
+
+  it('picks the strongest type when only peer + dev overlap', () => {
+    writePkg('pkg-a', {
+      name: 'a',
+      devDependencies: { b: '1.0.0' },
+      peerDependencies: { b: '1.0.0' },
+    })
+    writePkg('pkg-b', { name: 'b' })
+    const graph = scanWorkspace(baseConfig)
+    expect(graph.edges).toEqual([
+      {
+        source: 'a',
+        target: 'b',
+        depType: 'peerDependencies',
+        depTypes: ['peerDependencies', 'devDependencies'],
+      },
+    ])
+  })
+})
+
+describe('scanWorkspace — include/exclude matching', () => {
+  it('exclude with a plain name is an exact match, not a substring', () => {
+    writePkg('core', { name: 'core' })
+    writePkg('core-utils', { name: 'core-utils' })
+    const graph = scanWorkspace({ ...baseConfig, exclude: ['core'] })
+    expect(graph.nodes.map((n) => n.name)).toEqual(['core-utils'])
+  })
+
+  it('wildcard patterns still match', () => {
+    writePkg('core', { name: 'core' })
+    writePkg('core-utils', { name: 'core-utils' })
+    const graph = scanWorkspace({ ...baseConfig, exclude: ['core*'] })
+    expect(graph.nodes).toHaveLength(0)
   })
 })

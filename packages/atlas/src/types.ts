@@ -10,7 +10,10 @@ export interface DepNode {
 export interface DepEdge {
   source: string
   target: string
+  /** Strongest dep type for this edge (dependencies > peer > dev). */
   depType: DepType
+  /** Every dep type this source -> target relation appears under. */
+  depTypes?: DepType[]
 }
 
 export interface DepGraph {

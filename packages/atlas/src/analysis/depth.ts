@@ -54,8 +54,8 @@ const topoSort = (graph: DepGraph, adj: Map<string, string[]>): string[] => {
   }
 
   const topoOrder: string[] = []
-  while (queue.length > 0) {
-    const u = queue.shift() as string
+  for (let head = 0; head < queue.length; head++) {
+    const u = queue[head] as string
     topoOrder.push(u)
     for (const v of adj.get(u) ?? []) {
       const newDeg = (inDegree.get(v) ?? 1) - 1

@@ -162,3 +162,20 @@ describe('renderGraph', () => {
     expect(result.reportPath).toBeUndefined()
   })
 })
+
+describe('renderGraph — report validation and paths', () => {
+  it('throws on an unknown report format instead of silently skipping', async () => {
+    await expect(
+      renderGraph(mockData, { ...mockConfig, report: 'xml' as never }),
+    ).rejects.toThrow(/unknown report format "xml"/)
+  })
+
+  it('returns every written report path when report is true', async () => {
+    const result = await renderGraph(mockData, { ...mockConfig, report: true })
+    expect(result.reportPaths).toHaveLength(2)
+    expect(result.reportPaths?.some((p) => p.endsWith('-report.json'))).toBe(
+      true,
+    )
+    expect(result.reportPaths?.some((p) => p.endsWith('-report.md'))).toBe(true)
+  })
+})

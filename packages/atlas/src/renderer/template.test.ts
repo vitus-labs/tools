@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import baseConfig from '../config/baseConfig.ts'
 import type { AnalysisData, AtlasConfig } from '../types.ts'
 import { buildHtml } from './template.ts'
 
@@ -73,5 +74,42 @@ describe('buildHtml', () => {
     expect(html).toContain('<!DOCTYPE html>')
     expect(html).toContain('<html')
     expect(html).toContain('</html>')
+  })
+})
+
+describe('buildHtml — escaping and SRI', () => {
+  it('HTML-escapes the title', () => {
+    const html = buildHtml(mockData, {
+      ...mockConfig,
+      title: '<script>alert(1)</script> & "x"',
+    })
+    expect(html).not.toContain('<script>alert(1)</script>')
+    expect(html).toContain(
+      '&lt;script&gt;alert(1)&lt;/script&gt; &amp; &quot;x&quot;',
+    )
+  })
+
+  it('does not let a package name break out of the data script', () => {
+    const evil = '</script><img src=x onerror=alert(1)>'
+    const data: AnalysisData = {
+      ...mockData,
+      graph: {
+        nodes: [{ name: evil, version: '1.0.0', path: '/x', private: false }],
+        edges: [],
+      },
+    }
+    const html = buildHtml(data, mockConfig)
+    expect(html).not.toContain(evil)
+    expect(html).toContain('\\u003c/script>')
+  })
+
+  it('emits the SRI hash only for the default echarts URL', () => {
+    const custom = buildHtml(mockData, mockConfig)
+    expect(custom).not.toContain('integrity=')
+    const def = buildHtml(mockData, {
+      ...mockConfig,
+      echartsCdn: baseConfig.echartsCdn,
+    })
+    expect(def).toContain('integrity="sha384-')
   })
 })

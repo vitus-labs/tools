@@ -1,5 +1,6 @@
 import { execFileSync } from 'node:child_process'
-import { relative } from 'node:path'
+import { realpathSync } from 'node:fs'
+import { relative, sep } from 'node:path'
 import type { ChangeFrequencyResult, DepGraph, ImpactResult } from '../types.ts'
 
 const isGitRepo = (): boolean => {
@@ -11,6 +12,27 @@ const isGitRepo = (): boolean => {
   }
 }
 
+const safeRealpath = (p: string): string => {
+  try {
+    return realpathSync(p)
+  } catch {
+    return p
+  }
+}
+
+const getRepoRoot = (cwd: string): string | null => {
+  try {
+    const out = execFileSync('git', ['rev-parse', '--show-toplevel'], {
+      cwd,
+      encoding: 'utf-8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim()
+    return out ? safeRealpath(out) : null
+  } catch {
+    return null
+  }
+}
+
 const COMMIT_MARKER = '__COMMIT__'
 
 const runFullGitLog = (cwd: string): string | null => {
@@ -18,6 +40,8 @@ const runFullGitLog = (cwd: string): string | null => {
     return execFileSync(
       'git',
       [
+        '-c',
+        'core.quotepath=off',
         'log',
         '--since=90.days',
         '--name-only',
@@ -40,10 +64,13 @@ const runFullGitLog = (cwd: string): string | null => {
 // from `pkg-a-extra/`.
 const buildPathIndex = (
   graph: DepGraph,
-  cwd: string,
+  repoRoot: string,
 ): { prefix: string; name: string }[] =>
   graph.nodes
-    .map((n) => ({ prefix: `${relative(cwd, n.path)}/`, name: n.name }))
+    .map((n) => ({
+      prefix: `${relative(repoRoot, safeRealpath(n.path)).split(sep).join('/')}/`,
+      name: n.name,
+    }))
     .sort((a, b) => b.prefix.length - a.prefix.length)
 
 const matchPackage = (
@@ -84,10 +111,14 @@ const collectFrequencyMap = (
   const out: ChangeFrequencyResult['frequencyMap'] = {}
   for (const n of graph.nodes) out[n.name] = { commits: 0, lastChanged: '' }
 
+  // `git log --name-only` paths are relative to the repo root, not cwd.
+  const repoRoot = getRepoRoot(cwd)
+  if (repoRoot === null) return out
+
   const log = runFullGitLog(cwd)
   if (log === null) return out
 
-  const index = buildPathIndex(graph, cwd)
+  const index = buildPathIndex(graph, repoRoot)
   const seenForCommit = new Set<string>()
   let date = ''
 
