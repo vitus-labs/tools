@@ -1,15 +1,41 @@
+import baseConfig from '../config/baseConfig.ts'
 import type { AnalysisData, AtlasConfig } from '../types.ts'
 
+const DEFAULT_ECHARTS_CDN = baseConfig.echartsCdn
+const ECHARTS_INTEGRITY =
+  'sha384-4BgDtWiMQ6LkjslUOSIQCXQmx4ZytjTmbU5Pv4dtJVDQxF5xVB2H2CEDoiZCXpXy'
+
+const escapeHtml = (s: string): string =>
+  s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+
+/** JSON safe to embed inside an inline `<script>` element. */
+const safeJson = (value: unknown): string =>
+  JSON.stringify(value)
+    .replace(/</g, '\\u003c')
+    .replace(/\u2028/g, '\\u2028')
+    .replace(/\u2029/g, '\\u2029')
+
 export const buildHtml = (data: AnalysisData, config: AtlasConfig): string => {
-  const graphJson = JSON.stringify(data)
+  const graphJson = safeJson(data)
+  const title = escapeHtml(config.title)
+  // The SRI hash only matches the default build; a custom URL would be blocked.
+  const integrity =
+    config.echartsCdn === DEFAULT_ECHARTS_CDN
+      ? ` integrity="${ECHARTS_INTEGRITY}"`
+      : ''
 
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>${config.title}</title>
-<script src="${config.echartsCdn}" integrity="sha384-4BgDtWiMQ6LkjslUOSIQCXQmx4ZytjTmbU5Pv4dtJVDQxF5xVB2H2CEDoiZCXpXy" crossorigin="anonymous"></script>
+<title>${title}</title>
+<script src="${escapeHtml(config.echartsCdn)}"${integrity} crossorigin="anonymous"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -160,7 +186,7 @@ export const buildHtml = (data: AnalysisData, config: AtlasConfig): string => {
 <body>
 
 <div id="sidebar">
-  <h1>${config.title}</h1>
+  <h1>${title}</h1>
 
   <div class="sidebar-section">
     <h2>Chart Type</h2>

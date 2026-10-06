@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { DepGraph } from '../types.ts'
+import type { DepGraph, DepType } from '../types.ts'
 import { detectCycles } from './cycles.ts'
 
 const node = (name: string) => ({
@@ -73,5 +73,29 @@ describe('detectCycles', () => {
     const result = detectCycles(graph)
     expect(result.hasCycles).toBe(false)
     expect(result.cycles).toHaveLength(0)
+  })
+})
+
+describe('detectCycles — duplicate edges', () => {
+  it('reports a cycle once when edges are duplicated per dep type', () => {
+    const e = (source: string, target: string, depType: DepType) => ({
+      source,
+      target,
+      depType,
+    })
+    const graph: DepGraph = {
+      nodes: ['a', 'b'].map((name) => ({
+        name,
+        version: '1.0.0',
+        path: `/${name}`,
+        private: false,
+      })),
+      edges: [
+        e('a', 'b', 'dependencies'),
+        e('a', 'b', 'devDependencies'),
+        e('b', 'a', 'peerDependencies'),
+      ],
+    }
+    expect(detectCycles(graph).cycles).toEqual([['a', 'b']])
   })
 })

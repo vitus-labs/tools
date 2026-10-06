@@ -7,13 +7,13 @@ import {
   detectCycles,
   detectVersionDrift,
 } from './analysis/index.ts'
-import { renderGraph } from './renderer/renderer.ts'
+import { type RenderResult, renderGraph } from './renderer/renderer.ts'
 import { scanWorkspace } from './scanner/scanner.ts'
 import type { AnalysisData, AtlasConfig } from './types.ts'
 
 export const generateAtlas = async (
   config: AtlasConfig,
-): Promise<{ htmlPath: string; reportPath?: string }> => {
+): Promise<RenderResult> => {
   const graph = scanWorkspace(config)
 
   console.log(
@@ -61,8 +61,9 @@ export const generateAtlas = async (
   const result = await renderGraph(data, config)
 
   console.log(`Atlas: written ${result.htmlPath}`)
-  if (result.reportPath) {
-    console.log(`Atlas: report ${result.reportPath}`)
+  for (const path of result.reportPaths ??
+    (result.reportPath ? [result.reportPath] : [])) {
+    console.log(`Atlas: report ${path}`)
   }
 
   return result

@@ -57,3 +57,17 @@ describe('analyzeImpact', () => {
     expect(result.impactMap.b).toEqual([])
   })
 })
+
+describe('analyzeImpact — large graphs', () => {
+  it('handles a long chain', () => {
+    const n = 800
+    const names = Array.from({ length: n }, (_, i) => `p${i}`)
+    const graph: DepGraph = {
+      nodes: names.map(node),
+      edges: names.slice(1).map((name, i) => edge(name, names[i] as string)),
+    }
+    const result = analyzeImpact(graph)
+    expect(result.impactMap.p0).toHaveLength(n - 1)
+    expect(result.impactMap[`p${n - 1}`]).toEqual([])
+  })
+})

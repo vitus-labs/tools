@@ -44,6 +44,7 @@ const fakeLog = (
 const mockSingleGitLog = (output: string) => {
   mockedExecFileSync.mockImplementation((_cmd: string, args?: string[]) => {
     const argsStr = (args ?? []).join(' ')
+    if (argsStr.includes('--show-toplevel')) return '/\n'
     if (argsStr.includes('rev-parse')) return ''
     if (argsStr.includes('--name-only')) return output
     return ''
@@ -176,5 +177,42 @@ describe('analyzeChangeFrequency', () => {
 
     const result = analyzeChangeFrequency(multiGraph, multiImpact)
     expect(result?.hotspots).toContain('a')
+  })
+})
+
+describe('analyzeChangeFrequency — subdirectory cwd', () => {
+  it('matches repo-root-relative git paths when cwd is a subdirectory', () => {
+    vi.spyOn(process, 'cwd').mockReturnValue('/repo/sub')
+    const calls: string[][] = []
+    mockedExecFileSync.mockImplementation((_cmd: string, args?: string[]) => {
+      const a = args ?? []
+      calls.push(a)
+      const str = a.join(' ')
+      if (str.includes('--show-toplevel')) return '/repo\n'
+      if (str.includes('--name-only'))
+        return fakeLog([
+          {
+            hash: 'h1',
+            date: '2026-02-20T10:00:00+01:00',
+            files: ['sub/packages/a/src/index.ts'],
+          },
+        ])
+      return ''
+    })
+    const g: DepGraph = {
+      nodes: [
+        {
+          name: 'a',
+          version: '1.0.0',
+          path: '/repo/sub/packages/a',
+          private: false,
+        },
+      ],
+      edges: [],
+    }
+    const result = analyzeChangeFrequency(g, impact)
+    expect(result?.frequencyMap.a?.commits).toBe(1)
+    const logCall = calls.find((c) => c.includes('--name-only')) ?? []
+    expect(logCall.slice(0, 2)).toEqual(['-c', 'core.quotepath=off'])
   })
 })

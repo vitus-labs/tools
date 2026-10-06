@@ -53,7 +53,7 @@ export const buildReportData = (data: AnalysisData): ReportJson => {
     peerDependencies: 0,
   }
   for (const edge of graph.edges) {
-    depTypeDistribution[edge.depType]++
+    for (const t of edge.depTypes ?? [edge.depType]) depTypeDistribution[t]++
   }
 
   // Direct dep count per package

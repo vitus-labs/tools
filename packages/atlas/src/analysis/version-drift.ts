@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { manifests } from '../scanner/manifests.ts'
 import type { DepGraph, VersionDriftResult } from '../types.ts'
 
 const DEP_FIELDS = [
@@ -75,7 +76,9 @@ export const detectVersionDrift = (graph: DepGraph): VersionDriftResult => {
   const nodeNames = new Set(graph.nodes.map((n) => n.name))
 
   for (const node of graph.nodes) {
-    const pkg = readPkg(node.path)
+    const pkg =
+      (manifests.get(node) as Parameters<typeof collectDepsFromPkg>[0]) ??
+      readPkg(node.path)
     if (!pkg) continue
     collectDepsFromPkg(pkg, node.name, nodeNames, versionMap)
   }

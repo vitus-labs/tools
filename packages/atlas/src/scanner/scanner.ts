@@ -1,5 +1,6 @@
-import { readdirSync, readFileSync, statSync } from 'node:fs'
-import { join, resolve } from 'node:path'
+import { readFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { globSync } from 'tinyglobby'
 import type {
   AtlasConfig,
   DepEdge,
@@ -7,15 +8,13 @@ import type {
   DepNode,
   DepType,
 } from '../types.ts'
+import { manifests, type PackageJson } from './manifests.ts'
 
-interface PackageJson {
-  name?: string
-  version?: string
-  private?: boolean
-  dependencies?: Record<string, string>
-  devDependencies?: Record<string, string>
-  peerDependencies?: Record<string, string>
-}
+const DEP_TYPE_PRIORITY: DepType[] = [
+  'dependencies',
+  'peerDependencies',
+  'devDependencies',
+]
 
 const readPackageJson = (dir: string): PackageJson | null => {
   try {
@@ -36,7 +35,7 @@ const matchesAny = (name: string, patterns: string[]): boolean =>
       const regex = new RegExp(`^${escapeRegExp(p).replace(/\*/g, '.*')}$`)
       return regex.test(name)
     }
-    return name === p || name.includes(p)
+    return name === p
   })
 
 const stripTrailingSlashes = (s: string): string => {
@@ -45,36 +44,39 @@ const stripTrailingSlashes = (s: string): string => {
   return trimmed
 }
 
-const listDirectories = (base: string): string[] => {
-  try {
-    const result: string[] = []
-    for (const entry of readdirSync(base, { withFileTypes: true })) {
-      const p = join(base, entry.name)
-      if (entry.isDirectory()) {
-        result.push(p)
-      } else if (entry.isSymbolicLink()) {
-        // Dirent.isDirectory() is false for symlinks; statSync follows
-        // the link. Monorepos symlink package dirs, so resolve those.
-        try {
-          if (statSync(p).isDirectory()) result.push(p)
-        } catch {
-          // broken symlink — skip
-        }
-      }
-    }
-    return result
-  } catch {
-    return []
-  }
+const normalizePattern = (pattern: string): string => {
+  let p = stripTrailingSlashes(pattern.trim())
+  while (p.startsWith('./')) p = p.slice(2)
+  return p
 }
 
+/**
+ * Resolve workspace globs to package directories. Each positive pattern
+ * matches `<pattern>/package.json`; `!`-prefixed patterns exclude.
+ */
 const resolveWorkspaceDirs = (workspaces: string[], cwd: string): string[] => {
-  return workspaces.flatMap((pattern) => {
-    const starIdx = pattern.indexOf('*')
-    const stripped = starIdx >= 0 ? pattern.slice(0, starIdx) : pattern
-    const base = resolve(cwd, stripTrailingSlashes(stripped))
-    return listDirectories(base)
+  const include: string[] = []
+  const ignore: string[] = ['**/node_modules/**']
+  for (const raw of workspaces) {
+    if (raw.startsWith('!')) {
+      const neg = normalizePattern(raw.slice(1))
+      if (neg) ignore.push(neg, `${neg}/**`)
+      continue
+    }
+    const p = normalizePattern(raw)
+    if (!p) continue
+    include.push(p.endsWith('package.json') ? p : `${p}/package.json`)
+  }
+  if (include.length === 0) return []
+
+  const files = globSync(include, {
+    cwd,
+    ignore,
+    absolute: true,
+    onlyFiles: true,
+    followSymbolicLinks: true,
   })
+  return [...new Set(files.map((f) => dirname(f)))].sort()
 }
 
 const shouldIncludePackage = (name: string, config: AtlasConfig): boolean => {
@@ -103,12 +105,14 @@ const collectNodes = (
     if (!pkg?.name) continue
     if (!shouldIncludePackage(pkg.name, config)) continue
 
-    nodes.push({
+    const node: DepNode = {
       name: pkg.name,
       version: pkg.version ?? '0.0.0',
       path: dir,
       private: pkg.private ?? false,
-    })
+    }
+    nodes.push(node)
+    manifests.set(node, pkg)
 
     const depEntries: { deps: Record<string, string>; depType: DepType }[] = []
     for (const depType of config.depTypes) {
@@ -123,24 +127,43 @@ const collectNodes = (
   return { nodes, pkgDeps }
 }
 
+type MergedEdge = { source: string; target: string; types: Set<DepType> }
+
+const addEdge = (
+  merged: Map<string, MergedEdge>,
+  source: string,
+  target: string,
+  depType: DepType,
+): void => {
+  const key = `${source}\u0000${target}`
+  const entry = merged.get(key)
+  if (entry) entry.types.add(depType)
+  else merged.set(key, { source, target, types: new Set([depType]) })
+}
+
 const collectEdges = (
   nodes: DepNode[],
   pkgDeps: Map<string, { deps: Record<string, string>; depType: DepType }[]>,
 ): DepEdge[] => {
   const nodeNames = new Set(nodes.map((n) => n.name))
-  const edges: DepEdge[] = []
+  // One edge per (source, target); the set of dep types it appears under
+  // is kept in `depTypes`, `depType` is the strongest one.
+  const merged = new Map<string, MergedEdge>()
 
   for (const [source, depEntries] of pkgDeps) {
     for (const { deps, depType } of depEntries) {
       for (const target of Object.keys(deps)) {
         if (nodeNames.has(target) && target !== source) {
-          edges.push({ source, target, depType })
+          addEdge(merged, source, target, depType)
         }
       }
     }
   }
 
-  return edges
+  return [...merged.values()].map(({ source, target, types }) => {
+    const depTypes = DEP_TYPE_PRIORITY.filter((t) => types.has(t))
+    return { source, target, depType: depTypes[0] as DepType, depTypes }
+  })
 }
 
 export const scanWorkspace = (config: AtlasConfig): DepGraph => {

@@ -120,3 +120,24 @@ describe('detectVersionDrift', () => {
     expect(result.drifts[0]?.dependency).toBe('react')
   })
 })
+
+describe('detectVersionDrift — parsed manifests', () => {
+  it('reuses manifests parsed by the scanner instead of re-reading', async () => {
+    const { manifests } = await import('../scanner/manifests.ts')
+    const mk = (name: string, v: string) => {
+      const n = {
+        name,
+        version: '1.0.0',
+        path: join(tmpDir, 'does-not-exist', name),
+        private: false,
+      }
+      manifests.set(n, { name, dependencies: { react: v } })
+      return n
+    }
+    const graph: DepGraph = {
+      nodes: [mk('a', '^18'), mk('b', '^19')],
+      edges: [],
+    }
+    expect(detectVersionDrift(graph).hasDrifts).toBe(true)
+  })
+})

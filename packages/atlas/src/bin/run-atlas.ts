@@ -31,6 +31,26 @@ program.parse()
 
 const opts = program.opts()
 
+const DEP_TYPES: DepType[] = [
+  'dependencies',
+  'devDependencies',
+  'peerDependencies',
+]
+const REPORT_FORMATS = ['markdown', 'json']
+
+for (const t of opts.depTypes ?? []) {
+  if (!DEP_TYPES.includes(t)) {
+    program.error(
+      `Invalid --dep-types value "${t}" (expected: ${DEP_TYPES.join(', ')})`,
+    )
+  }
+}
+if (typeof opts.report === 'string' && !REPORT_FORMATS.includes(opts.report)) {
+  program.error(
+    `Invalid --report value "${opts.report}" (expected: ${REPORT_FORMATS.join(', ')})`,
+  )
+}
+
 const config: AtlasConfig = {
   workspaces: opts.workspaces ?? CONFIG.workspaces,
   depTypes: (opts.depTypes ?? CONFIG.depTypes) as DepType[],
