@@ -62,7 +62,7 @@ Note: PKG, VL_CONFIG, TS_CONFIG use top-level await (side effects at import time
   },
   {
     name: 'typescript',
-    description: 'Shared TypeScript configuration presets (lib + nextjs)',
+    description: 'Shared TypeScript configuration presets (lib, node, nextjs)',
     content: `# @vitus-labs/tools-typescript
 
 Shared TypeScript configuration presets. Peer dep: typescript 6.x or 7.x.
@@ -75,23 +75,29 @@ Shared TypeScript configuration presets. Peer dep: typescript 6.x or 7.x.
 \`\`\`
 Settings: target ES2024, module Preserve, moduleResolution Bundler, strict, noUncheckedIndexedAccess, jsx react-jsx, declaration + declarationMap + sourceMap, verbatimModuleSyntax.
 
+### node — for Node.js packages and CLIs
+\`\`\`json
+{ "extends": "@vitus-labs/tools-typescript/node" }
+\`\`\`
+Settings: target ES2024, module NodeNext, moduleResolution NodeNext, rewriteRelativeImportExtensions (write \`.ts\` in relative imports, tsc emits \`.js\`), strict, noUncheckedIndexedAccess, declaration + declarationMap + sourceMap, verbatimModuleSyntax, no DOM lib.
+
 ### nextjs — for Next.js apps
 \`\`\`json
 { "extends": "@vitus-labs/tools-typescript/nextjs" }
 \`\`\`
-Settings: target ES2024, module ESNext, jsx preserve, incremental.`,
+Settings: target ES2024, module ESNext, moduleResolution Bundler, jsx preserve, incremental, strict, noUncheckedIndexedAccess.`,
   },
   {
     name: 'lint',
     description: 'Shared Biome configuration for formatting and linting',
     content: `# @vitus-labs/tools-lint
 
-Shared Biome configuration.
+Shared Biome configuration. Ships @biomejs/biome as a dependency.
 
 ## Usage
 \`\`\`json
 {
-  "$schema": "https://biomejs.dev/schemas/2.4.7/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.5.10/schema.json",
   "extends": ["@vitus-labs/tools-lint/biome"]
 }
 \`\`\`
@@ -110,7 +116,7 @@ Pre-declared: __BROWSER__, __NATIVE__, __NODE__, __WEB__, __CLIENT__, __VERSION_
     description: 'Shared Vitest configuration with coverage thresholds',
     content: `# @vitus-labs/tools-vitest
 
-Shared Vitest configuration. Peer dep: vitest >= 4.
+Shared Vitest configuration. Peer deps: vitest >= 4, vite ^8.2.2.
 
 ## Usage
 \`\`\`ts
@@ -130,11 +136,14 @@ export default createVitestConfig()
 | pool | 'threads' | Worker pool |
 | include | — | Extra test patterns |
 | exclude | — | Extra exclude patterns |
+| coverageInclude | — | Extra coverage includes |
 | coverageExclude | — | Extra coverage excludes |
 | coverageThresholds | 90% all | Override thresholds |
 
+createVitestConfig also accepts a string array (shorthand for coverageExclude).
+
 ## Defaults
-Node environment, globals enabled, mock reset, V8 coverage, 90% thresholds.`,
+Node environment, globals enabled, mock reset, V8 coverage, 90% thresholds. Tests: src/**/*.test.ts(x). Coverage covers src/**/*.ts(x), excluding tests, index.ts files and src/bin/**.`,
   },
   {
     name: 'rolldown',

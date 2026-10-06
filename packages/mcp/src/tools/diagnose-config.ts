@@ -1,7 +1,7 @@
-import { accessSync, readdirSync, readFileSync } from 'node:fs'
+import { accessSync, type Dirent, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
-import { z } from 'zod'
+import { absolutePath } from './utils.ts'
 
 interface Issue {
   severity: 'error' | 'warning' | 'info'
@@ -23,6 +23,27 @@ const fileExists = (filePath: string): boolean => {
 const readJson = (filePath: string): Record<string, unknown> | null => {
   try {
     return JSON.parse(readFileSync(filePath, 'utf-8'))
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Remove comments and trailing commas from JSONC text (e.g. tsconfig.json)
+ * without touching anything inside string literals.
+ */
+const COMMENTS_AND_STRINGS = /"(?:[^"\\]|\\.)*"|\/\/[^\n]*|\/\*[\s\S]*?\*\//g
+const TRAILING_COMMAS_AND_STRINGS = /"(?:[^"\\]|\\.)*"|,(?=\s*[}\]])/g
+
+const stripJsonc = (text: string): string =>
+  text
+    .replace(/^﻿/, '')
+    .replace(COMMENTS_AND_STRINGS, (m) => (m.startsWith('"') ? m : ' '))
+    .replace(TRAILING_COMMAS_AND_STRINGS, (m) => (m === ',' ? '' : m))
+
+const readJsonc = (filePath: string): Record<string, unknown> | null => {
+  try {
+    return JSON.parse(stripJsonc(readFileSync(filePath, 'utf-8')))
   } catch {
     return null
   }
@@ -53,16 +74,24 @@ const checkTsConfig = (directory: string): Issue[] => {
     ]
   }
 
-  const tsConfig = readJson(tsConfigPath)
+  const tsConfig = readJsonc(tsConfigPath)
   if (!tsConfig) return []
 
-  const ext = tsConfig.extends as string | undefined
-  if (ext && !ext.includes('@vitus-labs/tools-typescript')) {
+  // `extends` may be a string or (TS 5+) an array of strings
+  const rawExtends = tsConfig.extends
+  const extendsList = (
+    Array.isArray(rawExtends) ? rawExtends : [rawExtends]
+  ).filter((e): e is string => typeof e === 'string' && e.length > 0)
+
+  if (
+    extendsList.length > 0 &&
+    !extendsList.some((e) => e.includes('@vitus-labs/tools-typescript'))
+  ) {
     return [
       {
         severity: 'info',
-        message: `tsconfig.json extends "${ext}" instead of @vitus-labs/tools-typescript`,
-        fix: 'Consider using @vitus-labs/tools-typescript/lib or /nextjs preset',
+        message: `tsconfig.json extends ${extendsList.map((e) => `"${e}"`).join(', ')} instead of @vitus-labs/tools-typescript`,
+        fix: 'Consider using @vitus-labs/tools-typescript/lib, /node or /nextjs preset',
       },
     ]
   }
@@ -70,18 +99,23 @@ const checkTsConfig = (directory: string): Issue[] => {
   return []
 }
 
+const ESLINT_CONFIGS = [
+  '.eslintrc',
+  '.eslintrc.js',
+  '.eslintrc.cjs',
+  '.eslintrc.json',
+  '.eslintrc.yml',
+  '.eslintrc.yaml',
+  ...['js', 'mjs', 'cjs', 'ts', 'mts', 'cts'].map((e) => `eslint.config.${e}`),
+]
+
 const checkBiome = (directory: string): Issue[] => {
   const hasBiome = ['biome.json', 'biome.jsonc'].some((f) =>
     fileExists(join(directory, f)),
   )
   if (hasBiome) return []
 
-  const hasEslint = [
-    '.eslintrc',
-    '.eslintrc.js',
-    '.eslintrc.json',
-    '.eslintrc.yml',
-  ].some((f) => fileExists(join(directory, f)))
+  const hasEslint = ESLINT_CONFIGS.some((f) => fileExists(join(directory, f)))
 
   if (hasEslint) {
     return [
@@ -142,19 +176,28 @@ const checkExports = (pkg: Record<string, unknown>): Issue[] => {
   return issues
 }
 
+const SOURCE_FILE = /\.(tsx?|mts|cts)$/
+const EXCLUDED_SOURCE_FILE =
+  /(\.d\.(ts|mts|cts)|\.(test|spec)\.(tsx?|mts|cts))$/
+
+// Only dependency folders are skipped: `src/lib/**` is regular source code
+// (build output lives at the project root, outside the scanned `src`).
 const findTsFiles = (dir: string, files: string[] = []): string[] => {
-  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+  let entries: Dirent[]
+  try {
+    entries = readdirSync(dir, { withFileTypes: true })
+  } catch {
+    return files
+  }
+
+  for (const entry of entries) {
     const full = join(dir, entry.name)
-    if (
-      entry.isDirectory() &&
-      entry.name !== 'node_modules' &&
-      entry.name !== 'lib'
-    ) {
-      findTsFiles(full, files)
+    if (entry.isDirectory()) {
+      if (entry.name !== 'node_modules') findTsFiles(full, files)
     } else if (
       entry.isFile() &&
-      /\.tsx?$/.test(entry.name) &&
-      !entry.name.endsWith('.test.ts')
+      SOURCE_FILE.test(entry.name) &&
+      !EXCLUDED_SOURCE_FILE.test(entry.name)
     ) {
       files.push(full)
     }
@@ -162,26 +205,55 @@ const findTsFiles = (dir: string, files: string[] = []): string[] => {
   return files
 }
 
+const MAX_IMPORT_ISSUES = 20
+
+// Extensions that make a relative specifier explicit (code, data, assets)
+const KNOWN_EXTENSION =
+  /\.(m?[jt]sx?|c[jt]s|json|node|wasm|css|scss|sass|less|styl|svg|png|jpe?g|gif|webp|avif|ico|html?|mdx?|txt|ya?ml|csv|woff2?|ttf|otf|eot|mp[34]|webm)$/i
+
+const RELATIVE_SPECIFIER =
+  /(?:\bfrom\s*|\bimport\s*\(?\s*)(['"])(\.{1,2}(?:\/[^'"\n]*)?)\1/g
+
+const hasExplicitExtension = (specifier: string): boolean =>
+  KNOWN_EXTENSION.test(specifier.split(/[?#]/)[0] ?? specifier)
+
 const checkEsmImports = (directory: string): Issue[] => {
   const srcDir = join(directory, 'src')
   if (!fileExists(srcDir)) return []
 
   const issues: Issue[] = []
-  const tsFiles = findTsFiles(srcDir)
+  let total = 0
 
-  for (const file of tsFiles.slice(0, 20)) {
-    const content = readFileSync(file, 'utf-8')
-    const relativeImports = content.match(/from\s+['"]\..*?['"]/g) || []
-    for (const imp of relativeImports) {
-      if (!/\.(js|jsx|ts|tsx|json)['"]\s*$/.test(imp)) {
+  for (const file of findTsFiles(srcDir)) {
+    let content: string
+    try {
+      content = readFileSync(file, 'utf-8')
+    } catch {
+      continue
+    }
+
+    const seen = new Set<string>()
+    for (const match of content.matchAll(RELATIVE_SPECIFIER)) {
+      const specifier = match[2] as string
+      if (hasExplicitExtension(specifier) || seen.has(specifier)) continue
+      seen.add(specifier)
+      total++
+
+      if (issues.length < MAX_IMPORT_ISSUES) {
         issues.push({
           severity: 'error',
-          message: `Missing extension in relative import: ${imp} (${file.replace(directory, '.')})`,
+          message: `Missing extension in relative import: '${specifier}' (${file.replace(directory, '.')})`,
           fix: 'ESM requires explicit extensions on relative imports — use ".ts"/".tsx" with rewriteRelativeImportExtensions, or ".js"',
         })
-        break
       }
     }
+  }
+
+  if (total > issues.length) {
+    issues.push({
+      severity: 'error',
+      message: `...and ${total - issues.length} more relative import(s) without an extension`,
+    })
   }
 
   return issues
@@ -190,7 +262,11 @@ const checkEsmImports = (directory: string): Issue[] => {
 const SCRIPT_DEP_MAP: Array<{ pattern: string; dep: string }> = [
   { pattern: 'vl_build', dep: '@vitus-labs/tools-rollup' },
   { pattern: 'vl_rolldown', dep: '@vitus-labs/tools-rolldown' },
+  // also matches vl_stories-build, vl_stories-monorepo[-build]
   { pattern: 'vl_stories', dep: '@vitus-labs/tools-storybook' },
+  { pattern: 'vl_favicon', dep: '@vitus-labs/tools-favicon' },
+  { pattern: 'vl_atlas', dep: '@vitus-labs/tools-atlas' },
+  { pattern: 'vl_mcp', dep: '@vitus-labs/tools-mcp' },
 ]
 
 const checkMissingDeps = (pkg: Record<string, unknown>): Issue[] => {
@@ -255,9 +331,9 @@ const registerDiagnoseConfig = (server: McpServer) => {
       description:
         'Analyze a project for @vitus-labs/tools configuration issues. Checks package.json, tsconfig, biome, ESM imports, missing dependencies, and more.',
       inputSchema: {
-        directory: z
-          .string()
-          .describe('Absolute path to the project root to diagnose'),
+        directory: absolutePath(
+          'Absolute path to the project root to diagnose',
+        ),
       },
     },
     async ({ directory }) => {
@@ -276,11 +352,18 @@ const registerDiagnoseConfig = (server: McpServer) => {
 
       const summary = `\n---\nSummary: ${errors} error(s), ${warnings} warning(s), ${issues.length} total issue(s)`
 
+      // Findings are a normal result; only an unusable project (no readable
+      // package.json) means the diagnosis itself could not run.
+      const unusable =
+        !fileExists(join(directory, 'package.json')) ||
+        !readJson(join(directory, 'package.json'))
+
       return {
+        ...(unusable ? { isError: true as const } : {}),
         content: [{ type: 'text' as const, text: text + summary }],
       }
     },
   )
 }
 
-export { diagnose, registerDiagnoseConfig }
+export { diagnose, registerDiagnoseConfig, stripJsonc }

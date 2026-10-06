@@ -20,7 +20,7 @@ describe('scaffoldLibrary', () => {
   })
 
   it('should create all library project files', () => {
-    const files = scaffoldLibrary(dir, '@test/my-lib')
+    const { created: files } = scaffoldLibrary(dir, '@test/my-lib')
 
     expect(files).toContain('package.json')
     expect(files).toContain('tsconfig.json')
@@ -68,7 +68,7 @@ describe('scaffoldNextjs', () => {
   })
 
   it('should create Next.js project files', () => {
-    const files = scaffoldNextjs(dir, 'my-app')
+    const { created: files } = scaffoldNextjs(dir, 'my-app')
 
     expect(files).toContain('package.json')
     expect(files).toContain('next.config.ts')
@@ -99,7 +99,7 @@ describe('scaffoldStorybook', () => {
   })
 
   it('should create Storybook project files', () => {
-    const files = scaffoldStorybook(dir, 'my-stories')
+    const { created: files } = scaffoldStorybook(dir, 'my-stories')
 
     expect(files).toContain('.storybook/main.ts')
     expect(files).toContain('.storybook/preview.ts')

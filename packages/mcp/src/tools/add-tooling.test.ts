@@ -2,6 +2,7 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { VERSIONS } from '../versions.ts'
 import { applyToolAction, formatResult, getToolActions } from './add-tooling.ts'
 
 describe('getToolActions', () => {
@@ -9,7 +10,7 @@ describe('getToolActions', () => {
     const actions = getToolActions('typescript')
     expect(actions.devDependencies).toBeDefined()
     expect(actions.devDependencies?.['@vitus-labs/tools-typescript']).toBe(
-      'latest',
+      VERSIONS.vitusLabs,
     )
   })
 
@@ -21,7 +22,9 @@ describe('getToolActions', () => {
 
   it('should return dependencies (not devDependencies) for nextjs tool', () => {
     const actions = getToolActions('nextjs')
-    expect(actions.dependencies?.['@vitus-labs/tools-nextjs']).toBe('latest')
+    expect(actions.dependencies?.['@vitus-labs/tools-nextjs']).toBe(
+      VERSIONS.vitusLabs,
+    )
     expect(actions.devDependencies).toBeUndefined()
   })
 

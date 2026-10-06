@@ -1,11 +1,40 @@
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
-import { join } from 'node:path'
+import { existsSync, mkdirSync } from 'node:fs'
+import { dirname, join } from 'node:path'
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { z } from 'zod'
+import { BIOME_SCHEMA, VERSIONS } from '../versions.ts'
+import { absolutePath, errorResult, writeIfMissing } from './utils.ts'
 
 const PRESETS = ['library', 'nextjs', 'storybook'] as const
 
-const scaffoldLibrary = (dir: string, name: string) => {
+interface ScaffoldResult {
+  created: string[]
+  skipped: string[]
+}
+
+const json = (value: unknown) => `${JSON.stringify(value, null, 2)}\n`
+
+/** Write files without overwriting existing ones; keys are relative paths. */
+const writeFiles = (dir: string, files: [string, string][]): ScaffoldResult => {
+  const result: ScaffoldResult = { created: [], skipped: [] }
+
+  for (const [rel, content] of files) {
+    const target = join(dir, rel)
+    mkdirSync(dirname(target), { recursive: true })
+    if (writeIfMissing(target, content)) result.created.push(rel)
+    else result.skipped.push(rel)
+  }
+
+  return result
+}
+
+const biomeConfig = () =>
+  json({
+    $schema: BIOME_SCHEMA,
+    extends: ['@vitus-labs/tools-lint/biome'],
+  })
+
+const scaffoldLibrary = (dir: string, name: string): ScaffoldResult => {
   const pkgJson = {
     name,
     version: '0.0.0',
@@ -21,13 +50,18 @@ const scaffoldLibrary = (dir: string, name: string) => {
       build: 'vl_rolldown_build',
       dev: 'vl_rolldown_build-watch',
       typecheck: 'tsc --noEmit',
+      test: 'vitest run',
     },
     devDependencies: {
-      '@vitus-labs/tools-rolldown': 'latest',
-      '@vitus-labs/tools-typescript': 'latest',
-      '@vitus-labs/tools-lint': 'latest',
-      '@vitus-labs/tools-vitest': 'latest',
-      typescript: '^5.9.0',
+      '@vitus-labs/tools-rolldown': VERSIONS.vitusLabs,
+      '@vitus-labs/tools-typescript': VERSIONS.vitusLabs,
+      '@vitus-labs/tools-lint': VERSIONS.vitusLabs,
+      '@vitus-labs/tools-vitest': VERSIONS.vitusLabs,
+      '@biomejs/biome': VERSIONS.biome,
+      '@vitest/coverage-v8': VERSIONS.vitestCoverage,
+      typescript: VERSIONS.typescript,
+      vite: VERSIONS.vite,
+      vitest: VERSIONS.vitest,
     },
   }
 
@@ -37,16 +71,10 @@ const scaffoldLibrary = (dir: string, name: string) => {
       noEmit: false,
       outDir: 'lib',
       rootDir: 'src',
-      baseUrl: '.',
       declarationDir: './lib/types',
     },
     include: ['src'],
     exclude: ['node_modules', 'lib', '**/*.test.ts'],
-  }
-
-  const biome = {
-    $schema: 'https://biomejs.dev/schemas/2.4.7/schema.json',
-    extends: ['@vitus-labs/tools-lint/biome'],
   }
 
   const vitestConfig = `import { createVitestConfig } from '@vitus-labs/tools-vitest'
@@ -63,29 +91,20 @@ export default createVitestConfig()
 }
 `
 
-  const indexTs = `export const hello = () => 'Hello from ${name}!'
+  const indexTs = `export const hello = () => ${JSON.stringify(`Hello from ${name}!`)}
 `
 
-  writeFileSync(join(dir, 'package.json'), JSON.stringify(pkgJson, null, 2))
-  writeFileSync(join(dir, 'tsconfig.json'), JSON.stringify(tsconfig, null, 2))
-  writeFileSync(join(dir, 'biome.json'), JSON.stringify(biome, null, 2))
-  writeFileSync(join(dir, 'vitest.config.ts'), vitestConfig)
-  writeFileSync(join(dir, 'vl-tools.config.mjs'), vlConfig)
-
-  mkdirSync(join(dir, 'src'), { recursive: true })
-  writeFileSync(join(dir, 'src', 'index.ts'), indexTs)
-
-  return [
-    'package.json',
-    'tsconfig.json',
-    'biome.json',
-    'vitest.config.ts',
-    'vl-tools.config.mjs',
-    'src/index.ts',
-  ]
+  return writeFiles(dir, [
+    ['package.json', json(pkgJson)],
+    ['tsconfig.json', json(tsconfig)],
+    ['biome.json', biomeConfig()],
+    ['vitest.config.ts', vitestConfig],
+    ['vl-tools.config.mjs', vlConfig],
+    ['src/index.ts', indexTs],
+  ])
 }
 
-const scaffoldNextjs = (dir: string, name: string) => {
+const scaffoldNextjs = (dir: string, name: string): ScaffoldResult => {
   const pkgJson = {
     name,
     version: '0.0.0',
@@ -98,26 +117,22 @@ const scaffoldNextjs = (dir: string, name: string) => {
       typecheck: 'tsc --noEmit',
     },
     dependencies: {
-      next: 'latest',
-      react: '^19.0.0',
-      'react-dom': '^19.0.0',
-      '@vitus-labs/tools-nextjs': 'latest',
+      next: VERSIONS.next,
+      react: VERSIONS.react,
+      'react-dom': VERSIONS.reactDom,
+      '@vitus-labs/tools-nextjs': VERSIONS.vitusLabs,
     },
     devDependencies: {
-      '@vitus-labs/tools-typescript': 'latest',
-      '@vitus-labs/tools-lint': 'latest',
-      '@types/react': '^19.0.0',
-      typescript: '^5.9.0',
+      '@vitus-labs/tools-typescript': VERSIONS.vitusLabs,
+      '@vitus-labs/tools-lint': VERSIONS.vitusLabs,
+      '@biomejs/biome': VERSIONS.biome,
+      '@types/react': VERSIONS.typesReact,
+      typescript: VERSIONS.typescript,
     },
   }
 
   const tsconfig = {
     extends: '@vitus-labs/tools-typescript/nextjs',
-  }
-
-  const biome = {
-    $schema: 'https://biomejs.dev/schemas/2.4.7/schema.json',
-    extends: ['@vitus-labs/tools-lint/biome'],
   }
 
   const nextConfig = `import { withVitusLabs } from '@vitus-labs/tools-nextjs'
@@ -132,22 +147,16 @@ export default withVitusLabs({})
 }
 `
 
-  writeFileSync(join(dir, 'package.json'), JSON.stringify(pkgJson, null, 2))
-  writeFileSync(join(dir, 'tsconfig.json'), JSON.stringify(tsconfig, null, 2))
-  writeFileSync(join(dir, 'biome.json'), JSON.stringify(biome, null, 2))
-  writeFileSync(join(dir, 'next.config.ts'), nextConfig)
-  writeFileSync(join(dir, 'vl-tools.config.mjs'), vlConfig)
-
-  return [
-    'package.json',
-    'tsconfig.json',
-    'biome.json',
-    'next.config.ts',
-    'vl-tools.config.mjs',
-  ]
+  return writeFiles(dir, [
+    ['package.json', json(pkgJson)],
+    ['tsconfig.json', json(tsconfig)],
+    ['biome.json', biomeConfig()],
+    ['next.config.ts', nextConfig],
+    ['vl-tools.config.mjs', vlConfig],
+  ])
 }
 
-const scaffoldStorybook = (dir: string, name: string) => {
+const scaffoldStorybook = (dir: string, name: string): ScaffoldResult => {
   const pkgJson = {
     name,
     version: '0.0.0',
@@ -158,16 +167,12 @@ const scaffoldStorybook = (dir: string, name: string) => {
       'stories:build': 'vl_stories-build',
     },
     devDependencies: {
-      '@vitus-labs/tools-storybook': 'latest',
-      '@vitus-labs/tools-lint': 'latest',
-      react: '^19.0.0',
-      'react-dom': '^19.0.0',
+      '@vitus-labs/tools-storybook': VERSIONS.vitusLabs,
+      '@vitus-labs/tools-lint': VERSIONS.vitusLabs,
+      '@biomejs/biome': VERSIONS.biome,
+      react: VERSIONS.react,
+      'react-dom': VERSIONS.reactDom,
     },
-  }
-
-  const biome = {
-    $schema: 'https://biomejs.dev/schemas/2.4.7/schema.json',
-    extends: ['@vitus-labs/tools-lint/biome'],
   }
 
   const vlConfig = `export default {
@@ -182,21 +187,28 @@ const scaffoldStorybook = (dir: string, name: string) => {
   const previewTs = `export { default } from '@vitus-labs/tools-storybook/storybook/preview'
 `
 
-  writeFileSync(join(dir, 'package.json'), JSON.stringify(pkgJson, null, 2))
-  writeFileSync(join(dir, 'biome.json'), JSON.stringify(biome, null, 2))
-  writeFileSync(join(dir, 'vl-tools.config.mjs'), vlConfig)
+  return writeFiles(dir, [
+    ['package.json', json(pkgJson)],
+    ['biome.json', biomeConfig()],
+    ['vl-tools.config.mjs', vlConfig],
+    ['.storybook/main.ts', mainTs],
+    ['.storybook/preview.ts', previewTs],
+  ])
+}
 
-  mkdirSync(join(dir, '.storybook'), { recursive: true })
-  writeFileSync(join(dir, '.storybook', 'main.ts'), mainTs)
-  writeFileSync(join(dir, '.storybook', 'preview.ts'), previewTs)
+const PRESET_SCAFFOLDERS: Record<
+  (typeof PRESETS)[number],
+  (dir: string, name: string) => ScaffoldResult
+> = {
+  library: scaffoldLibrary,
+  nextjs: scaffoldNextjs,
+  storybook: scaffoldStorybook,
+}
 
-  return [
-    'package.json',
-    'biome.json',
-    'vl-tools.config.mjs',
-    '.storybook/main.ts',
-    '.storybook/preview.ts',
-  ]
+const PRESET_FIRST_COMMAND: Record<(typeof PRESETS)[number], string> = {
+  library: 'bun run build',
+  nextjs: 'bun run dev',
+  storybook: 'bun run stories',
 }
 
 const registerScaffoldPackage = (server: McpServer) => {
@@ -204,12 +216,10 @@ const registerScaffoldPackage = (server: McpServer) => {
     'scaffold_package',
     {
       description:
-        'Scaffold a new project pre-configured with @vitus-labs/tools. Creates all config files (package.json, tsconfig, biome, vitest, vl-tools.config.mjs) for the selected preset.',
+        'Scaffold a new project pre-configured with @vitus-labs/tools. Creates all config files (package.json, tsconfig, biome, vitest, vl-tools.config.mjs) for the selected preset. Existing files are never overwritten.',
       inputSchema: {
-        name: z.string().describe('Package name (e.g. @my-org/my-lib)'),
-        directory: z
-          .string()
-          .describe('Absolute path to create the project in'),
+        name: z.string().min(1).describe('Package name (e.g. @my-org/my-lib)'),
+        directory: absolutePath('Absolute path to create the project in'),
         preset: z
           .enum(PRESETS)
           .describe(
@@ -218,48 +228,50 @@ const registerScaffoldPackage = (server: McpServer) => {
       },
     },
     async ({ name, directory, preset }) => {
+      if (existsSync(join(directory, 'package.json'))) {
+        return errorResult(
+          `Error: ${directory} already contains a package.json. Use add_tooling instead to add tools to an existing project.`,
+        )
+      }
+
+      let result: ScaffoldResult
       try {
-        readFileSync(join(directory, 'package.json'))
-        return {
-          content: [
-            {
-              type: 'text' as const,
-              text: `Error: ${directory} already contains a package.json. Use add_tooling instead to add tools to an existing project.`,
-            },
-          ],
-        }
-      } catch {
-        // No package.json — safe to scaffold
+        mkdirSync(directory, { recursive: true })
+
+        result = PRESET_SCAFFOLDERS[preset](directory, name)
+      } catch (error) {
+        return errorResult(
+          `Error: failed to scaffold ${preset} project in ${directory}: ${error instanceof Error ? error.message : String(error)}`,
+        )
       }
 
-      mkdirSync(directory, { recursive: true })
-
-      let files: string[]
-
-      switch (preset) {
-        case 'library':
-          files = scaffoldLibrary(directory, name)
-          break
-        case 'nextjs':
-          files = scaffoldNextjs(directory, name)
-          break
-        case 'storybook':
-          files = scaffoldStorybook(directory, name)
-          break
+      const lines = [
+        `Scaffolded ${preset} project "${name}" in ${directory}`,
+        '',
+        'Created files:',
+        ...result.created.map((f) => `  - ${f}`),
+      ]
+      if (result.skipped.length > 0) {
+        lines.push(
+          '',
+          'Skipped (already exist, left untouched):',
+          ...result.skipped.map((f) => `  - ${f}`),
+        )
       }
+      lines.push(
+        '',
+        'Next steps:',
+        `1. cd ${directory}`,
+        '2. bun install',
+        `3. ${PRESET_FIRST_COMMAND[preset]}`,
+      )
 
-      return {
-        content: [
-          {
-            type: 'text' as const,
-            text: `Scaffolded ${preset} project "${name}" in ${directory}\n\nCreated files:\n${files.map((f) => `  - ${f}`).join('\n')}\n\nNext steps:\n1. cd ${directory}\n2. bun install\n3. ${preset === 'library' ? 'bun run build' : preset === 'nextjs' ? 'bun run dev' : 'bun run stories'}`,
-          },
-        ],
-      }
+      return { content: [{ type: 'text' as const, text: lines.join('\n') }] }
     },
   )
 }
 
+export type { ScaffoldResult }
 export {
   registerScaffoldPackage,
   scaffoldLibrary,
