@@ -372,4 +372,87 @@ describe('createBuildPipeline', () => {
       expect(umdProd.env).toBe('production')
     })
   })
+
+  describe('with non-object browser fields', () => {
+    const load = async () => {
+      vi.resetModules()
+      mockPKG.type = 'module'
+      const mod = await import('./createBuildPipeline.js')
+      return mod.default as () => any[]
+    }
+
+    it('should ignore `false` values in the browser map', async () => {
+      mockPKG.browser = { fs: false, './lib/index.js': './lib/browser.js' }
+      mockPKG.module = 'lib/index.js'
+      const builds = (await load())()
+
+      expect(builds.filter((b) => b.platform === 'browser')).toHaveLength(1)
+    })
+
+    it('should not iterate a string browser field char by char', async () => {
+      mockPKG.browser = './lib/browser.js'
+      mockPKG.module = 'lib/index.js'
+      const builds = (await load())()
+
+      expect(builds.some((b) => b.platform === 'browser')).toBe(false)
+    })
+  })
+
+  describe('with duplicate variants', () => {
+    it('should build a file once when exports.import and module match', async () => {
+      vi.resetModules()
+      mockPKG.type = 'module'
+      mockPKG.module = 'lib/index.js'
+      mockPKG.exports = { import: './lib/index.js' }
+      const { default: createBuildPipeline } = await import(
+        './createBuildPipeline.js'
+      )
+      const builds = createBuildPipeline().filter(
+        (b: any) => b.file.replace(/^\.\//, '') === 'lib/index.js',
+      )
+
+      expect(builds).toHaveLength(1)
+    })
+  })
+
+  describe('with wildcard and nested condition exports', () => {
+    beforeEach(() => {
+      vi.resetModules()
+      mockPKG.type = 'module'
+      delete mockPKG.main
+      delete mockPKG.module
+    })
+
+    it('should skip wildcard subpaths with a warning', async () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+      mockPKG.exports = {
+        '.': { import: './lib/index.js' },
+        './features/*': { import: './lib/features/*.js' },
+      }
+      const { default: createBuildPipeline } = await import(
+        './createBuildPipeline.js'
+      )
+      const builds = createBuildPipeline()
+
+      expect(builds).toHaveLength(1)
+      expect(builds.some((b: any) => `${b.input}`.includes('*'))).toBe(false)
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining('./features/*'))
+      warn.mockRestore()
+    })
+
+    it('should flatten nested condition objects to a file path', async () => {
+      mockPKG.exports = {
+        '.': {
+          import: { types: './lib/index.d.ts', default: './lib/index.js' },
+          require: { default: './lib/index.cjs' },
+        },
+      }
+      const { default: createBuildPipeline } = await import(
+        './createBuildPipeline.js'
+      )
+      const files = createBuildPipeline().map((b: any) => b.file)
+
+      expect(files).toEqual(['./lib/index.js', './lib/index.cjs'])
+    })
+  })
 })

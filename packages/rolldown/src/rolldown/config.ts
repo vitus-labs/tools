@@ -1,10 +1,11 @@
-import { existsSync } from 'node:fs'
+import { posix } from 'node:path'
 import { expandExternal, filesize, swapGlobals } from '@vitus-labs/tools-core'
 import chalk from 'chalk'
 import type { RolldownPlugin } from 'rolldown'
 import { dts } from 'rolldown-plugin-dts'
 import { visualizer } from 'rollup-plugin-visualizer'
 import { CONFIG, PKG, PLATFORMS } from '../config/index.ts'
+import { isWildcardSubpath, resolveSourceFile } from './resolveEntry.ts'
 
 // Externals that ALWAYS apply, independent of the user-overridable
 // `CONFIG.external`. A `node:*` import is never a real module a library
@@ -46,14 +47,15 @@ const loadPlugins = ({ file }: { file: string }) => {
 
   // generate visualised graphs in dist folder
   if (CONFIG.visualise) {
-    const filePath = file.split('/')
-    const fileName = filePath.pop()
+    const fileName = posix.basename(file)
 
     const visualiserOptions = {
       title: `${PKG.name} - ${fileName}`,
-      filename: `${filePath.join('/')}/${
-        CONFIG.visualise.outputDir
-      }/${fileName}.html`,
+      filename: posix.join(
+        posix.dirname(file),
+        CONFIG.visualise.outputDir,
+        `${fileName}.html`,
+      ),
       template: CONFIG.visualise.template,
       gzipSize: CONFIG.visualise.gzipSize,
     }
@@ -186,20 +188,13 @@ const createDtsConfig = (typesFilePath: string, inputFile: string) => {
 const isSubpathExports = (obj: Record<string, any>): boolean =>
   Object.keys(obj).some((k) => k === '.' || k.startsWith('./'))
 
-/** Resolve the actual source file extension (.ts, .tsx, etc.) */
-const resolveWithExtension = (path: string): string => {
-  for (const ext of ['.ts', '.tsx', '.js', '.jsx']) {
-    if (existsSync(`${path}${ext}`)) return `${path}${ext}`
-  }
-  return `${path}.ts`
-}
-
-/** Resolve input .ts file from a subpath export key using convention. */
-const resolveSubpathInput = (exportPath: string): string => {
-  if (exportPath === '.') return `${CONFIG.sourceDir}/index.ts`
-  const subpath = exportPath.slice(2)
-  return `${CONFIG.sourceDir}/${subpath}`
-}
+/** Resolve the source entry for a subpath export key using convention. */
+const resolveSubpathInput = (exportPath: string): string =>
+  resolveSourceFile(
+    exportPath === '.'
+      ? `${CONFIG.sourceDir}/index`
+      : `${CONFIG.sourceDir}/${exportPath.slice(2)}`,
+  )
 
 const buildDts = (): ReturnType<typeof createDtsConfig> | null => {
   if (!CONFIG.typescript) return null
@@ -207,7 +202,10 @@ const buildDts = (): ReturnType<typeof createDtsConfig> | null => {
   // Simple case: no subpath exports
   const typesFilePath = PKG?.exports?.types || PKG.types || PKG.typings
   if (typesFilePath) {
-    return createDtsConfig(typesFilePath, `${CONFIG.sourceDir}/index.ts`)
+    return createDtsConfig(
+      typesFilePath,
+      resolveSourceFile(`${CONFIG.sourceDir}/index`),
+    )
   }
 
   return null
@@ -230,14 +228,15 @@ const buildAllDts = (): ReturnType<typeof createDtsConfig>[] => {
   const results: ReturnType<typeof createDtsConfig>[] = []
   for (const [exportPath, exportConfig] of Object.entries(exportsOptions)) {
     if (!exportConfig || typeof exportConfig !== 'object') continue
-    const typesPath = (exportConfig as Record<string, string>).types
-    if (!typesPath) continue
-    const resolved = resolveSubpathInput(exportPath)
-    const inputFile =
-      resolved.endsWith('.ts') || resolved.endsWith('.tsx')
-        ? resolved
-        : resolveWithExtension(resolved)
-    results.push(createDtsConfig(typesPath, inputFile))
+    if (isWildcardSubpath(exportPath)) continue
+    const conditions = exportConfig as Record<string, any>
+    // `types` may sit at the top level or inside a nested `import` condition
+    const typesPath =
+      typeof conditions.types === 'string'
+        ? conditions.types
+        : conditions.import?.types
+    if (typeof typesPath !== 'string') continue
+    results.push(createDtsConfig(typesPath, resolveSubpathInput(exportPath)))
   }
 
   return results

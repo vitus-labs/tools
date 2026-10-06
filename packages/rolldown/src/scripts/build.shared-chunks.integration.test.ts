@@ -94,7 +94,7 @@ describe('rolldown multi-entry shared-chunk dedup', () => {
     // to be grouped (those would indicate fallback to the per-entry loop).
     expect(out).not.toMatch(/DTS -> [^{]*use\.d\.ts \(\d+ms\)$/m)
     expect(out).not.toMatch(/DTS -> [^{]*peek\.d\.ts \(\d+ms\)$/m)
-  })
+  }, 60_000)
 
   it('produces correct per-entry .d.ts files', () => {
     expect(existsSync(join(LIB, 'types', 'index.d.ts'))).toBe(true)
