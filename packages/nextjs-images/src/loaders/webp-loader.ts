@@ -4,6 +4,8 @@ import type {
   OptimizedImagesConfig,
   WebpackConfig,
 } from '../types.ts'
+import { queryParam } from './query.ts'
+import { resolveOwnLoader } from './resolve.ts'
 import { getResourceQueries } from './resource-queries.ts'
 import { getUrlLoaderOptions } from './url-loader.ts'
 
@@ -30,7 +32,7 @@ const applyWebpLoader = (
     options?: Record<string, unknown>
   }> = [
     {
-      loader: 'url-loader',
+      loader: resolveOwnLoader('url-loader'),
       options: getUrlLoaderOptions(optimizedConfig, nextConfig, isServer),
     },
   ]
@@ -84,10 +86,10 @@ const getWebpResourceQuery = (
       : `${urlLoaderOptions.name}.webp`
 
   return {
-    resourceQuery: /webp/,
+    resourceQuery: queryParam('webp'),
     use: [
       {
-        loader: 'url-loader',
+        loader: resolveOwnLoader('url-loader'),
         options: {
           ...urlLoaderOptions,
           name: imageName,

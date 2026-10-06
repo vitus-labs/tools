@@ -144,9 +144,7 @@ describe('getResourceQueries', () => {
     )
 
     const originalQuery = queries.find(
-      (q) =>
-        q.resourceQuery.source === 'original' ||
-        q.resourceQuery.toString() === '/original/',
+      (q) => q.resourceQuery.test('?original') && !q.resourceQuery.test('?url'),
     )
 
     expect(originalQuery).toBeDefined()
@@ -162,16 +160,15 @@ describe('getResourceQueries', () => {
       defaultDetectedLoaders,
     )
 
-    const inlineQuery = queries.find((q) => {
-      const src = q.resourceQuery.source || q.resourceQuery.toString()
-      // Match the pure inline query (not the combination with original)
-      return src === 'inline' || src === '/inline/'
-    })
+    // combinations come first, so the first match for a bare query is the pure one
+    const inlineQuery = queries.find((q) => q.resourceQuery.test('?inline'))
 
     expect(inlineQuery).toBeDefined()
 
     if (inlineQuery) {
-      const urlLoader = inlineQuery.use.find((u) => u.loader === 'url-loader')
+      const urlLoader = inlineQuery.use.find((u) =>
+        u.loader.includes('url-loader'),
+      )
       expect(urlLoader).toBeDefined()
       expect(urlLoader?.options?.limit).toBeUndefined()
     }
@@ -187,15 +184,15 @@ describe('getResourceQueries', () => {
       defaultDetectedLoaders,
     )
 
-    const includeQuery = queries.find((q) => {
-      const src = q.resourceQuery.source || q.resourceQuery.toString()
-      return src === 'include' || src === '/include/'
-    })
+    // combinations come first, so the first match for a bare query is the pure one
+    const includeQuery = queries.find((q) => q.resourceQuery.test('?include'))
 
     expect(includeQuery).toBeDefined()
 
     if (includeQuery) {
-      const rawLoader = includeQuery.use.find((u) => u.loader === 'raw-loader')
+      const rawLoader = includeQuery.use.find((u) =>
+        u.loader.includes('raw-loader'),
+      )
       expect(rawLoader).toBeDefined()
     }
   })
@@ -210,10 +207,7 @@ describe('getResourceQueries', () => {
       defaultDetectedLoaders,
     )
 
-    const sizeQuery = queries.find((q) => {
-      const src = q.resourceQuery.source || q.resourceQuery.toString()
-      return src === 'size' || src === '/size/'
-    })
+    const sizeQuery = queries.find((q) => q.resourceQuery.test('?size=300'))
 
     expect(sizeQuery).toBeDefined()
 
@@ -235,10 +229,11 @@ describe('getResourceQueries', () => {
       defaultDetectedLoaders,
     )
 
-    const combinationQuery = queries.find((q) => {
-      const src = q.resourceQuery.source || q.resourceQuery.toString()
-      return src.includes('url') && src.includes('original')
-    })
+    const combinationQuery = queries.find(
+      (q) =>
+        q.resourceQuery.test('?url&original') &&
+        q.resourceQuery.test('?original&url'),
+    )
 
     expect(combinationQuery).toBeDefined()
   })
@@ -255,14 +250,14 @@ describe('getResourceQueries', () => {
 
     // Find any query that uses url-loader
     const queryWithUrlLoader = queries.find((q) =>
-      q.use.some((u) => u.loader === 'url-loader'),
+      q.use.some((u) => u.loader.includes('url-loader')),
     )
 
     expect(queryWithUrlLoader).toBeDefined()
 
     if (queryWithUrlLoader) {
-      const urlLoader = queryWithUrlLoader.use.find(
-        (u) => u.loader === 'url-loader',
+      const urlLoader = queryWithUrlLoader.use.find((u) =>
+        u.loader.includes('url-loader'),
       )
       expect(urlLoader?.options?.publicPath).toBe('/_next/static/images/')
       expect(urlLoader?.options?.name).toBe('[name]-[hash].[ext]')
@@ -283,16 +278,78 @@ describe('getResourceQueries', () => {
     )
 
     const queryWithUrlLoader = queries.find((q) =>
-      q.use.some((u) => u.loader === 'url-loader'),
+      q.use.some((u) => u.loader.includes('url-loader')),
     )
 
     if (queryWithUrlLoader) {
-      const urlLoader = queryWithUrlLoader.use.find(
-        (u) => u.loader === 'url-loader',
+      const urlLoader = queryWithUrlLoader.use.find((u) =>
+        u.loader.includes('url-loader'),
       )
       expect(urlLoader?.options?.publicPath).toBe(
         'https://cdn.example.com/_next/static/images/',
       )
     }
+  })
+})
+
+describe('resource query anchoring', () => {
+  const queries = getResourceQueries(
+    defaultOptimized,
+    {},
+    false,
+    'img-loader',
+    {},
+    defaultDetectedLoaders,
+  )
+  const matching = (query: string) =>
+    queries.filter((q) => q.resourceQuery.test(query))
+
+  it('should not match substrings of unrelated parameters', () => {
+    for (const query of [
+      '?curl',
+      '?url_x',
+      '?hash=inline-ish',
+      '?v=include',
+      '?resized',
+      '?sizeless',
+      '?lqips',
+      '?foo=url',
+      '?dontrace',
+    ]) {
+      expect(matching(query)).toHaveLength(0)
+    }
+  })
+
+  it('should keep matching documented queries', () => {
+    for (const query of [
+      '?url',
+      '?inline',
+      '?include',
+      '?original',
+      '?lqip',
+      '?lqip&x=1',
+      '?lqip-colors',
+      '?resize&sizes[]=300&sizes[]=600',
+      '?size=300',
+      '?trace',
+      '?x=1&url',
+    ]) {
+      expect(matching(query).length).toBeGreaterThan(0)
+    }
+  })
+
+  it('should not treat ?lqip-colors as ?lqip', () => {
+    const lqip = queries.find((q) => q.resourceQuery.test('?lqip'))
+    expect(lqip?.resourceQuery.test('?lqip-colors')).toBe(false)
+  })
+
+  it('should match combinations in either order only with both params', () => {
+    expect(
+      matching('?url&original')[0].use.some((u) =>
+        u.loader.includes('file-loader'),
+      ),
+    ).toBe(true)
+    expect(matching('?original&url')[0]).toBe(matching('?url&original')[0])
+    expect(matching('?url')[0]).not.toBe(matching('?url&original')[0])
   })
 })

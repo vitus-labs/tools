@@ -1,5 +1,6 @@
 import { fileURLToPath } from 'node:url'
 import type { DetectedLoaders, OptimizedImagesConfig } from '../../types.ts'
+import { queryParam } from '../query.ts'
 
 const RUNTIME_GENERATOR = fileURLToPath(
   import.meta.resolve('./svg-runtime-generator.js'),
@@ -13,8 +14,9 @@ const getSvgSpriteLoaderResourceQuery = (
   detectedLoaders: DetectedLoaders,
   imgLoaderOptions: Record<string, unknown>,
   optimize: boolean,
+  imgLoader = 'img-loader',
 ) => ({
-  resourceQuery: /sprite/,
+  resourceQuery: queryParam('sprite'),
   use: [
     {
       loader: 'svg-sprite-loader',
@@ -26,7 +28,7 @@ const getSvgSpriteLoaderResourceQuery = (
     ...(detectedLoaders.svg && optimize
       ? [
           {
-            loader: 'img-loader',
+            loader: imgLoader,
             options: imgLoaderOptions,
           },
         ]

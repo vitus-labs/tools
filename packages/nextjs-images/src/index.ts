@@ -5,7 +5,7 @@ import {
   detectLoaders,
   getNumOptimizationLoadersInstalled,
 } from './loaders/index.ts'
-import { showWarning } from './migrater.ts'
+import { showTurbopackWarning, showWarning } from './migrater.ts'
 import type {
   NextComposePlugins,
   NextConfig,
@@ -126,7 +126,13 @@ const withOptimizedImages =
     nextComposePlugins: NextComposePlugins = {},
   ) => {
     const { overwriteImageLoaderPaths } = nextConfig
-    const { optimizeImages, optimizeImagesInDev } = getConfig(optimizedConfig)
+    const resolvedConfig = getConfig(optimizedConfig)
+    const { optimizeImages, optimizeImagesInDev } = resolvedConfig
+
+    // Next.js sets TURBOPACK before loading the config unless `--webpack` is used
+    if (process.env.TURBOPACK) {
+      showTurbopackWarning()
+    }
 
     return {
       ...nextConfig,
@@ -161,7 +167,7 @@ const withOptimizedImages =
 
         enrichedConfig = appendLoaders(
           enrichedConfig,
-          getConfig(optimizedConfig),
+          resolvedConfig,
           nextConfig,
           detectedLoaders,
           isServer,

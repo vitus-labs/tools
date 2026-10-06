@@ -109,7 +109,7 @@ describe('applyWebpLoader', () => {
     const loaders = defaultEntry.use as Array<{ loader: string }>
 
     expect(loaders.length).toBe(2)
-    expect(loaders[0].loader).toBe('url-loader')
+    expect(loaders[0].loader).toContain('url-loader')
     expect(loaders[1].loader).toBe('webp-loader')
   })
 
@@ -130,7 +130,7 @@ describe('applyWebpLoader', () => {
     const loaders = defaultEntry.use as Array<{ loader: string }>
 
     expect(loaders.length).toBe(1)
-    expect(loaders[0].loader).toBe('url-loader')
+    expect(loaders[0].loader).toContain('url-loader')
   })
 
   it('should include resource queries in oneOf', () => {
@@ -156,14 +156,17 @@ describe('getWebpResourceQuery', () => {
   it('should return a resourceQuery regex matching webp', () => {
     const result = getWebpResourceQuery(defaultOptimized, {}, false)
 
-    expect(result.resourceQuery).toEqual(/webp/)
+    expect(result.resourceQuery.test('?webp')).toBe(true)
+    expect(result.resourceQuery.test('?webp&x=1')).toBe(true)
+    expect(result.resourceQuery.test('?webpage=1')).toBe(false)
+    expect(result.resourceQuery.test('?awebp')).toBe(false)
   })
 
   it('should include url-loader and webp-loader in use array', () => {
     const result = getWebpResourceQuery(defaultOptimized, {}, false)
 
     expect(result.use.length).toBe(2)
-    expect(result.use[0].loader).toBe('url-loader')
+    expect(result.use[0].loader).toContain('url-loader')
     expect(result.use[1].loader).toBe('webp-loader')
   })
 

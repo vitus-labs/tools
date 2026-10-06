@@ -18,15 +18,18 @@
       "import": "./lib/index.js"
     }
   },
+  "files": [
+    "lib/"
+  ],
   "engines": {
-    "node": ">= 22"
+    "node": ">= 22.12"
   },
   "publishConfig": {
     "access": "public"
   },
   "scripts": {
     "prepublish": "bun run build",
-    "build": "tsc",
+    "build": "rm -rf lib && tsc",
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {

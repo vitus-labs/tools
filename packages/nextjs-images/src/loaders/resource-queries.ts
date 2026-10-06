@@ -8,12 +8,19 @@ import type {
 import { getFileLoaderOptions, getFileLoaderPath } from './file-loader.ts'
 import { getImageTraceLoaderOptions } from './image-trace-loader.ts'
 import { getLqipLoaderOptions } from './lqip-loader/index.ts'
+import { allParamsSource, paramSource } from './query.ts'
+import { resolveOwnLoader } from './resolve.ts'
 import { getResponsiveLoaderOptions } from './responsive-loader.ts'
 import { getUrlLoaderOptions } from './url-loader.ts'
 
 const LQIP_EXPORT_LOADER = fileURLToPath(
   import.meta.resolve('./lqip-export-loader.js'),
 )
+
+// Own dependencies are resolved to absolute paths: webpack would otherwise
+// look them up from the user's project, which fails with isolated installs.
+const URL_LOADER = resolveOwnLoader('url-loader')
+const RAW_LOADER = resolveOwnLoader('raw-loader')
 
 /**
  * Configure the common resource queries.
@@ -30,7 +37,7 @@ const queries: ResourceQueryConfig[] = [
   // ?inline: force inlining an image regardless of the defined limit
   {
     test: 'inline',
-    loaders: ['url-loader'],
+    loaders: [URL_LOADER],
     options: [{ limit: undefined }],
     optimize: true,
     combinations: ['original'],
@@ -39,7 +46,7 @@ const queries: ResourceQueryConfig[] = [
   // ?include: include the image directly, no data uri or external file
   {
     test: 'include',
-    loaders: ['raw-loader'],
+    loaders: [RAW_LOADER],
     optimize: true,
     combinations: ['original'],
   },
@@ -47,14 +54,14 @@ const queries: ResourceQueryConfig[] = [
   // ?original: use the original image and don't optimize it
   {
     test: 'original',
-    loaders: ['url-loader'],
+    loaders: [URL_LOADER],
     optimize: false,
   },
 
   // ?lqip: low quality image placeholder
   {
-    test: 'lqip(&|$)',
-    loaders: [LQIP_EXPORT_LOADER, 'lqip-loader', 'url-loader'],
+    test: 'lqip',
+    loaders: [LQIP_EXPORT_LOADER, 'lqip-loader', URL_LOADER],
     options: [{ exportProperty: 'preSrc' }],
     optimize: false,
   },
@@ -62,14 +69,14 @@ const queries: ResourceQueryConfig[] = [
   // ?lqip-colors: low quality image placeholder colors
   {
     test: 'lqip-colors',
-    loaders: [LQIP_EXPORT_LOADER, 'lqip-loader', 'url-loader'],
+    loaders: [LQIP_EXPORT_LOADER, 'lqip-loader', URL_LOADER],
     options: [{ exportProperty: 'palette' }, { base64: false, palette: true }],
     optimize: false,
   },
 
   // ?resize: resize images
   {
-    test: 'size',
+    test: '(?:resize|sizes?)',
     loaders: ['responsive-loader'],
     optimize: false,
   },
@@ -77,7 +84,7 @@ const queries: ResourceQueryConfig[] = [
   // ?trace: generate svg image traces for placeholders
   {
     test: 'trace',
-    loaders: ['image-trace-loader', 'url-loader'],
+    loaders: ['image-trace-loader', URL_LOADER],
     optimize: true,
     combinations: ['original'],
   },
@@ -91,7 +98,7 @@ for (const queryConfig of baseCopy) {
       if (combination === 'original') {
         queries.unshift({
           ...queryConfig,
-          test: `(${queryConfig.test}.*original|original.*${queryConfig.test})`,
+          requires: [queryConfig.test, 'original'],
           optimize: false,
         })
       }
@@ -111,7 +118,7 @@ const getResourceQueries = (
   detectedLoaders: DetectedLoaders,
 ) => {
   const loaderOptions: Record<string, Record<string, unknown>> = {
-    'url-loader': getUrlLoaderOptions(optimizedConfig, nextConfig, isServer),
+    [URL_LOADER]: getUrlLoaderOptions(optimizedConfig, nextConfig, isServer),
     'file-loader': getFileLoaderOptions(optimizedConfig, nextConfig, isServer),
     [getFileLoaderPath()]: getFileLoaderOptions(
       optimizedConfig,
@@ -157,7 +164,11 @@ const getResourceQueries = (
     })
 
     return {
-      resourceQuery: new RegExp(queryConfig.test),
+      resourceQuery: new RegExp(
+        queryConfig.requires
+          ? allParamsSource(queryConfig.requires)
+          : paramSource(queryConfig.test),
+      ),
       use: loaders.concat(
         queryConfig.optimize && optimizerLoaderName !== null
           ? [
