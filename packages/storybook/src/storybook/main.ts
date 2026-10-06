@@ -1,13 +1,11 @@
-import { readFile } from 'node:fs/promises'
 import type { StorybookConfig } from '@storybook/react-vite'
 import type { Indexer } from 'storybook/internal/types'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import { CONFIG } from '../config/index.ts'
 import {
   createAutoDiscoveryIndexer,
-  manualStoryIndexer,
+  createManualStoryIndexer,
 } from '../indexer/index.ts'
-import { isRocketstoriesPattern } from '../indexer/utils.ts'
 import { rocketstoriesVitePlugin } from '../vite-plugin/index.ts'
 
 // --------------------------------------------------------
@@ -51,25 +49,25 @@ const STORYBOOK_CONFIG: StorybookConfig = {
     return acc
   }, [] as any),
 
-  // Custom indexers: rocketstories first, then auto-discovery,
-  // then default CSF indexer (wrapped to skip rocketstories files)
+  // Custom indexers. Storybook picks only the FIRST indexer whose `test`
+  // matches a file, so the manual indexer receives the default indexers and
+  // delegates standard CSF/MDX story files to them (it only handles
+  // rocketstories files itself — the CSF indexer cannot statically parse
+  // `export default stories.init()`).
   experimental_indexers: (existingIndexers) => {
-    // Wrap existing indexers so they skip rocketstories files —
-    // without this, the CSF indexer tries to statically parse
-    // `export default stories.init()` and fails.
-    const wrapped: Indexer[] = (existingIndexers ?? []).map((indexer) => ({
-      ...indexer,
-      createIndex: async (fileName: string, opts: any) => {
-        if (/\.stories\.([jt]sx?|mdx?)$/.test(fileName)) {
-          const code = await readFile(fileName, 'utf-8')
-          if (isRocketstoriesPattern(code)) return []
-        }
-        return indexer.createIndex(fileName, opts)
-      },
-    }))
+    const existing = existingIndexers ?? []
+    const indexers: Indexer[] = [createManualStoryIndexer(existing)]
 
-    return [manualStoryIndexer, autoDiscoveryIndexer, ...wrapped]
+    if (CONFIG.autoDiscovery) indexers.push(autoDiscoveryIndexer)
+
+    return [...indexers, ...existing]
   },
+
+  // Expose the UI theme to the manager (browser) bundle as process.env.
+  env: (existingEnv) => ({
+    ...existingEnv,
+    STORYBOOK_VL_UI_THEME: CONFIG.ui?.theme ?? 'dark',
+  }),
 
   viteFinal: async (config) => {
     // DEFINE GLOBALS
@@ -118,11 +116,11 @@ const STORYBOOK_CONFIG: StorybookConfig = {
       if (!config.optimizeDeps) {
         config.optimizeDeps = {}
       }
-      if (!config.optimizeDeps.esbuildOptions) {
-        config.optimizeDeps.esbuildOptions = {}
+      if (!config.optimizeDeps.rolldownOptions) {
+        config.optimizeDeps.rolldownOptions = {}
       }
-      if (!config.optimizeDeps.esbuildOptions.plugins) {
-        config.optimizeDeps.esbuildOptions.plugins = []
+      if (!config.optimizeDeps.rolldownOptions.plugins) {
+        config.optimizeDeps.rolldownOptions.plugins = []
       }
 
       const FONT_MOCK = [
@@ -131,23 +129,22 @@ const STORYBOOK_CONFIG: StorybookConfig = {
         '}',
       ].join('\n')
 
-      config.optimizeDeps.esbuildOptions.plugins.push({
+      const FONT_FILTER =
+        /^(next\/font\/(local|google)|@next\/font\/(local|google))$/
+      const FONT_MOCK_ID = '\0next-font-mock'
+
+      const rolldownPlugins = config.optimizeDeps.rolldownOptions.plugins
+      const fontMockPlugin = {
         name: 'storybook-next-font-mock',
-        setup(build) {
-          const filter =
-            /^(next\/font\/(local|google)|@next\/font\/(local|google))$/
-
-          build.onResolve({ filter }, (args) => ({
-            path: args.path,
-            namespace: 'next-font-mock',
-          }))
-
-          build.onLoad({ filter: /.*/, namespace: 'next-font-mock' }, () => ({
-            contents: FONT_MOCK,
-            loader: 'js',
-          }))
+        resolveId(source: string) {
+          if (FONT_FILTER.test(source)) return `${FONT_MOCK_ID}:${source}`
         },
-      })
+        load(id: string) {
+          if (id.startsWith(FONT_MOCK_ID)) return FONT_MOCK
+        },
+      }
+
+      if (Array.isArray(rolldownPlugins)) rolldownPlugins.push(fontMockPlugin)
     }
 
     // VITE PLUGINS

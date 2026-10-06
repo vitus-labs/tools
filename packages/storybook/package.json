@@ -13,13 +13,28 @@
   },
   "type": "module",
   "exports": {
-    ".": "./lib/config/index.js",
-    "./storybook": "./lib/storybook/index.js",
-    "./storybook/preview": "./lib/storybook/preview.js",
-    "./storybook/main": "./lib/storybook/main.js",
-    "./storybook/manager": "./lib/storybook/manager.js"
+    ".": {
+      "types": "./lib/types/config/index.d.ts",
+      "default": "./lib/config/index.js"
+    },
+    "./storybook": {
+      "types": "./lib/types/storybook/index.d.ts",
+      "default": "./lib/storybook/index.js"
+    },
+    "./storybook/preview": {
+      "types": "./lib/types/storybook/preview.d.ts",
+      "default": "./lib/storybook/preview.js"
+    },
+    "./storybook/main": {
+      "types": "./lib/types/storybook/main.d.ts",
+      "default": "./lib/storybook/main.js"
+    },
+    "./storybook/manager": {
+      "types": "./lib/types/storybook/manager.d.ts",
+      "default": "./lib/storybook/manager.js"
+    }
   },
-  "types": "./lib/types/index.d.ts",
+  "types": "./lib/types/config/index.d.ts",
   "bin": {
     "vl_stories": "./lib/bin/run-stories.js",
     "vl_stories-build": "./lib/bin/run-stories-build.js",
@@ -64,7 +79,6 @@
     "@storybook/addon-vitest": "^10.6.1",
     "@storybook/nextjs-vite": "^10.6.1",
     "@storybook/react": "^10.6.1",
-    "@storybook/react-native": "^10.6.0",
     "@storybook/react-vite": "^10.6.1",
     "@vitus-labs/tools-core": "workspace:*",
     "@vueless/storybook-dark-mode": "^10.0.8",

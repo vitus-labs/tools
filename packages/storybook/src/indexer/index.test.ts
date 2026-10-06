@@ -15,6 +15,7 @@ vi.mock('./utils.ts', async (importOriginal) => {
 import { readFile } from 'node:fs/promises'
 import {
   createAutoDiscoveryIndexer,
+  createManualStoryIndexer,
   manualStoryIndexer,
   VIRTUAL_STORY_PREFIX,
 } from './index.ts'
@@ -103,6 +104,58 @@ describe('manualStoryIndexer', () => {
 
     expect(result).toHaveLength(1)
     expect(mockMakeTitle).toHaveBeenCalledWith('Custom/Title')
+  })
+})
+
+describe('createManualStoryIndexer', () => {
+  const csfEntries = [
+    { type: 'story' as const, importPath: 'x', exportName: 'A', title: 'T' },
+  ]
+  const csfIndexer = {
+    test: /\.stories\.([jt]sx?)$/,
+    createIndex: vi.fn(async () => csfEntries),
+  }
+  const mdxIndexer = {
+    test: /\.mdx$/,
+    createIndex: vi.fn(async () => []),
+  }
+
+  it('delegates standard CSF files to the existing indexers', async () => {
+    mockReadFile.mockResolvedValue('export default { title: "Badge" }')
+    const indexer = createManualStoryIndexer([mdxIndexer, csfIndexer])
+    const opts = { makeTitle: mockMakeTitle } as any
+
+    const result = await indexer.createIndex('/p/Badge.stories.tsx', opts)
+
+    expect(result).toBe(csfEntries)
+    expect(csfIndexer.createIndex).toHaveBeenCalledWith(
+      '/p/Badge.stories.tsx',
+      opts,
+    )
+  })
+
+  it('does not delegate rocketstories files', async () => {
+    csfIndexer.createIndex.mockClear()
+    mockReadFile.mockResolvedValue(
+      'export default stories.init()\nexport const Default = stories.main()',
+    )
+    const indexer = createManualStoryIndexer([csfIndexer])
+
+    const result = await indexer.createIndex('/p/src/Badge/Badge.stories.tsx', {
+      makeTitle: mockMakeTitle,
+    } as any)
+
+    expect(result).toHaveLength(1)
+    expect(csfIndexer.createIndex).not.toHaveBeenCalled()
+  })
+
+  it('returns empty when no delegate matches', async () => {
+    mockReadFile.mockResolvedValue('export default {}')
+    const result = await createManualStoryIndexer([mdxIndexer]).createIndex(
+      '/p/Badge.stories.tsx',
+      { makeTitle: mockMakeTitle } as any,
+    )
+    expect(result).toEqual([])
   })
 })
 

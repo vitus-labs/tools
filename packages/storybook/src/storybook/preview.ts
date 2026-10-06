@@ -1,7 +1,7 @@
 import type { Preview } from '@storybook/react'
 
 declare const __VITUS_LABS_STORIES__: {
-  globals: any
+  globals: Record<string, any>
   addons: Record<string, any>
   framework: string
 }
@@ -16,6 +16,16 @@ const parameters = Object.entries(__VITUS_LABS_STORIES__.addons).reduce(
   {},
 )
 
+// Storybook 10 no longer reads `parameters.backgrounds.default` — the active
+// background is a global. Map the configured default onto it (explicit
+// `globals.backgrounds` still wins).
+const defaultBackground = __VITUS_LABS_STORIES__.addons.backgrounds?.default
+
+const initialGlobals = {
+  ...(defaultBackground && { backgrounds: { value: defaultBackground } }),
+  ...__VITUS_LABS_STORIES__.globals,
+}
+
 const preview: Preview = {
   tags: ['autodocs'],
   parameters: {
@@ -24,7 +34,7 @@ const preview: Preview = {
       nextjs: { appDirectory: true },
     }),
   },
-  initialGlobals: __VITUS_LABS_STORIES__.globals,
+  initialGlobals,
 }
 
 export default preview

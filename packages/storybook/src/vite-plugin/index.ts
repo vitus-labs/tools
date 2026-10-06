@@ -6,6 +6,9 @@ import { detectComponentKind, extractDimensionNames } from '../indexer/utils.ts'
 
 const RESOLVE_PREFIX = VIRTUAL_STORY_PREFIX
 const VIRTUAL_PREFIX = `\0${VIRTUAL_STORY_PREFIX}`
+// The generated modules contain JSX, so the resolved id must carry a JSX
+// extension or Vite would parse it as plain TS.
+const VIRTUAL_SUFFIX = '.tsx'
 
 interface RocketstoriesConfig {
   module: string
@@ -23,15 +26,15 @@ const generateRocketstyleStory = (
 ): string => {
   const dimExports = dimensions.map((dim) => {
     const exportName = `${dim.charAt(0).toUpperCase() + dim.slice(1)}s`
-    return `export const ${exportName} = stories.dimension('${dim}')`
+    return `export const ${exportName} = stories.dimension(${JSON.stringify(dim)})`
   })
 
   return `
-import { ${rs.export} } from '${rs.module}'
-import Component from '${componentPath}'
+import { ${rs.export} } from ${JSON.stringify(rs.module)}
+import Component from ${JSON.stringify(componentPath)}
 
 const stories = ${rs.export}(Component)
-  .attrs({ label: '${componentName}' })
+  .attrs({ label: ${JSON.stringify(componentName)} })
 
 export default stories.init
 export const Default = stories.main()
@@ -52,7 +55,7 @@ export const PseudoStates = stories.render((props) => {
           >
             <Component
               {...props}
-              label="${componentName}"
+              label={${JSON.stringify(componentName)}}
               {...(state === 'disabled' ? { disabled: true } : {})}
             />
           </div>
@@ -72,10 +75,10 @@ const generatePlainStory = (
   componentPath: string,
   componentName: string,
 ): string => `
-import Component from '${componentPath}'
+import Component from ${JSON.stringify(componentPath)}
 
 export default {
-  title: '${componentName}',
+  title: ${JSON.stringify(componentName)},
   component: Component,
 }
 
@@ -93,14 +96,17 @@ export const rocketstoriesVitePlugin = (rs: RocketstoriesConfig): Plugin => ({
 
   resolveId(id) {
     if (id.startsWith(RESOLVE_PREFIX)) {
-      return VIRTUAL_PREFIX + id.slice(RESOLVE_PREFIX.length)
+      return VIRTUAL_PREFIX + id.slice(RESOLVE_PREFIX.length) + VIRTUAL_SUFFIX
     }
   },
 
   async load(id) {
     if (!id.startsWith(VIRTUAL_PREFIX)) return
 
-    const componentPath = id.slice(VIRTUAL_PREFIX.length)
+    const componentPath = id.slice(
+      VIRTUAL_PREFIX.length,
+      id.endsWith(VIRTUAL_SUFFIX) ? -VIRTUAL_SUFFIX.length : undefined,
+    )
     const code = await readFile(componentPath, 'utf-8')
     const kind = detectComponentKind(code)
 

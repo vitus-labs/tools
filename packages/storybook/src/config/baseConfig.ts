@@ -10,6 +10,10 @@ const CONFIG: Record<string, any> = {
   },
   storiesDir: [`/src/**/*.stories.@(js|jsx|ts|tsx|md|mdx)`],
   monorepoStoriesDir: [`/packages/*/src/**/*.stories.@(js|jsx|ts|tsx|md|mdx)`],
+  autoDiscoveryDir: ['/src/**/index.@(js|jsx|ts|tsx)'],
+  monorepoAutoDiscoveryDir: ['/packages/*/src/**/index.@(js|jsx|ts|tsx)'],
+  // Opt-in: also index component `index.*` files and generate virtual stories
+  autoDiscovery: false,
   globals: {},
   addons: {
     controls: { expanded: true },

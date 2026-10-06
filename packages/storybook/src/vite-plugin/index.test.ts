@@ -28,7 +28,15 @@ describe('rocketstoriesVitePlugin', () => {
       const result = resolveId(
         'virtual:rocketstory:/project/src/Badge/index.tsx',
       )
-      expect(result).toBe('\0virtual:rocketstory:/project/src/Badge/index.tsx')
+      expect(result).toBe(
+        '\0virtual:rocketstory:/project/src/Badge/index.tsx.tsx',
+      )
+    })
+
+    it('should give virtual ids a .tsx suffix so JSX is parsed', () => {
+      expect(resolveId('virtual:rocketstory:/p/Card/index.ts')).toMatch(
+        /\.tsx$/,
+      )
     })
 
     it('should not resolve other ids', () => {
@@ -51,13 +59,13 @@ describe('rocketstoriesVitePlugin', () => {
       )
 
       const result = await load(
-        '\0virtual:rocketstory:/project/src/Badge/index.tsx',
+        '\0virtual:rocketstory:/project/src/Badge/index.tsx.tsx',
       )
 
       expect(result).toContain(
-        "import Component from '/project/src/Badge/index.tsx'",
+        'import Component from "/project/src/Badge/index.tsx"',
       )
-      expect(result).toContain("title: 'Badge'")
+      expect(result).toContain('title: "Badge"')
       expect(result).toContain('component: Component')
       expect(result).toContain('export const Default')
     })
@@ -72,23 +80,23 @@ describe('rocketstoriesVitePlugin', () => {
       `)
 
       const result = await load(
-        '\0virtual:rocketstory:/project/src/Badge/index.tsx',
+        '\0virtual:rocketstory:/project/src/Badge/index.tsx.tsx',
       )
 
       expect(result).toContain(
-        "import { rocketstories } from '@vitus-labs/rocketstories'",
+        'import { rocketstories } from "@vitus-labs/rocketstories"',
       )
       expect(result).toContain(
-        "import Component from '/project/src/Badge/index.tsx'",
+        'import Component from "/project/src/Badge/index.tsx"',
       )
       expect(result).toContain('rocketstories(Component)')
-      expect(result).toContain("label: 'Badge'")
+      expect(result).toContain('label: "Badge"')
       expect(result).toContain('export default stories.init')
       expect(result).toContain('export const Default = stories.main()')
       expect(result).toContain(
-        "export const States = stories.dimension('state')",
+        'export const States = stories.dimension("state")',
       )
-      expect(result).toContain("export const Sizes = stories.dimension('size')")
+      expect(result).toContain('export const Sizes = stories.dimension("size")')
       expect(result).toContain('export const PseudoStates')
     })
 
@@ -98,10 +106,10 @@ describe('rocketstoriesVitePlugin', () => {
       )
 
       const result = await load(
-        '\0virtual:rocketstory:/project/src/Card/index.tsx',
+        '\0virtual:rocketstory:/project/src/Card/index.tsx.tsx',
       )
 
-      expect(result).toContain("title: 'Card'")
+      expect(result).toContain('title: "Card"')
     })
 
     it('should generate PseudoStates with pseudo-state rendering', async () => {
@@ -110,7 +118,7 @@ describe('rocketstoriesVitePlugin', () => {
       `)
 
       const result = await load(
-        '\0virtual:rocketstory:/project/src/Badge/index.tsx',
+        '\0virtual:rocketstory:/project/src/Badge/index.tsx.tsx',
       )
 
       expect(result).toContain('PseudoStates')
@@ -135,13 +143,32 @@ describe('rocketstoriesVitePlugin', () => {
       `)
 
       const result = await customLoad(
-        '\0virtual:rocketstory:/project/src/Badge/index.tsx',
+        '\0virtual:rocketstory:/project/src/Badge/index.tsx.tsx',
       )
 
       expect(result).toContain(
-        "import { storyOf } from '@my-org/tools-rocketstories'",
+        'import { storyOf } from "@my-org/tools-rocketstories"',
       )
       expect(result).toContain('storyOf(Component)')
+    })
+
+    it('should strip the .tsx suffix and escape interpolated names', async () => {
+      mockReadFile.mockResolvedValue(
+        'export default function Badge() { return <div /> }',
+      )
+
+      const result = await load(
+        "\0virtual:rocketstory:/project/src/it's/index.ts.tsx",
+      )
+
+      expect(mockReadFile).toHaveBeenLastCalledWith(
+        "/project/src/it's/index.ts",
+        'utf-8',
+      )
+      expect(result).toContain(
+        'import Component from "/project/src/it\'s/index.ts"',
+      )
+      expect(result).toContain('title: "it\'s"')
     })
   })
 })
