@@ -31,7 +31,7 @@ export default defineConfig({
 Parsed `package.json` of the consuming project, augmented with:
 
 - `bundleName` — camelCase package name (e.g. `@my-org/my-lib` → `myOrgMyLib`)
-- `externalDependencies` — merged `dependencies` + `peerDependencies` keys
+- `externalDependencies` — merged `dependencies` + `peerDependencies` + `optionalDependencies` keys
 
 ### `VL_CONFIG`
 

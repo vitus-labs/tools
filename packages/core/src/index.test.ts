@@ -381,6 +381,102 @@ describe('tools-core', () => {
     })
   })
 
+  describe('robustness regressions', () => {
+    it('should not throw at import time when package.json has no name', async () => {
+      vi.resetModules()
+      const dir = createTestDir({ packageJson: {} })
+      vi.spyOn(process, 'cwd').mockReturnValue(dir)
+
+      const mod = await import('./index.js')
+      expect(mod.PKG.bundleName).toBe('bundle')
+    })
+
+    it.each([
+      ['@my.org/my_lib.js', 'myOrgMy_libJs'],
+      ['@a/b/c-d', 'aBCD'],
+      ['my-cool-lib', 'myCoolLib'],
+      ['123-abc', '_123Abc'],
+      ['@@//', 'bundle'],
+    ])('should sanitize bundleName for %s', async (name, expected) => {
+      vi.resetModules()
+      const dir = createTestDir({ packageJson: { name } })
+      vi.spyOn(process, 'cwd').mockReturnValue(dir)
+
+      const mod = await import('./index.js')
+      expect(mod.PKG.bundleName).toBe(expected)
+      expect(mod.PKG.bundleName).toMatch(/^[A-Za-z_$][A-Za-z0-9_$]*$/)
+    })
+
+    it('should keep falsy default values in .get()', async () => {
+      vi.resetModules()
+      const dir = createTestDir({ vlConfig: { build: { a: 1 } } })
+      vi.spyOn(process, 'cwd').mockReturnValue(dir)
+
+      const mod = await import('./index.js')
+      const build = mod.VL_CONFIG('build')
+      expect(build.get('x', false)).toBe(false)
+      expect(build.get('x', 0)).toBe(0)
+      expect(build.get('x', '')).toBe('')
+      expect(build.get('x', null)).toBeNull()
+      expect(build.get('x')).toEqual({})
+      expect(build.get('a', 5)).toBe(1)
+    })
+
+    it('should not let an undefined user value override a default', async () => {
+      vi.resetModules()
+      const dir = createTestDir({})
+      writeFileSync(
+        path.join(dir, 'vl-tools.config.mjs'),
+        'export default { build: { sourceDir: undefined, outputDir: "out" } }',
+      )
+      vi.spyOn(process, 'cwd').mockReturnValue(dir)
+
+      const mod = await import('./index.js')
+      const merged = mod.VL_CONFIG('build').merge({
+        sourceDir: 'src',
+        outputDir: 'lib',
+      })
+      expect(merged.config).toEqual({ sourceDir: 'src', outputDir: 'out' })
+    })
+
+    it('should cache the parsed file in loadConfigParam', async () => {
+      vi.resetModules()
+      const dir = createTestDir({})
+      const file = path.join(dir, 'config.json')
+      writeFileSync(file, JSON.stringify({ a: 1 }))
+      vi.spyOn(process, 'cwd').mockReturnValue(dir)
+
+      const mod = await import('./index.js')
+      const getParam = mod.loadConfigParam('config.json')
+      expect(getParam('a')).toBe(1)
+
+      writeFileSync(file, JSON.stringify({ a: 2 }))
+      expect(getParam('a')).toBe(1)
+      // a different cwd is a different cache entry
+      const other = createTestDir({})
+      writeFileSync(path.join(other, 'config.json'), JSON.stringify({ a: 3 }))
+      vi.spyOn(process, 'cwd').mockReturnValue(other)
+      expect(getParam('a')).toBe(3)
+    })
+
+    it('should include optionalDependencies in externalDependencies', async () => {
+      vi.resetModules()
+      const dir = createTestDir({
+        packageJson: {
+          name: 'x',
+          dependencies: { a: '1' },
+          peerDependencies: { b: '1' },
+          optionalDependencies: { c: '1' },
+        },
+      })
+      vi.spyOn(process, 'cwd').mockReturnValue(dir)
+
+      const mod = await import('./index.js')
+      for (const id of ['a', 'b', 'c'])
+        expect(matchesExternal(mod.PKG.externalDependencies, id)).toBe(true)
+    })
+  })
+
   describe('findFile edge cases', () => {
     it('should not find directories, only files', async () => {
       vi.resetModules()
